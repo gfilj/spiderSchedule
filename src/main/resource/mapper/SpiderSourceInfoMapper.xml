@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.netease.spiderSchedule.mapper.SpiderSourceInfoMapper">
+	<sql id="Base_Column_List">
+		id, sourceid, appid, name, create_time, status, priority, update_time, openid, customid
+	</sql> 
+	<select id="selectAll" resultType="com.netease.spiderSchedule.model.SpiderSourceInfo">
+		select 
+		<include refid="Base_Column_List" />
+		from spider_source_info 
+		where status = 0 and openid is not null and openid != ''
+	</select>
+	
+	<select id="selectBySourceid" resultType="com.netease.spiderSchedule.model.SpiderSourceInfo" parameterType="java.lang.String">
+		select 
+		<include refid="Base_Column_List" />
+		from spider_source_info 
+		where sourceid = #{sourceid,jdbcType=VARCHAR}
+	</select>
+</mapper>
