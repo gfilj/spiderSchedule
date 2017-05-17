@@ -54,7 +54,7 @@ public class SpiderScheduleController extends AbstractVerticle {
 			return;
 		}
 		JsonArray arr = new JsonArray();
-		spiderSortService.getTask(taskNum, spiderRateInfoService).forEach((v)->arr.add(v));;
+		spiderSortService.getTask(taskNum, spiderRateInfoService).forEach((v)->arr.add(JsonObject.mapFrom(v)));
 		response.putHeader("content-type", "application/json").end(arr.encodePrettily());
 
 	}

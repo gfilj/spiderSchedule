@@ -1,6 +1,7 @@
 package com.netease.spiderSchedule.timer;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.netease.spiderSchedule.service.spiderRateInfo.SpiderRateInfoService;
 import com.netease.spiderSchedule.service.spiderSort.SpiderSortService;
@@ -11,17 +12,18 @@ public class SpiderScheduleTask {
 	private SpiderRateInfoService spiderRateInfoService;
 	
 	@Autowired
+	@Qualifier("smoothingAlgorithmSpiderSortService")
 	private SpiderSortService spiderSortService;
 	
 	/**
 	 * 凌晨统计
 	 */
 	public void zeroSchedule(){
-		spiderRateInfoService.generateRateMap(0,10);
+		spiderRateInfoService.generateRateMap(0,9);
 	}
 	
 	/**
-	 * 相隔5分钟计算任务事假
+	 * 相隔5分钟计算任务数
 	 */
 	
 	public void perFiveMinutesSchedule(){
