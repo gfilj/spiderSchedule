@@ -37,6 +37,9 @@ public class SpiderRecordInfo implements Serializable{
 		this.sourceId = sourceid;
 	}
 	public Date getCreate_time() {
+		if(create_time == null){
+			setCreate_time(new Date());
+		}
 		return create_time;
 	}
 	public void setCreate_time(Date create_time) {
