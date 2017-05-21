@@ -299,7 +299,7 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		generateRateMap(0, 15);
+		generateRateMap(0, 20);
 	}
 
 }
