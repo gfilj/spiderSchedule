@@ -10,13 +10,13 @@
 	<select id="selectAll" resultType="com.netease.spiderSchedule.model.SpiderRecordInfo">
 		select 
 		<include refid="Static_Column_List" />
-		from spider_record_info 
+		from spider_record_info_test 
 		where update_time > DATE_SUB(now(),INTERVAL 7 DAY)
 	</select>
 	<select id="selectInterval" resultType="com.netease.spiderSchedule.model.SpiderRecordInfo">
 		select 
 		<include refid="Static_Column_List" />
-		from spider_record_info 
+		from spider_record_info_test 
 		where to_days(now()) - to_days(date_format(update_time,"%Y-%m-%d")) &gt;= #{0,jdbcType=INTEGER}
 		and to_days(now()) - to_days(date_format(update_time,"%Y-%m-%d")) &lt; #{1,jdbcType=INTEGER} 
 	</select>
