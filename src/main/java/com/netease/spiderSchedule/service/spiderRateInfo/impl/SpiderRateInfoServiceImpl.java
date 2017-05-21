@@ -182,29 +182,29 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 		 * 
 		 * }
 		 */
-		int countTooOld = 0;
-		System.out.println("before add sourceId ---------------->" + rateMap.size());
-		for (SpiderSourceInfo spiderSourceInfo : spiderSourceInfoServie.selectAll()) {
-			String sourceid = spiderSourceInfo.getSourceid();
-			if (sourceid == null) {
-				continue;
-			}
-			if (!rateMap.containsKey(sourceid)) {
-				SpiderRateInfo spiderRateInfo = new SpiderRateInfo(spiderSourceInfo);
-				rateMap.put(sourceid, spiderRateInfo);
-
-				Calendar cal = Calendar.getInstance();
-				cal.setTime(spiderSourceInfo.getCreate_time());
-				int dayUpdate = cal.get(Calendar.DAY_OF_YEAR);
-				cal.setTimeInMillis(System.currentTimeMillis());
-				int dayCur = cal.get(Calendar.DAY_OF_YEAR);
-				if ((dayCur - dayUpdate) >= end) {
-					spiderRateInfo.setTooOld(true);
-					countTooOld++;
-				}
-			}
-		}
-		System.out.println("end add sourceId ----------->" + rateMap.size() + "--------->countTooOld" + countTooOld);
+//		int countTooOld = 0;
+//		System.out.println("before add sourceId ---------------->" + rateMap.size());
+//		for (SpiderSourceInfo spiderSourceInfo : spiderSourceInfoServie.selectAll()) {
+//			String sourceid = spiderSourceInfo.getSourceid();
+//			if (sourceid == null) {
+//				continue;
+//			}
+//			if (!rateMap.containsKey(sourceid)) {
+//				SpiderRateInfo spiderRateInfo = new SpiderRateInfo(spiderSourceInfo);
+//				rateMap.put(sourceid, spiderRateInfo);
+//
+//				Calendar cal = Calendar.getInstance();
+//				cal.setTime(spiderSourceInfo.getCreate_time());
+//				int dayUpdate = cal.get(Calendar.DAY_OF_YEAR);
+//				cal.setTimeInMillis(System.currentTimeMillis());
+//				int dayCur = cal.get(Calendar.DAY_OF_YEAR);
+//				if ((dayCur - dayUpdate) >= end) {
+//					spiderRateInfo.setTooOld(true);
+//					countTooOld++;
+//				}
+//			}
+//		}
+//		System.out.println("end add sourceId ----------->" + rateMap.size() + "--------->countTooOld" + countTooOld);
 		
 		// update time
 		Calendar cal = Calendar.getInstance();
