@@ -18,6 +18,14 @@ public class SpiderRecordInfo implements Serializable{
 	private String sourceId;	//源id
 	private Date create_time;//创建时间
 	private Date update_time;//最后更新时间
+	private String modifykey;
+	
+	public String getModifykey() {
+		return modifykey;
+	}
+	public void setModifykey(String modifykey) {
+		this.modifykey = modifykey;
+	}
 	public int getId() {
 		return id;
 	}

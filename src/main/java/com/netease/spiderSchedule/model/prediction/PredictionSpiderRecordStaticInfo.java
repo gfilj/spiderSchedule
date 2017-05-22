@@ -118,8 +118,72 @@ public class PredictionSpiderRecordStaticInfo {
 																				}
 																			}
 																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	
+	public void statistics(long timeDelay, SpiderRecordInfo v ) {
+		
+		if(timeDelay > 180 * 60 * 1000){
+			countUp++;
+		}else{
+			count180++;
+			if(timeDelay < 170 * 60 * 1000){
+				count170++;
+				if(timeDelay < 160 *60 * 1000) {
+					count160++;
+					if(timeDelay < 150 *60 * 1000) {
+						count150++;
+						if(timeDelay < 140 *60 * 1000) {
+							count140++;
+							if(timeDelay < 130 *60 * 1000) {
+								count130++;
+								if(timeDelay < 120 *60 * 1000) {
+									count120++;
+									if(timeDelay < 110 *60 * 1000) {
+										count110++;
+										if(timeDelay < 100 *60 * 1000) {
+											count100++;
+											if(timeDelay < 90 *60 * 1000) {
+												count90++;
+												if(timeDelay < 80 *60 * 1000) {
+													count80++;
+													if(timeDelay < 70 *60 * 1000) {
+														count70++;
+														if(timeDelay < 60 *60 * 1000) {
+															count60++;
+															if(timeDelay < 50 *60 * 1000) {
+																count50++;
+																if(timeDelay < 40 *60 * 1000) {
+																	count40++;
+																	if(timeDelay < 30 *60 * 1000) {
+																		count30++;
+																		if(timeDelay < 20 *60 * 1000) {
+																			count20++;
+																			if(timeDelay < 10 *60 * 1000) {
+																				count10++;
+																				if(timeDelay < 5 *60 * 1000) {
+																					count5++;
+																				}
+																			}
+																		}
 																	}else{
-//																		System.out.println(entry.getValue() +"-----"+ predictionSpiderRateInfoServiceImpl.getRateMap().get(entry.getKey().getSourceid()).getTimeSliceCount().toString());
+																		System.out.println(v);
 																	}
 																}
 															}
@@ -171,6 +235,207 @@ public class PredictionSpiderRecordStaticInfo {
 				+ ", count180=" + count180 + ", countUp=" + countUp + "]";
 	}
 
+
+	public int getCount5() {
+		return count5;
+	}
+
+
+	public void setCount5(int count5) {
+		this.count5 = count5;
+	}
+
+
+	public int getCount10() {
+		return count10;
+	}
+
+
+	public void setCount10(int count10) {
+		this.count10 = count10;
+	}
+
+
+	public int getCount20() {
+		return count20;
+	}
+
+
+	public void setCount20(int count20) {
+		this.count20 = count20;
+	}
+
+
+	public int getCount30() {
+		return count30;
+	}
+
+
+	public void setCount30(int count30) {
+		this.count30 = count30;
+	}
+
+
+	public int getCount40() {
+		return count40;
+	}
+
+
+	public void setCount40(int count40) {
+		this.count40 = count40;
+	}
+
+
+	public int getCount50() {
+		return count50;
+	}
+
+
+	public void setCount50(int count50) {
+		this.count50 = count50;
+	}
+
+
+	public int getCount60() {
+		return count60;
+	}
+
+
+	public void setCount60(int count60) {
+		this.count60 = count60;
+	}
+
+
+	public int getCount70() {
+		return count70;
+	}
+
+
+	public void setCount70(int count70) {
+		this.count70 = count70;
+	}
+
+
+	public int getCount80() {
+		return count80;
+	}
+
+
+	public void setCount80(int count80) {
+		this.count80 = count80;
+	}
+
+
+	public int getCount90() {
+		return count90;
+	}
+
+
+	public void setCount90(int count90) {
+		this.count90 = count90;
+	}
+
+
+	public int getCount100() {
+		return count100;
+	}
+
+
+	public void setCount100(int count100) {
+		this.count100 = count100;
+	}
+
+
+	public int getCount110() {
+		return count110;
+	}
+
+
+	public void setCount110(int count110) {
+		this.count110 = count110;
+	}
+
+
+	public int getCount120() {
+		return count120;
+	}
+
+
+	public void setCount120(int count120) {
+		this.count120 = count120;
+	}
+
+
+	public int getCount130() {
+		return count130;
+	}
+
+
+	public void setCount130(int count130) {
+		this.count130 = count130;
+	}
+
+
+	public int getCount140() {
+		return count140;
+	}
+
+
+	public void setCount140(int count140) {
+		this.count140 = count140;
+	}
+
+
+	public int getCount150() {
+		return count150;
+	}
+
+
+	public void setCount150(int count150) {
+		this.count150 = count150;
+	}
+
+
+	public int getCount160() {
+		return count160;
+	}
+
+
+	public void setCount160(int count160) {
+		this.count160 = count160;
+	}
+
+
+	public int getCount170() {
+		return count170;
+	}
+
+
+	public void setCount170(int count170) {
+		this.count170 = count170;
+	}
+
+
+	public int getCount180() {
+		return count180;
+	}
+
+
+	public void setCount180(int count180) {
+		this.count180 = count180;
+	}
+
+
+	public int getCountUp() {
+		return countUp;
+	}
+
+
+	public void setCountUp(int countUp) {
+		this.countUp = countUp;
+	}
+	
+	
 
 
 }

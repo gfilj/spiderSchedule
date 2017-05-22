@@ -20,4 +20,25 @@
 		where to_days(now()) - to_days(date_format(update_time,"%Y-%m-%d")) &gt;= #{0,jdbcType=INTEGER}
 		and to_days(now()) - to_days(date_format(update_time,"%Y-%m-%d")) &lt; #{1,jdbcType=INTEGER} 
 	</select>
+	<select id="selectIntervalDataBase" resultType="com.netease.spiderSchedule.model.SpiderRecordInfo" statementType="STATEMENT">
+		select 
+		<include refid="Static_Column_List" />
+		from ${param1}
+		where to_days(now()) - to_days(date_format(update_time,"%Y-%m-%d")) &gt;= ${param2}
+		and to_days(now()) - to_days(date_format(update_time,"%Y-%m-%d")) &lt; ${param3} 
+	</select>
+	
+	<select id="selectTest1" resultType="com.netease.spiderSchedule.model.SpiderRecordInfo">
+		select 
+		c.id, c.appid, c.sourceid, c.create_time, c.update_time
+		from spider_record_info_test_1 d left join (select b.* from spider_record_info_test a,spider_record_info_test_1 b where a.modifykey = b.modifykey) as c on d.id = c.id 
+		where c.id is not null and  to_days(now()) - to_days(date_format(c.update_time,"%Y-%m-%d")) >= 0 and to_days(now()) - to_days(date_format(c.update_time,"%Y-%m-%d")) &lt; 1
+	</select>
+	
+	<select id="selectTest2" resultType="com.netease.spiderSchedule.model.SpiderRecordInfo">
+		select 
+		c.id, c.appid, c.sourceid, c.create_time, c.update_time
+		from spider_record_info_test d left join (select a.* from spider_record_info_test a,spider_record_info_test_1 b where a.modifykey = b.modifykey) as c on d.id = c.id 
+		where c.id is not null and  to_days(now()) - to_days(date_format(c.update_time,"%Y-%m-%d")) >= 0 and to_days(now()) - to_days(date_format(c.update_time,"%Y-%m-%d")) &lt; 1
+	</select>
 </mapper>

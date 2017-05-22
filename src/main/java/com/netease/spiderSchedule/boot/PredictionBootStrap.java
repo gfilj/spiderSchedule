@@ -128,10 +128,6 @@ public class PredictionBootStrap {
 			spiderRecordStaticInfo.statistics(entry, timeDelay, predictionSpiderRateInfoServiceImpl);
 		}
 		System.out.println(spiderRecordStaticInfo);
-		try {
-			System.in.read();
-		} catch (Exception e) {
-		}
 	}
 
 }
