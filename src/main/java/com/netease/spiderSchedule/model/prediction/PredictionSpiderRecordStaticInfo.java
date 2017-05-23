@@ -1,6 +1,5 @@
 package com.netease.spiderSchedule.model.prediction;
 
-import java.util.Map;
 import java.util.Map.Entry;
 
 import com.netease.spiderSchedule.model.SpiderRecordInfo;
@@ -28,6 +27,28 @@ public class PredictionSpiderRecordStaticInfo {
 	int count170 = 0;
 	int count180 = 0;
 	int countUp = 0;
+	int countAll = 0;
+	
+	double count5Percent = 0;
+	double count10Percent = 0;
+	double count20Percent = 0;
+	double count30Percent = 0;
+	double count40Percent = 0;
+	double count50Percent = 0;
+	double count60Percent = 0;
+	double count70Percent = 0;
+	double count80Percent = 0;
+	double count90Percent = 0;
+	double count100Percent = 0;
+	double count110Percent = 0;
+	double count120Percent = 0;
+	double count130Percent = 0;
+	double count140Percent = 0;
+	double count150Percent = 0;
+	double count160Percent = 0;
+	double count170Percent = 0;
+	double count180Percent = 0;
+	double countUpPercent = 0;
 	
 	public void statistics(Entry<SpiderRecordInfo, PredictionSpiderRecordInfo> entry, long timeDelay, PredictionSpiderRateInfoService predictionSpiderRateInfoServiceImpl) {
 //		if (timeDelay < 5 * 60 * 1000) {
@@ -134,6 +155,7 @@ public class PredictionSpiderRecordStaticInfo {
 				}
 			}
 		}
+		generatePercent();
 	}
 	
 	
@@ -182,8 +204,6 @@ public class PredictionSpiderRecordStaticInfo {
 																				}
 																			}
 																		}
-																	}else{
-																		System.out.println(v);
 																	}
 																}
 															}
@@ -200,33 +220,55 @@ public class PredictionSpiderRecordStaticInfo {
 				}
 			}
 		}
+		generatePercent();
 	}
 
-
+	public void generatePercent(){
+		countAll = count180+countUp;
+		count5Percent = count5 * 100d / countAll;
+		count10Percent = count10 * 100d / countAll;
+		count20Percent = count20 * 100d / countAll;
+		count30Percent = count30 * 100d / countAll;
+		count40Percent = count40 * 100d / countAll;
+		count50Percent = count50 * 100d / countAll;
+		count60Percent = count60 * 100d / countAll;
+		count70Percent = count70 * 100d / countAll;
+		count80Percent = count80 * 100d / countAll;
+		count90Percent = count90 * 100d / countAll;
+		count100Percent = count100 * 100d / countAll;
+		count110Percent = count110 * 100d / countAll;
+		count120Percent = count120 * 100d / countAll;
+		count130Percent = count130 * 100d / countAll;
+		count140Percent = count140 * 100d / countAll;
+		count150Percent = count150 * 100d / countAll;
+		count160Percent = count160 * 100d / countAll;
+		count170Percent = count170 * 100d / countAll;
+		count180Percent = count180 * 100d / countAll;
+		countUpPercent = countAll * 100d / countAll;
+	}
 	@Override
 	public String toString() {
-		int countAll = count180+countUp;
 		System.out.println("countAll:" + countAll);
-		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 5 minute is " + (count5 * 100d /countAll) + "%");
-		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 10 minute is " + (count10 * 100d /countAll) + "%");
-		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 20 minute is " + (count20 * 100d /countAll) + "%");
-		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 30 minute is " + (count30 * 100d /countAll) + "%");
-		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 40 minute is " + (count40 * 100d /countAll) + "%");
-		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 50 minute is " + (count50 * 100d /countAll) + "%");
-		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 60 minute is " + (count60 * 100d /countAll) + "%");
-		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 70 minute is " + (count70 * 100d /countAll) + "%");
-		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 80 minute is " + (count80 * 100d /countAll) + "%");
-		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 90 minute is " + (count90 * 100d /countAll) + "%");
-		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 100 minute is " + (count100 * 100d /countAll) + "%");
-		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 110 minute is " + (count110 * 100d /countAll) + "%");
-		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 120 minute is " + (count120 * 100d /countAll) + "%");
-		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 130 minute is " + (count130* 100d /countAll) + "%");
-		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 140 minute is " + (count140 * 100d /countAll) + "%");
-		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 150 minute is " + (count150 * 100d /countAll) + "%");
-		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 160 minute is " + (count160 * 100d /countAll) + "%");
-		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 170 minute is " + (count170 * 100d /countAll) + "%");
-		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 180 minute is " + (count180 * 100d /countAll) + "%");
-		System.out.println("PredictionSpiderRecordStaticInfo the rate of up 180 minute is " + (countUp * 100d /countAll) + "%");
+		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 5 minute is " + count5Percent + "%");
+		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 10 minute is " + count10Percent + "%");
+		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 20 minute is " + count20Percent + "%");
+		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 30 minute is " + count30Percent + "%");
+		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 40 minute is " + count40Percent + "%");
+		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 50 minute is " + count50Percent + "%");
+		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 60 minute is " + count60Percent + "%");
+		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 70 minute is " + count70Percent + "%");
+		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 80 minute is " + count80Percent + "%");
+		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 90 minute is " + count90Percent + "%");
+		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 100 minute is " + count100Percent + "%");
+		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 110 minute is " + count110Percent + "%");
+		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 120 minute is " + count120Percent + "%");
+		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 130 minute is " + count130Percent + "%");
+		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 140 minute is " + count140Percent + "%");
+		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 150 minute is " + count150Percent + "%");
+		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 160 minute is " + count160Percent + "%");
+		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 170 minute is " + count170Percent + "%");
+		System.out.println("PredictionSpiderRecordStaticInfo the rate of low 180 minute is " + count180Percent+ "%");
+		System.out.println("PredictionSpiderRecordStaticInfo the rate of up 180 minute is " + countUpPercent + "%");
 		return "PredictionSpiderRecordStaticInfo [count5=" + count5 + ", count10=" + count10 + ", count20=" + count20
 				+ ", count30=" + count30 + ", count40=" + count40 + ", count50=" + count50 + ", count60=" + count60
 				+ ", count70=" + count70 + ", count80=" + count80 + ", count90=" + count90 + ", count100=" + count100
@@ -434,8 +476,216 @@ public class PredictionSpiderRecordStaticInfo {
 	public void setCountUp(int countUp) {
 		this.countUp = countUp;
 	}
-	
-	
 
 
+	public int getCountAll() {
+		return countAll;
+	}
+
+
+	public void setCountAll(int countAll) {
+		this.countAll = countAll;
+	}
+
+
+	public double getCount5Percent() {
+		return count5Percent;
+	}
+
+
+	public void setCount5Percent(double count5Percent) {
+		this.count5Percent = count5Percent;
+	}
+
+
+	public double getCount10Percent() {
+		return count10Percent;
+	}
+
+
+	public void setCount10Percent(double count10Percent) {
+		this.count10Percent = count10Percent;
+	}
+
+
+	public double getCount20Percent() {
+		return count20Percent;
+	}
+
+
+	public void setCount20Percent(double count20Percent) {
+		this.count20Percent = count20Percent;
+	}
+
+
+	public double getCount30Percent() {
+		return count30Percent;
+	}
+
+
+	public void setCount30Percent(double count30Percent) {
+		this.count30Percent = count30Percent;
+	}
+
+
+	public double getCount40Percent() {
+		return count40Percent;
+	}
+
+
+	public void setCount40Percent(double count40Percent) {
+		this.count40Percent = count40Percent;
+	}
+
+
+	public double getCount50Percent() {
+		return count50Percent;
+	}
+
+
+	public void setCount50Percent(double count50Percent) {
+		this.count50Percent = count50Percent;
+	}
+
+
+	public double getCount60Percent() {
+		return count60Percent;
+	}
+
+
+	public void setCount60Percent(double count60Percent) {
+		this.count60Percent = count60Percent;
+	}
+
+
+	public double getCount70Percent() {
+		return count70Percent;
+	}
+
+
+	public void setCount70Percent(double count70Percent) {
+		this.count70Percent = count70Percent;
+	}
+
+
+	public double getCount80Percent() {
+		return count80Percent;
+	}
+
+
+	public void setCount80Percent(double count80Percent) {
+		this.count80Percent = count80Percent;
+	}
+
+
+	public double getCount90Percent() {
+		return count90Percent;
+	}
+
+
+	public void setCount90Percent(double count90Percent) {
+		this.count90Percent = count90Percent;
+	}
+
+
+	public double getCount100Percent() {
+		return count100Percent;
+	}
+
+
+	public void setCount100Percent(double count100Percent) {
+		this.count100Percent = count100Percent;
+	}
+
+
+	public double getCount110Percent() {
+		return count110Percent;
+	}
+
+
+	public void setCount110Percent(double count110Percent) {
+		this.count110Percent = count110Percent;
+	}
+
+
+	public double getCount120Percent() {
+		return count120Percent;
+	}
+
+
+	public void setCount120Percent(double count120Percent) {
+		this.count120Percent = count120Percent;
+	}
+
+
+	public double getCount130Percent() {
+		return count130Percent;
+	}
+
+
+	public void setCount130Percent(double count130Percent) {
+		this.count130Percent = count130Percent;
+	}
+
+
+	public double getCount140Percent() {
+		return count140Percent;
+	}
+
+
+	public void setCount140Percent(double count140Percent) {
+		this.count140Percent = count140Percent;
+	}
+
+
+	public double getCount150Percent() {
+		return count150Percent;
+	}
+
+
+	public void setCount150Percent(double count150Percent) {
+		this.count150Percent = count150Percent;
+	}
+
+
+	public double getCount160Percent() {
+		return count160Percent;
+	}
+
+
+	public void setCount160Percent(double count160Percent) {
+		this.count160Percent = count160Percent;
+	}
+
+
+	public double getCount170Percent() {
+		return count170Percent;
+	}
+
+
+	public void setCount170Percent(double count170Percent) {
+		this.count170Percent = count170Percent;
+	}
+
+
+	public double getCount180Percent() {
+		return count180Percent;
+	}
+
+
+	public void setCount180Percent(double count180Percent) {
+		this.count180Percent = count180Percent;
+	}
+
+
+	public double getCountUpPercent() {
+		return countUpPercent;
+	}
+
+
+	public void setCountUpPercent(double countUpPercent) {
+		this.countUpPercent = countUpPercent;
+	}
+	
+	
 }

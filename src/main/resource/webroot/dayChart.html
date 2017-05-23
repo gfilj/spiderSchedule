@@ -3,9 +3,13 @@
 		<meta charset="utf-8">
 		<title>dayChart</title>
 		<script src="../static/Chart.js"></script>
+		<style> 
+			body{ text-align:center} 
+			.div{ margin:0 auto; width:400px; height:100px; border:1px solid #F00} 
+		</style> 
 	</head>
 	<body>
-		<div style="width:50%">
+		<div style="width:70%">
 			<div>
 				<canvas id="canvas" height="50%" width="70%"></canvas>
 			</div>
@@ -28,12 +32,9 @@
 		{
 			if (xmlhttp.readyState==4 && xmlhttp.status==200)
 			{
-				   var result = xmlhttp.responseText;
-
-                   //使用eval函数使返回的字符串变成js对象
-                   var datas = eval("(" + result + ")");
-
-				var randomScalingFactor = function(){ return Math.round(Math.random()*100)};
+			   	var result = xmlhttp.responseText;
+                //使用eval函数使返回的字符串变成js对象
+                var datas = eval("(" + result + ")");
 				var lineChartData = {
 					labels : ["5","10","20","30","40","50","60","70","80","90","100","110","120","130","140","150","160","170","180","up"],
 					datasets : [
@@ -64,7 +65,7 @@
 							        datas[0].count160,
 							        datas[0].count170,
 							        datas[0].count180,
-							        100]
+							        datas[0].countAll]
 						},
 						{
 							label: "My Second dataset",
@@ -93,7 +94,7 @@
 							        datas[1].count160,
 							        datas[1].count170,
 							        datas[1].count180,
-							        100]
+							        datas[1].countAll]
 						}
 					]
 		
