@@ -5,13 +5,17 @@
 		<script src="../static/Chart.js"></script>
 		<style> 
 			body{ text-align:center} 
-			.div{ margin:0 auto; width:400px; height:100px; border:1px solid #F00} 
 		</style> 
 	</head>
 	<body>
-		<div style="width:70%">
+		<div style="width:50%f " >
 			<div>
 				<canvas id="canvas" height="50%" width="70%"></canvas>
+			</div>
+		</div>
+		<div style="width:50%" >
+			<div>
+				<canvas id="canvas1" height="50%" width="70%"></canvas>
 			</div>
 		</div>
 
@@ -103,6 +107,77 @@
 				window.myLine = new Chart(ctx).Line(lineChartData, {
 					responsive: true
 				});
+				
+				
+				
+				var lineChartData = {
+						labels : ["5","10","20","30","40","50","60","70","80","90","100","110","120","130","140","150","160","170","180","up"],
+						datasets : [
+							{
+								label: "My First dataset",
+								fillColor : "rgba(220,220,220,0.2)",
+								strokeColor : "rgba(220,220,220,1)",
+								pointColor : "rgba(220,220,220,1)",
+								pointStrokeColor : "#fff",
+								pointHighlightFill : "#fff",
+								pointHighlightStroke : "rgba(220,220,220,1)",
+								data : [datas[0].count5Percent,
+								        datas[0].count10Percent,
+								        datas[0].count20Percent,
+								        datas[0].count30Percent,
+								        datas[0].count40Percent,
+								        datas[0].count50Percent,
+								        datas[0].count60Percent,
+								        datas[0].count70Percent,
+								        datas[0].count80Percent,
+								        datas[0].count90Percent,
+								        datas[0].count100Percent,
+								        datas[0].count110Percent,
+								        datas[0].count120Percent,
+								        datas[0].count130Percent,
+								        datas[0].count140Percent,
+								        datas[0].count150Percent,
+								        datas[0].count160Percent,
+								        datas[0].count170Percent,
+								        datas[0].count180Percent,
+								        datas[0].countUpPercent]
+							},
+							{
+								label: "My Second dataset",
+								fillColor : "rgba(151,187,205,0.2)",
+								strokeColor : "rgba(151,187,205,1)",
+								pointColor : "rgba(151,187,205,1)",
+								pointStrokeColor : "#fff",
+								pointHighlightFill : "#fff",
+								pointHighlightStroke : "rgba(151,187,205,1)",
+								data : [datas[1].count5Percent,
+								        datas[1].count10Percent,
+								        datas[1].count20Percent,
+								        datas[1].count30Percent,
+								        datas[1].count40Percent,
+								        datas[1].count50Percent,
+								        datas[1].count60Percent,
+								        datas[1].count70Percent,
+								        datas[1].count80Percent,
+								        datas[1].count90Percent,
+								        datas[1].count100Percent,
+								        datas[1].count110Percent,
+								        datas[1].count120Percent,
+								        datas[1].count130Percent,
+								        datas[1].count140Percent,
+								        datas[1].count150Percent,
+								        datas[1].count160Percent,
+								        datas[1].count170Percent,
+								        datas[1].count180Percent,
+								        datas[1].countUpPercent]
+							}
+						]
+			
+					}
+					var ctx = document.getElementById("canvas1").getContext("2d");
+					window.myLine = new Chart(ctx).Line(lineChartData, {
+						responsive: true
+					});
 			}
 			
 		}

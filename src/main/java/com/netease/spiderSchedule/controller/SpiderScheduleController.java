@@ -82,6 +82,16 @@ public class SpiderScheduleController extends AbstractVerticle {
 			arr.add(JsonObject.mapFrom(spiderRecordStaticInfo1));
 			ctx.response().end(arr.encodePrettily());
 		});
+		
+		router.post("/detailSourceId").handler(ctx -> {
+			ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, "text/plain");
+			JsonArray arr = new JsonArray();
+			spiderRateInfoService.getRateMap().forEach((k,v)->{
+				
+				arr.add(JsonObject.mapFrom(v));
+			});
+			ctx.response().end(arr.encodePrettily());
+		});
 
 		vertx.createHttpServer().requestHandler(router::accept).listen(8079);
 	}
