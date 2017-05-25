@@ -101,7 +101,7 @@ public class SpiderScheduleDto implements Comparable<SpiderScheduleDto> {
 				this.score = -1;
 			}
 		} else {
-			if (delayVal >= DelayLevel.ONE.getDelayVal()) {
+			if (delayVal >= DelayLevel.TWO.getDelayVal()) {
 				this.score = delayVal * RateLevel.TEN.getRateVal();
 			} else {
 				this.score = delayVal * rate;

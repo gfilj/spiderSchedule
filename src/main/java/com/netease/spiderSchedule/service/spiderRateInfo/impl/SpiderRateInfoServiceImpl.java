@@ -163,28 +163,12 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 				spiderRateInfo.getTimeSlicePredict().put(i, s);
 			}
 		}
-		//
-		// rateMap.forEach((r,v)->System.out.println(v.getTimeSliceCount() +
-		// "-----" + v.getTimeSlicePredict()));
 		// makeup all source
-		/*
-		 * for(SpiderSourceInfo
-		 * spiderSourceInfo:spiderSourceInfoServie.selectAll()){
-		 * if(spiderSourceInfo.getSourceid() == null){ continue; }
-		 * SpiderRateInfo spiderRateInfo = new SpiderRateInfo(spiderSourceInfo);
-		 * Calendar cal = Calendar.getInstance();
-		 * cal.setTime(spiderSourceInfo.getUpdate_time()); int dayUpdate =
-		 * cal.get(Calendar.DAY_OF_YEAR);
-		 * cal.setTimeInMillis(System.currentTimeMillis()); int dayCur=
-		 * cal.get(Calendar.DAY_OF_YEAR); if((dayCur - dayUpdate) > end){
-		 * spiderRateInfo.setTooOld(true); }
-		 * rateMap.put(spiderRateInfo.getSourceId(), spiderRateInfo);
-		 * 
-		 * }
-		 */
+		List<SpiderSourceInfo> sourceList = spiderSourceInfoServie.selectAll();
+
 		int countTooOld = 0;
 		System.out.println("before add sourceId ---------------->" + rateMap.size());
-		for (SpiderSourceInfo spiderSourceInfo : spiderSourceInfoServie.selectAll()) {
+		for (SpiderSourceInfo spiderSourceInfo : sourceList) {
 			String sourceid = spiderSourceInfo.getSourceid();
 			if (sourceid == null) {
 				continue;
@@ -199,24 +183,26 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 				cal.setTimeInMillis(System.currentTimeMillis());
 				int dayCur = cal.get(Calendar.DAY_OF_YEAR);
 				if ((dayCur - dayUpdate) >= end) {
-//					spiderRateInfo.setTooOld(true);
+					spiderRateInfo.setTooOld(true);
 					countTooOld++;
 				}
 			}
 		}
 		System.out.println("end add sourceId ----------->" + rateMap.size() + "--------->countTooOld" + countTooOld);
-		
+
 		// update time
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(new Date());
 		cal.add(Calendar.DAY_OF_MONTH, -1);
 		rateMap.forEach((r, v) -> {
+			System.out.println(v);
 			if (v.isTooOld()) {
 				v.setUpdate_time(cal.getTime());
-			}else{
+			} else {
 				v.setUpdate_time(new Date());
 			}
 		});
+		
 	}
 
 	public Double getValueST(LinkedList<Double> spiderRateInfoS, int i) {
@@ -299,7 +285,7 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		generateRateMap(0, 20);
+//		generateRateMap(0, 20);
 	}
 
 }

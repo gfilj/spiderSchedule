@@ -15,21 +15,21 @@ public class PredictionSpiderRateInfoServiceImpl extends SpiderRateInfoServiceIm
 
 	private TimeSimulator timeSimulator;
 
-//	@Override
-//	public void generateRateMap(int start, int end) {
-//		super.generateRateMap(start, end);
-//		// updateTime
-//		Calendar cal = Calendar.getInstance();
-//		cal.setTime(timeSimulator.getDate());
-//		cal.add(Calendar.DAY_OF_MONTH, -1);
-//		rateMap.forEach((k, v) -> {
-//			if (v.isTooOld()) {
-//				v.setUpdate_time(cal.getTime());
-//			}else{
-//				v.setUpdate_time(timeSimulator.getDate());
-//			}
-//		});
-//	}
+	@Override
+	public void generateRateMap(int start, int end) {
+		super.generateRateMap(start, end);
+		// updateTime
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(timeSimulator.getDate());
+		cal.add(Calendar.DAY_OF_MONTH, -1);
+		rateMap.forEach((k, v) -> {
+			if (v.isTooOld()) {
+				v.setUpdate_time(cal.getTime());
+			}else{
+				v.setUpdate_time(timeSimulator.getDate());
+			}
+		});
+	}
 
 	@Override
 	public void updateRateMap(SpiderScheduleDto spiderScheduleDto) {

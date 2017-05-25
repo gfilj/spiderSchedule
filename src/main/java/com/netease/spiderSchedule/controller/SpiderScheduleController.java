@@ -1,7 +1,10 @@
 package com.netease.spiderSchedule.controller;
 
+import java.util.List;
+
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import com.netease.spiderSchedule.boot.PredictionBootStrap;
 import com.netease.spiderSchedule.model.SpiderRateInfoDto;
 import com.netease.spiderSchedule.model.prediction.PredictionSpiderRecordStaticInfo;
 import com.netease.spiderSchedule.service.spiderRateInfo.SpiderRateInfoService;
@@ -21,6 +24,7 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.StaticHandler;
+import io.vertx.ext.web.handler.TimeoutHandler;
 
 public class SpiderScheduleController extends AbstractVerticle {
 
@@ -29,10 +33,24 @@ public class SpiderScheduleController extends AbstractVerticle {
 	private static SpiderRateInfoService spiderRateInfoService;
 	private static SpiderSortService spiderSortService;
 	private static SpiderRecodeInfoService spiderRecordInfoService;
+	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo1;
+	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo2;
+	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo3;
+	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo4;
+	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo5;
+	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo6;
+	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo7;
 
 	public static void main(String[] args) {
 		context = new ClassPathXmlApplicationContext("classpath*:config/spring-application.xml");
 		context.start();
+		predirctSpiderRecordInfo1 = PredictionBootStrap.predirctSpiderRecordInfo(context, 1);
+		predirctSpiderRecordInfo2 = PredictionBootStrap.predirctSpiderRecordInfo(context, 2);
+		predirctSpiderRecordInfo3 = PredictionBootStrap.predirctSpiderRecordInfo(context, 3);
+		predirctSpiderRecordInfo4 = PredictionBootStrap.predirctSpiderRecordInfo(context, 4);
+		predirctSpiderRecordInfo5 = PredictionBootStrap.predirctSpiderRecordInfo(context, 5);
+		predirctSpiderRecordInfo6 = PredictionBootStrap.predirctSpiderRecordInfo(context, 6);
+		predirctSpiderRecordInfo7 = PredictionBootStrap.predirctSpiderRecordInfo(context, 7);
 		spiderRateInfoService = (SpiderRateInfoServiceImpl) context.getBean("spiderRateInfoService");
 		spiderSortService = (SpiderSortServiceImpl) context.getBean("smoothingAlgorithmSpiderSortService");
 		spiderRecordInfoService = (SpiderRecodeInfoService) context.getBean("spiderRecordInfoServie");
@@ -67,13 +85,13 @@ public class SpiderScheduleController extends AbstractVerticle {
 			ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, "text/plain");
 			// note the form attribute matches the html form element name.
 			PredictionSpiderRecordStaticInfo spiderRecordStaticInfo = new PredictionSpiderRecordStaticInfo();
-			spiderRecordInfoService.selectIntervalDataBase("spider_record_info_test", 0, 1).forEach((v) -> {
+			spiderRecordInfoService.selectIntervalDataBase("spider_record_info_test", 1, 2).forEach((v) -> {
 				long timeDelay = v.getUpdate_time().getTime() - v.getCreate_time().getTime();
 				spiderRecordStaticInfo.statistics(timeDelay, v);
 			});
-			
+
 			PredictionSpiderRecordStaticInfo spiderRecordStaticInfo1 = new PredictionSpiderRecordStaticInfo();
-			spiderRecordInfoService.selectIntervalDataBase("spider_record_info_test_1", 0, 1).forEach((v) -> {
+			spiderRecordInfoService.selectIntervalDataBase("spider_record_info_test_1", 1, 2).forEach((v) -> {
 				long timeDelay = v.getUpdate_time().getTime() - v.getCreate_time().getTime();
 				spiderRecordStaticInfo1.statistics(timeDelay, v);
 			});
@@ -82,14 +100,31 @@ public class SpiderScheduleController extends AbstractVerticle {
 			arr.add(JsonObject.mapFrom(spiderRecordStaticInfo1));
 			ctx.response().end(arr.encodePrettily());
 		});
-		
 		router.post("/detailSourceId").handler(ctx -> {
 			ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, "text/plain");
 			JsonArray arr = new JsonArray();
-			spiderRateInfoService.getRateMap().forEach((k,v)->{
-				
+			spiderRateInfoService.getRateMap().forEach((k, v) -> {
+
 				arr.add(JsonObject.mapFrom(v));
 			});
+			ctx.response().end(arr.encodePrettily());
+		});
+		router.post("/predictRecord/:predictDay").handler(ctx -> {
+			int predictDay = 0;
+			try {
+				predictDay = Integer.parseInt(ctx.request().getParam("predictDay"));
+			} catch (Exception e) {
+				sendError(400, ctx.response());
+				return;
+			}
+
+			ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, "text/plain");
+			JsonArray arr = new JsonArray();
+
+			predirctSpiderRecordInfo1.forEach((v) -> {
+				arr.add(JsonObject.mapFrom(v));
+			});
+
 			ctx.response().end(arr.encodePrettily());
 		});
 

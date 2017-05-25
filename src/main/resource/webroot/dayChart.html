@@ -8,12 +8,12 @@
 		</style> 
 	</head>
 	<body>
-		<div style="width:50%f " >
+		<!-- <div style="width:50%;margin:auto " >
 			<div>
 				<canvas id="canvas" height="50%" width="70%"></canvas>
 			</div>
-		</div>
-		<div style="width:50%" >
+		</div> -->
+		<div style="width:50%;margin:auto" >
 			<div>
 				<canvas id="canvas1" height="50%" width="70%"></canvas>
 			</div>
@@ -39,7 +39,7 @@
 			   	var result = xmlhttp.responseText;
                 //使用eval函数使返回的字符串变成js对象
                 var datas = eval("(" + result + ")");
-				var lineChartData = {
+				/* var lineChartData = {
 					labels : ["5","10","20","30","40","50","60","70","80","90","100","110","120","130","140","150","160","170","180","up"],
 					datasets : [
 						{
@@ -107,11 +107,11 @@
 				window.myLine = new Chart(ctx).Line(lineChartData, {
 					responsive: true
 				});
-				
+				 */
 				
 				
 				var lineChartData = {
-						labels : ["5","10","20","30","40","50","60","70","80","90","100","110","120","130","140","150","160","170","180","up"],
+						labels : ["5","10","20","30","40","50","60","70","80","90","100","110","120","130","140","150","160","170","180","190","200","210","220","230","240","all"],
 						datasets : [
 							{
 								label: "My First dataset",
@@ -140,7 +140,13 @@
 								        datas[0].count160Percent,
 								        datas[0].count170Percent,
 								        datas[0].count180Percent,
-								        datas[0].countUpPercent]
+								        datas[0].count190Percent,
+								        datas[0].count200Percent,
+								        datas[0].count210Percent,
+								        datas[0].count220Percent,
+								        datas[0].count230Percent,
+								        datas[0].count240Percent,
+								        datas[0].countAllPercent]
 							},
 							{
 								label: "My Second dataset",
@@ -169,7 +175,13 @@
 								        datas[1].count160Percent,
 								        datas[1].count170Percent,
 								        datas[1].count180Percent,
-								        datas[1].countUpPercent]
+								        datas[1].count190Percent,
+								        datas[1].count200Percent,
+								        datas[1].count210Percent,
+								        datas[1].count220Percent,
+								        datas[1].count230Percent,
+								        datas[1].count240Percent,
+								        datas[1].countAllPercent]
 							}
 						]
 			
@@ -181,8 +193,10 @@
 			}
 			
 		}
-		xmlhttp.open("POST","/statistics",true);
-		xmlhttp.send();
+		/* xmlhttp.open("POST","/statistics",true);
+		xmlhttp.send(); */
+		xmlhttp.open("POST","/predictRecord/1",true);
+		xmlhttp.send(); 
 	}	
 
 	window.onload = function(){
