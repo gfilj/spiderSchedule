@@ -115,15 +115,6 @@ public class MaxHeap<E extends Comparable<E>> {
 		}while(old != 0);
 	}
 	
-//		MaxHeap<E> heap = new MaxHeap<E>();
-//		for (int i = 0; i < array.length; i++) {
-//			heap.add(array[i]);
-//		}
-//
-//		System.out.println("Debug: heap is     " + heap);
-//
-//		for (int i = 0; i < array.length; i++) {
-//			array[i] = heap.removeTop();
 
 	public static void main(String[] args) {
 		MaxHeap<SpiderScheduleDto> heapSort = new MaxHeap<SpiderScheduleDto>();

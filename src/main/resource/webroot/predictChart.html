@@ -1,0 +1,136 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>predictChart</title>
+		<script src="../static/Chart.js"></script>
+		<style> 
+			body{ text-align:center} 
+		</style> 
+	</head>
+	<body>
+		<div id="content"></div>
+
+
+<script type="text/javascript">
+	function loadChart()
+	{
+		var xmlhttp;
+		if (window.XMLHttpRequest)
+		{
+			xmlhttp=new XMLHttpRequest();
+		}
+		else
+		{
+			xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		xmlhttp.onreadystatechange=function()
+		{
+			if (xmlhttp.readyState==4 && xmlhttp.status==200)
+			{
+			   	var result = xmlhttp.responseText;
+                //使用eval函数使返回的字符串变成js对象
+                var responseHtml = '';
+                var datas = eval("(" + result + ")");
+                for (var i=0; i < datas.length; i+=2) {
+                	var dayBefore = (i/2)+1;
+   	 				responseHtml += '<div style="width:50%;margin:auto" >' + dayBefore +'天的预测数据' + '<div><canvas id="canvas'+ dayBefore +'" height="50%" width="70%"></canvas></div></div>';
+				}
+				document.getElementById("content").innerHTML = responseHtml;
+				 for (var i=0; i < datas.length; i+=2) {
+	                	var dayBefore = (i/2)+1;
+	                	var lineChartData = {
+	    						labels : ["5","10","20","30","40","50","60","70","80","90","100","110","120","130","140","150","160","170","180","190","200","210","220","230","240","all"],
+	    						datasets : [
+	    							{
+	    								label: "My First dataset",
+	    								fillColor : "rgba(220,220,220,0.2)",
+	    								strokeColor : "rgba(220,220,220,1)",
+	    								pointColor : "rgba(220,220,220,1)",
+	    								pointStrokeColor : "#fff",
+	    								pointHighlightFill : "#fff",
+	    								pointHighlightStroke : "rgba(220,220,220,1)",
+	    								data : [datas[i].count5Percent,
+	    								        datas[i].count10Percent,
+	    								        datas[i].count20Percent,
+	    								        datas[i].count30Percent,
+	    								        datas[i].count40Percent,
+	    								        datas[i].count50Percent,
+	    								        datas[i].count60Percent,
+	    								        datas[i].count70Percent,
+	    								        datas[i].count80Percent,
+	    								        datas[i].count90Percent,
+	    								        datas[i].count100Percent,
+	    								        datas[i].count110Percent,
+	    								        datas[i].count120Percent,
+	    								        datas[i].count130Percent,
+	    								        datas[i].count140Percent,
+	    								        datas[i].count150Percent,
+	    								        datas[i].count160Percent,
+	    								        datas[i].count170Percent,
+	    								        datas[i].count180Percent,
+	    								        datas[i].count190Percent,
+	    								        datas[i].count200Percent,
+	    								        datas[i].count210Percent,
+	    								        datas[i].count220Percent,
+	    								        datas[i].count230Percent,
+	    								        datas[i].count240Percent,
+	    								        datas[i].countAllPercent]
+	    							},
+	    							{
+	    								label: "My Second dataset",
+	    								fillColor : "rgba(151,187,205,0.2)",
+	    								strokeColor : "rgba(151,187,205,1)",
+	    								pointColor : "rgba(151,187,205,1)",
+	    								pointStrokeColor : "#fff",
+	    								pointHighlightFill : "#fff",
+	    								pointHighlightStroke : "rgba(151,187,205,1)",
+	    								data : [datas[i+1].count5Percent,
+	    								        datas[i+1].count10Percent,
+	    								        datas[i+1].count20Percent,
+	    								        datas[i+1].count30Percent,
+	    								        datas[i+1].count40Percent,
+	    								        datas[i+1].count50Percent,
+	    								        datas[i+1].count60Percent,
+	    								        datas[i+1].count70Percent,
+	    								        datas[i+1].count80Percent,
+	    								        datas[i+1].count90Percent,
+	    								        datas[i+1].count100Percent,
+	    								        datas[i+1].count110Percent,
+	    								        datas[i+1].count120Percent,
+	    								        datas[i+1].count130Percent,
+	    								        datas[i+1].count140Percent,
+	    								        datas[i+1].count150Percent,
+	    								        datas[i+1].count160Percent,
+	    								        datas[i+1].count170Percent,
+	    								        datas[i+1].count180Percent,
+	    								        datas[i+1].count190Percent,
+	    								        datas[i+1].count200Percent,
+	    								        datas[i+1].count210Percent,
+	    								        datas[i+1].count220Percent,
+	    								        datas[i+1].count230Percent,
+	    								        datas[i+1].count240Percent,
+	    								        datas[i+1].countAllPercent]
+	    							}
+	    						]
+	    			
+	    					}
+	    					var ctx = document.getElementById("canvas" + dayBefore).getContext("2d");
+	    					window.myLine = new Chart(ctx).Line(lineChartData, {
+	    						responsive: true
+	    					});
+					}
+				
+			}
+			
+		}
+		xmlhttp.open("POST","/predictRecord",true);
+		xmlhttp.send(); 
+	}	
+
+	window.onload = function(){
+		loadChart();
+	}
+</script>
+
+	</body>
+</html>

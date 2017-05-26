@@ -47,41 +47,12 @@ public class PredictionBootStrap {
 		timeSimulator.setDayBegin();
 		predictionSpiderRateInfoServiceImpl.setTimeSimulator(timeSimulator);
 		smoothingAlgorithmSpiderSortServiceImpl.setTimeSimulator(timeSimulator);
-		predictionSpiderRateInfoServiceImpl.generateRateMap(start + 1, start + 10);
+		predictionSpiderRateInfoServiceImpl.generateRateMap(start + 1, start + 30);
 
 		// 计算明天要统计的公众号
 		// int count = 0;
 		List<SpiderRecordInfo> todaySpiderRecordList = spiderRecordInfoServie.selectInterval(start, start + 1);
 		System.out.println(todaySpiderRecordList.size());
-		// for (SpiderRecordInfo spiderRecordInfo : todaySpiderRecordList) {
-		// SpiderRateInfo spiderRateInfo =
-		// predictionSpiderRateInfoServiceImpl.getRateMap().get(spiderRecordInfo.getSourceId());
-		// if(spiderRateInfo!=null&spiderRateInfo.isTooOld()){
-		// count++;
-		// System.out.println(spiderRateInfo +"---" + spiderRecordInfo);
-		// };
-		// if
-		// (!predictionSpiderRateInfoServiceImpl.getRateMap().containsKey(spiderRecordInfo.getSourceId()))
-		// {
-		// SpiderRateInfo spiderRateInfo = new SpiderRateInfo(spiderRecordInfo);
-		// predictionSpiderRateInfoServiceImpl.getRateMap().put(spiderRecordInfo.getSourceId(),
-		// spiderRateInfo);
-		// if()
-		// Calendar cal = Calendar.getInstance();
-		// cal.setTime(spiderRecordInfo.getCreate_time());
-		// if (cal.get(Calendar.MONTH)== 5-1 &&
-		// cal.get(Calendar.DAY_OF_MONTH)==2) {
-		//
-		// }else{
-		//
-		// System.out.println(spiderRecordInfo + "----" +
-		// cal.get(Calendar.MONTH) + "----" + cal.get(Calendar.DAY_OF_MONTH));
-		// count++;
-		// }
-		// }
-		// }
-
-		// System.out.println("太久未更新的---》" + count);
 		// sort
 		int i = 0;
 		while (!timeSimulator.isNextDay()) {
@@ -100,9 +71,6 @@ public class PredictionBootStrap {
 			timeSimulator.getFiveMinuteAfter();
 		}
 		System.out.println("total count :" + i);
-		// check
-		// predictMap.forEach((k,v)->System.out.println(k));
-		// System.out.println("this is the count :" + predictMap.size());
 		// prediction
 		Map<SpiderRecordInfo, PredictionSpiderRecordInfo> todayPredictionSpiderRecordMap = new HashMap<SpiderRecordInfo, PredictionSpiderRecordInfo>();
 

@@ -153,11 +153,13 @@ public class SpiderRateInfo implements Serializable{
 	
 
 
+
 	@Override
 	public String toString() {
 		return "SpiderRateInfo [appId=" + appId + ", sourceId=" + sourceId + ", update_time=" + update_time
 				+ ", rateJson=" + rateJson + ", timeSliceCount=" + timeSliceCount + ", totalCount=" + totalCount
-				+ ", priority=" + priority + ", sliceStisticsMap=" + sliceStisticsMap + "]";
+				+ ", priority=" + priority + ", sliceStisticsMap=" + sliceStisticsMap + ", timeSliceList="
+				+ timeSliceList + ", timeSlicePredict=" + timeSlicePredict + ", tooOld=" + tooOld + "]";
 	}
 
 	public SpiderRateInfo() {

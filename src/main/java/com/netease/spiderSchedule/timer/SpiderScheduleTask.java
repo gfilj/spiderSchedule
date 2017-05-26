@@ -3,6 +3,7 @@ package com.netease.spiderSchedule.timer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import com.netease.spiderSchedule.controller.SpiderScheduleController;
 import com.netease.spiderSchedule.service.spiderRateInfo.SpiderRateInfoService;
 import com.netease.spiderSchedule.service.spiderSort.SpiderSortService;
 
@@ -27,6 +28,7 @@ public class SpiderScheduleTask {
 	 */
 	
 	public void perFiveMinutesSchedule(){
+		SpiderScheduleController.calAbility.setReset(true);
 		spiderSortService.addTask(spiderRateInfoService);
 	}
 

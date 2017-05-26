@@ -1,5 +1,6 @@
 package com.netease.spiderSchedule.controller;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -12,6 +13,7 @@ import com.netease.spiderSchedule.service.spiderRateInfo.impl.SpiderRateInfoServ
 import com.netease.spiderSchedule.service.spiderRecordInfo.SpiderRecodeInfoService;
 import com.netease.spiderSchedule.service.spiderSort.SpiderSortService;
 import com.netease.spiderSchedule.service.spiderSort.impl.SpiderSortServiceImpl;
+import com.netease.spiderSchedule.util.CalAbility;
 import com.netease.spiderSchedule.util.Runner;
 
 import io.vertx.core.AbstractVerticle;
@@ -24,7 +26,6 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.StaticHandler;
-import io.vertx.ext.web.handler.TimeoutHandler;
 
 public class SpiderScheduleController extends AbstractVerticle {
 
@@ -33,28 +34,22 @@ public class SpiderScheduleController extends AbstractVerticle {
 	private static SpiderRateInfoService spiderRateInfoService;
 	private static SpiderSortService spiderSortService;
 	private static SpiderRecodeInfoService spiderRecordInfoService;
-	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo1;
-	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo2;
-	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo3;
-	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo4;
-	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo5;
-	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo6;
-	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo7;
-
+	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo1=Collections.<PredictionSpiderRecordStaticInfo>emptyList();
+	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo2=Collections.<PredictionSpiderRecordStaticInfo>emptyList();
+	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo3=Collections.<PredictionSpiderRecordStaticInfo>emptyList();
+	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo4=Collections.<PredictionSpiderRecordStaticInfo>emptyList();
+	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo5=Collections.<PredictionSpiderRecordStaticInfo>emptyList();
+	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo6=Collections.<PredictionSpiderRecordStaticInfo>emptyList();
+	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo7=Collections.<PredictionSpiderRecordStaticInfo>emptyList();
+	public static CalAbility calAbility = new CalAbility();
 	public static void main(String[] args) {
 		context = new ClassPathXmlApplicationContext("classpath*:config/spring-application.xml");
 		context.start();
-		predirctSpiderRecordInfo1 = PredictionBootStrap.predirctSpiderRecordInfo(context, 1);
-		predirctSpiderRecordInfo2 = PredictionBootStrap.predirctSpiderRecordInfo(context, 2);
-		predirctSpiderRecordInfo3 = PredictionBootStrap.predirctSpiderRecordInfo(context, 3);
-		predirctSpiderRecordInfo4 = PredictionBootStrap.predirctSpiderRecordInfo(context, 4);
-		predirctSpiderRecordInfo5 = PredictionBootStrap.predirctSpiderRecordInfo(context, 5);
-		predirctSpiderRecordInfo6 = PredictionBootStrap.predirctSpiderRecordInfo(context, 6);
-		predirctSpiderRecordInfo7 = PredictionBootStrap.predirctSpiderRecordInfo(context, 7);
 		spiderRateInfoService = (SpiderRateInfoServiceImpl) context.getBean("spiderRateInfoService");
 		spiderSortService = (SpiderSortServiceImpl) context.getBean("smoothingAlgorithmSpiderSortService");
 		spiderRecordInfoService = (SpiderRecodeInfoService) context.getBean("spiderRecordInfoServie");
 		Runner.runExample(SpiderScheduleController.class);
+		System.out.println("init down!");
 	}
 
 	@Override
@@ -109,19 +104,38 @@ public class SpiderScheduleController extends AbstractVerticle {
 			});
 			ctx.response().end(arr.encodePrettily());
 		});
-		router.post("/predictRecord/:predictDay").handler(ctx -> {
-			int predictDay = 0;
-			try {
-				predictDay = Integer.parseInt(ctx.request().getParam("predictDay"));
-			} catch (Exception e) {
-				sendError(400, ctx.response());
-				return;
-			}
+		router.post("/predictRecord").handler(ctx -> {
 
 			ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, "text/plain");
 			JsonArray arr = new JsonArray();
-
+			if(predirctSpiderRecordInfo1.size()==0){
+				predirctSpiderRecordInfo1 = PredictionBootStrap.predirctSpiderRecordInfo(context, 1);
+				predirctSpiderRecordInfo2 = PredictionBootStrap.predirctSpiderRecordInfo(context, 2);
+				predirctSpiderRecordInfo3 = PredictionBootStrap.predirctSpiderRecordInfo(context, 3);
+				predirctSpiderRecordInfo4 = PredictionBootStrap.predirctSpiderRecordInfo(context, 4);
+				predirctSpiderRecordInfo5 = PredictionBootStrap.predirctSpiderRecordInfo(context, 5);
+				predirctSpiderRecordInfo6 = PredictionBootStrap.predirctSpiderRecordInfo(context, 6);
+				predirctSpiderRecordInfo7 = PredictionBootStrap.predirctSpiderRecordInfo(context, 7);
+			}
 			predirctSpiderRecordInfo1.forEach((v) -> {
+				arr.add(JsonObject.mapFrom(v));
+			});
+			predirctSpiderRecordInfo2.forEach((v) -> {
+				arr.add(JsonObject.mapFrom(v));
+			});
+			predirctSpiderRecordInfo3.forEach((v) -> {
+				arr.add(JsonObject.mapFrom(v));
+			});
+			predirctSpiderRecordInfo4.forEach((v) -> {
+				arr.add(JsonObject.mapFrom(v));
+			});
+			predirctSpiderRecordInfo5.forEach((v) -> {
+				arr.add(JsonObject.mapFrom(v));
+			});
+			predirctSpiderRecordInfo6.forEach((v) -> {
+				arr.add(JsonObject.mapFrom(v));
+			});
+			predirctSpiderRecordInfo7.forEach((v) -> {
 				arr.add(JsonObject.mapFrom(v));
 			});
 
@@ -140,8 +154,12 @@ public class SpiderScheduleController extends AbstractVerticle {
 			sendError(400, response);
 			return;
 		}
+		if(calAbility.getSpiderScheduleAbility().addAndGet(0-taskNum)<0){
+			taskNum= calAbility.getSpiderScheduleAbility().addAndGet(taskNum);
+		}
 		JsonArray arr = new JsonArray();
 		spiderSortService.getTask(taskNum, spiderRateInfoService).forEach((v) -> arr.add(JsonObject.mapFrom(v)));
+		calAbility.getSpiderScheduleAbility().addAndGet(taskNum-arr.size());
 		response.putHeader("content-type", "application/json").end(arr.encodePrettily());
 
 	}

@@ -208,8 +208,8 @@ public class Runner {
 		if (options == null) {
 			// Default parameter
 			options = new VertxOptions();
-			options.setMaxEventLoopExecuteTime(Long.MAX_VALUE);
 		}
+		options.setMaxEventLoopExecuteTime(Long.MAX_VALUE);
 		// Smart cwd detection
 
 		// Based on the current directory (.) and the desired directory
