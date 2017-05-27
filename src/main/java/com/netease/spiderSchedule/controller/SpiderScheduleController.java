@@ -163,6 +163,20 @@ public class SpiderScheduleController extends AbstractVerticle {
 		response.putHeader("content-type", "application/json").end(arr.encodePrettily());
 
 	}
+	
+	private void handleTaskError(RoutingContext routingContext) {
+		HttpServerResponse response = routingContext.response();
+		String sourceid=null;
+		try {
+			sourceid = String.valueOf(routingContext.request().getParam("sourceid"));
+		} catch (Exception e) {
+			sendError(400, response);
+			return;
+		}
+		handleGetRateMap(routingContext);
+		response.putHeader("content-type", "application/json").end(arr.encodePrettily());
+
+	}
 
 	private void handleAddTask(RoutingContext routingContext) {
 		HttpServerResponse response = routingContext.response();
