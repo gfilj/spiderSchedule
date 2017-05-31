@@ -22,7 +22,7 @@ import com.netease.spiderSchedule.util.TimeSimulator;
 
 public class PredictionBootStrap {
 
-	private static ClassPathXmlApplicationContext context=null;
+	private static ClassPathXmlApplicationContext context = null;
 
 	public static void main(String[] args) {
 		start();
@@ -31,10 +31,11 @@ public class PredictionBootStrap {
 	public static void start() {
 		context = new ClassPathXmlApplicationContext("classpath*:config/spring-application.xml");
 		context.start();
-		predirctSpiderRecordInfo(context,1);
+		predirctSpiderRecordInfo(context, 1);
 	}
 
-	public static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo(ClassPathXmlApplicationContext context,int start) {
+	public static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo(
+			ClassPathXmlApplicationContext context, int start) {
 		Map<SpiderScheduleDto, HashSet<Date>> predictMap = new HashMap<SpiderScheduleDto, HashSet<Date>>();
 		// 查询过去1到8天的
 		PredictionSpiderRateInfoService predictionSpiderRateInfoServiceImpl = (PredictionSpiderRateInfoService) context
@@ -47,7 +48,7 @@ public class PredictionBootStrap {
 		timeSimulator.setDayBegin();
 		predictionSpiderRateInfoServiceImpl.setTimeSimulator(timeSimulator);
 		smoothingAlgorithmSpiderSortServiceImpl.setTimeSimulator(timeSimulator);
-		predictionSpiderRateInfoServiceImpl.generateRateMap(start + 1, start + 30);
+		predictionSpiderRateInfoServiceImpl.generateRateMap(start + 1, start + 9);
 
 		// 计算明天要统计的公众号
 		// int count = 0;
@@ -56,16 +57,18 @@ public class PredictionBootStrap {
 		// sort
 		int i = 0;
 		while (!timeSimulator.isNextDay()) {
-			smoothingAlgorithmSpiderSortServiceImpl.addTask(predictionSpiderRateInfoServiceImpl);
-			for (SpiderScheduleDto spiderScheduleDto : smoothingAlgorithmSpiderSortServiceImpl.getTask(250,
-					predictionSpiderRateInfoServiceImpl)) {
-				i++;
-				if (predictMap.containsKey(spiderScheduleDto)) {
-					predictMap.get(spiderScheduleDto).add(timeSimulator.getDate());
-				} else {
-					HashSet<Date> dateSet = new HashSet<Date>();
-					dateSet.add(timeSimulator.getDate());
-					predictMap.put(spiderScheduleDto, dateSet);
+			if (!timeSimulator.inStopGrapSegment()) {
+				smoothingAlgorithmSpiderSortServiceImpl.addTask(predictionSpiderRateInfoServiceImpl);
+				for (SpiderScheduleDto spiderScheduleDto : smoothingAlgorithmSpiderSortServiceImpl.getTask(15,
+						predictionSpiderRateInfoServiceImpl)) {
+					i++;
+					if (predictMap.containsKey(spiderScheduleDto)) {
+						predictMap.get(spiderScheduleDto).add(timeSimulator.getDate());
+					} else {
+						HashSet<Date> dateSet = new HashSet<Date>();
+						dateSet.add(timeSimulator.getDate());
+						predictMap.put(spiderScheduleDto, dateSet);
+					}
 				}
 			}
 			timeSimulator.getFiveMinuteAfter();
@@ -101,7 +104,7 @@ public class PredictionBootStrap {
 			predictionSpiderRecordStaticInfo.statistics(entry, timeDelay, predictionSpiderRateInfoServiceImpl);
 		}
 		System.out.println(predictionSpiderRecordStaticInfo);
-		returnStaticInfo.add( predictionSpiderRecordStaticInfo);
+		returnStaticInfo.add(predictionSpiderRecordStaticInfo);
 		PredictionSpiderRecordStaticInfo spiderRecordStaticInfo = new PredictionSpiderRecordStaticInfo();
 		for (Entry<SpiderRecordInfo, PredictionSpiderRecordInfo> entry : todayPredictionSpiderRecordMap.entrySet()) {
 			long timeDelay = entry.getValue().getUpdate_time().getTime() - entry.getValue().getCreate_time().getTime();

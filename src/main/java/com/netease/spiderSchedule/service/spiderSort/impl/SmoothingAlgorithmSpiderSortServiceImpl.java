@@ -1,6 +1,5 @@
 package com.netease.spiderSchedule.service.spiderSort.impl;
 
-import java.util.Calendar;
 import java.util.Date;
 
 import org.springframework.stereotype.Service;
@@ -25,9 +24,7 @@ public class SmoothingAlgorithmSpiderSortServiceImpl extends SpiderSortServiceIm
 			int addCount = 0;
 			int timeSliceKey = 0;
 			if (timeSimulator == null) {
-				Calendar calendar = Calendar.getInstance();
-				calendar.setTime(new Date());
-				timeSliceKey = (calendar.get(Calendar.HOUR) * 60 + calendar.get(Calendar.MINUTE)) / 5;
+				timeSliceKey = TimeSimulator.getTimeSliceKey(new Date());
 			} else {
 				timeSliceKey = timeSimulator.getTimeSliceKey();
 			}

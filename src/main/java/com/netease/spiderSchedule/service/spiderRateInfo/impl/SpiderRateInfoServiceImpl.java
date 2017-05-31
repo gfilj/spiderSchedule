@@ -21,7 +21,6 @@ import com.netease.spiderSchedule.model.SpiderSourceInfo;
 import com.netease.spiderSchedule.service.spiderRateInfo.SpiderRateInfoService;
 import com.netease.spiderSchedule.service.spiderRecordInfo.SpiderRecodeInfoService;
 import com.netease.spiderSchedule.service.spiderSourceInfo.SpiderSourceInfoService;
-import com.netease.spiderSchedule.timer.SpiderScheduleTask;
 
 @Service("spiderRateInfoService")
 public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, InitializingBean {
@@ -195,6 +194,7 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 		cal.setTime(new Date());
 		cal.add(Calendar.DAY_OF_MONTH, -1);
 		rateMap.forEach((r, v) -> {
+			System.out.println(v);
 			if (v.isTooOld()) {
 				v.setUpdate_time(cal.getTime());
 			} else {

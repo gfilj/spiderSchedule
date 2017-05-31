@@ -1,7 +1,10 @@
 package com.netease.spiderSchedule.controller;
 
 import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -14,7 +17,9 @@ import com.netease.spiderSchedule.service.spiderRecordInfo.SpiderRecodeInfoServi
 import com.netease.spiderSchedule.service.spiderSort.SpiderSortService;
 import com.netease.spiderSchedule.service.spiderSort.impl.SpiderSortServiceImpl;
 import com.netease.spiderSchedule.util.CalAbility;
+import com.netease.spiderSchedule.util.RateLevel;
 import com.netease.spiderSchedule.util.Runner;
+import com.netease.spiderSchedule.util.TimeSimulator;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.http.HttpHeaders;
@@ -34,14 +39,24 @@ public class SpiderScheduleController extends AbstractVerticle {
 	private static SpiderRateInfoService spiderRateInfoService;
 	private static SpiderSortService spiderSortService;
 	private static SpiderRecodeInfoService spiderRecordInfoService;
-	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo1=Collections.<PredictionSpiderRecordStaticInfo>emptyList();
-	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo2=Collections.<PredictionSpiderRecordStaticInfo>emptyList();
-	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo3=Collections.<PredictionSpiderRecordStaticInfo>emptyList();
-	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo4=Collections.<PredictionSpiderRecordStaticInfo>emptyList();
-	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo5=Collections.<PredictionSpiderRecordStaticInfo>emptyList();
-	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo6=Collections.<PredictionSpiderRecordStaticInfo>emptyList();
-	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo7=Collections.<PredictionSpiderRecordStaticInfo>emptyList();
+	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo1 = Collections
+			.<PredictionSpiderRecordStaticInfo> emptyList();
+	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo2 = Collections
+			.<PredictionSpiderRecordStaticInfo> emptyList();
+	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo3 = Collections
+			.<PredictionSpiderRecordStaticInfo> emptyList();
+	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo4 = Collections
+			.<PredictionSpiderRecordStaticInfo> emptyList();
+	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo5 = Collections
+			.<PredictionSpiderRecordStaticInfo> emptyList();
+	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo6 = Collections
+			.<PredictionSpiderRecordStaticInfo> emptyList();
+	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo7 = Collections
+			.<PredictionSpiderRecordStaticInfo> emptyList();
 	public static CalAbility calAbility = new CalAbility();
+
+	public static Map<String, Integer> errorHandleMap = Collections.synchronizedMap(new HashMap<String, Integer>());
+
 	public static void main(String[] args) {
 		context = new ClassPathXmlApplicationContext("classpath*:config/spring-application.xml");
 		context.start();
@@ -59,6 +74,8 @@ public class SpiderScheduleController extends AbstractVerticle {
 		router.get("/getTask/:taskNum").handler(this::handleGetTask);
 		router.put("/addTask").handler(this::handleAddTask);
 		router.get("/getRateMap/:sourceId").handler(this::handleGetRateMap);
+		router.get("/getRateMap/:sourceId").handler(this::handleGetRateMap);
+		router.get("/handleTaskError/:sourceId").handler(this::handleTaskError);
 		router.get("/daychart").handler(routingContext -> {
 			routingContext.response().putHeader("content-type", "text/html")
 					.end("<form action=\"/form\" method=\"post\">\n" + "    <div>\n"
@@ -108,7 +125,7 @@ public class SpiderScheduleController extends AbstractVerticle {
 
 			ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, "text/plain");
 			JsonArray arr = new JsonArray();
-			if(predirctSpiderRecordInfo1.size()==0){
+			if (predirctSpiderRecordInfo1.size() == 0) {
 				predirctSpiderRecordInfo1 = PredictionBootStrap.predirctSpiderRecordInfo(context, 1);
 				predirctSpiderRecordInfo2 = PredictionBootStrap.predirctSpiderRecordInfo(context, 2);
 				predirctSpiderRecordInfo3 = PredictionBootStrap.predirctSpiderRecordInfo(context, 3);
@@ -154,28 +171,38 @@ public class SpiderScheduleController extends AbstractVerticle {
 			sendError(400, response);
 			return;
 		}
-		if(calAbility.getSpiderScheduleAbility().addAndGet(0-taskNum)<0){
-			taskNum= calAbility.getSpiderScheduleAbility().addAndGet(taskNum);
+		if (calAbility.getSpiderScheduleAbility().addAndGet(0 - taskNum) < 0) {
+			taskNum = calAbility.getSpiderScheduleAbility().addAndGet(taskNum);
 		}
 		JsonArray arr = new JsonArray();
 		spiderSortService.getTask(taskNum, spiderRateInfoService).forEach((v) -> arr.add(JsonObject.mapFrom(v)));
-		calAbility.getSpiderScheduleAbility().addAndGet(taskNum-arr.size());
+		calAbility.getSpiderScheduleAbility().addAndGet(taskNum - arr.size());
 		response.putHeader("content-type", "application/json").end(arr.encodePrettily());
 
 	}
-	
+
 	private void handleTaskError(RoutingContext routingContext) {
 		HttpServerResponse response = routingContext.response();
-		String sourceid=null;
+		String sourceId = null;
 		try {
-			sourceid = String.valueOf(routingContext.request().getParam("sourceid"));
+			sourceId = String.valueOf(routingContext.request().getParam("sourceId"));
 		} catch (Exception e) {
 			sendError(400, response);
 			return;
 		}
-		handleGetRateMap(routingContext);
-		response.putHeader("content-type", "application/json").end(arr.encodePrettily());
-
+		// 整理次数
+		if (errorHandleMap.containsKey(sourceId)) {
+			errorHandleMap.put(sourceId, errorHandleMap.get(sourceId) + 1);
+		} else {
+			errorHandleMap.put(sourceId, 1);
+		}
+		if (errorHandleMap.get(sourceId) <= 10) {
+			if (spiderRateInfoService.getRateMap().containsKey(sourceId)) {
+				spiderRateInfoService.getRateMap().get(sourceId).getTimeSlicePredict()
+						.put(TimeSimulator.getTimeSliceKey(new Date()), Double.valueOf(RateLevel.TEN.getRateVal()));
+			}
+		}
+		sendOK(200, response);
 	}
 
 	private void handleAddTask(RoutingContext routingContext) {
@@ -206,6 +233,10 @@ public class SpiderScheduleController extends AbstractVerticle {
 
 	private void sendError(int statusCode, HttpServerResponse response) {
 		response.setStatusCode(statusCode).end("400 error");
+	}
+
+	private void sendOK(int statusCode, HttpServerResponse response) {
+		response.setStatusCode(statusCode).end("200 ok");
 	}
 
 }
