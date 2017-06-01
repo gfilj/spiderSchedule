@@ -17,7 +17,7 @@ public class PredictionSpiderSortServiceImpl extends SpiderSortServiceImpl {
 
 
 	@Override
-	public void addTask(SpiderRateInfoService spiderRateInfoService) {
+	public int addTask(SpiderRateInfoService spiderRateInfoService) {
 		int addCount = 0;
 		for (SpiderRateInfo spiderRateInfo : spiderRateInfoService.getRateMap().values()) {
 			PreditionSpiderScheduleDto predictionSpiderScheduleDto = new PreditionSpiderScheduleDto(spiderRateInfo,
@@ -30,5 +30,6 @@ public class PredictionSpiderSortServiceImpl extends SpiderSortServiceImpl {
 		int timeSliceKey = timeSimulator.getTimeSliceKey();
 
 		System.out.println("PredictionSpiderSortServiceImpl do call addTask add " + addCount + " currentSliceKey " + timeSliceKey);
+		return addCount;
 	}
 }

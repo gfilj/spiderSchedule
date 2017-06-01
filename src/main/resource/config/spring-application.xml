@@ -32,7 +32,7 @@
 
 	<import resource="spring-mybatis.xml" />
 
-	<!-- <import resource="spring-quartz.xml" /> -->
+	<import resource="spring-quartz.xml" /> 
 
 	<!-- <import resource="spring_spider.xml"/> -->
 	

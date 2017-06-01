@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import com.netease.spiderSchedule.model.SpiderSourceInfo;
 import com.netease.spiderSchedule.service.spiderRateInfo.SpiderRateInfoService;
 import com.netease.spiderSchedule.service.spiderRecordInfo.SpiderRecodeInfoService;
 import com.netease.spiderSchedule.service.spiderSourceInfo.SpiderSourceInfoService;
+import com.netease.spiderSchedule.util.TimeSimulator;
 
 @Service("spiderRateInfoService")
 public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, InitializingBean {
@@ -82,43 +84,6 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 				e.printStackTrace();
 			}
 		}
-		// for (SpiderRateInfo spiderRateInfo : rateMap.values()) {
-		// // make up statistics map , timeSliceList
-		// for(Entry<Integer, Integer>
-		// timeSlice:spiderRateInfo.getTimeSliceCount().entrySet()){
-		// spiderRateInfo.getTimeSliceList().add(timeSlice.getKey());
-		// for(int i=1; i <= 96 ; i++){
-		// if(timeSlice.getKey()<=i*3 && timeSlice.getKey()>(i-1)*3){
-		// if(!spiderRateInfo.getSliceStisticsMap().containsKey(i)){
-		// spiderRateInfo.getSliceStisticsMap().put(i, new
-		// SliceStatistics(1,timeSlice.getValue()));
-		// }else{
-		// spiderRateInfo.getSliceStisticsMap().get(i).addCount(timeSlice.getValue()).addShowTime();
-		// }
-		// }
-		// }
-		// }
-		// }
-		// //合并时间片
-		// for (SpiderRateInfo spiderRateInfo : rateMap.values()) {
-		// for(Entry<Integer, SliceStatistics>
-		// sliceStisticsEntry:spiderRateInfo.getSliceStisticsMap().entrySet()){
-		// SliceStatistics sliceStatistics = sliceStisticsEntry.getValue();
-		// if(sliceStatistics.getShowTime()>1){
-		// int sliceStaticsKey = sliceStisticsEntry.getKey();
-		// for(int timeSlice :spiderRateInfo.getTimeSliceList()){
-		// if(timeSlice<=sliceStaticsKey*3 && timeSlice>(sliceStaticsKey-1)*3){
-		// spiderRateInfo.getTimeSliceCount().remove(timeSlice);
-		// }
-		// }
-		// spiderRateInfo.getTimeSliceCount().put(sliceStaticsKey*3 ,
-		// sliceStatistics.getCount());
-		// }
-		// }
-		// System.out.println(spiderRateInfo);
-		// }
-		// System.out.println("spiderRateInfoService do call zeroSchedule size "
-		// + rateMap.values().size());
 
 		// 置信区间
 		final double z = 1.96;
@@ -162,6 +127,52 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 				spiderRateInfo.getTimeSlicePredict().put(i, s);
 			}
 		}
+
+		// 合并时间片
+		// 针对4,5,6期间的时间片按照最大的分数合并到6点对应的时间片为
+		// 针对半个小时有连续概率大于0的全部合并到其后
+		int spiderRateInfoTimes = 0;
+		for (SpiderRateInfo v : rateMap.values()) {
+			spiderRateInfoTimes++;
+			Map<Integer, Double> timeSlicePredict = v.getTimeSlicePredict();
+			double freeMax = 0.0d;
+			for (int i = 35; i < 72; i++) {
+				if (freeMax < timeSlicePredict.get(i)) {
+					freeMax = timeSlicePredict.get(i);
+					timeSlicePredict.put(i, -1d);
+				}
+			}
+			timeSlicePredict.put(72, freeMax);
+			final int combineInterval = 5;//new Random().nextInt(3)+
+			for (int i = timeSlicePredict.size() - spiderRateInfoTimes%5-1; i >= 0; i--) {
+				double combineMax = 0.0d;
+				for (int j = 0; j <= combineInterval; j++) {
+
+					int combinekey = i - j;
+					if (combinekey >= 0) {
+						Double combineValue = timeSlicePredict.get(combinekey);
+						timeSlicePredict.put(combinekey, -1d);
+						if (combineValue < 0 || j == combineInterval) {
+							if (combineMax > 0) {
+								timeSlicePredict.put(i, combineMax);
+							}
+							i = combinekey;
+							break;
+						} else {
+							if (combineMax < combineValue) {
+								combineMax = combineValue;
+							}
+						}
+					}else{
+						if (combineMax > 0) {
+							timeSlicePredict.put(i, combineMax);
+						}
+						break;
+					}
+				}
+			}
+
+		}
 		// makeup all source
 		List<SpiderSourceInfo> sourceList = spiderSourceInfoServie.selectAll();
 
@@ -201,7 +212,7 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 				v.setUpdate_time(new Date());
 			}
 		});
-		
+
 	}
 
 	public Double getValueST(LinkedList<Double> spiderRateInfoS, int i) {
@@ -284,7 +295,7 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-//		generateRateMap(0, 20);
+		generateRateMap(0, 9);
 	}
 
 }

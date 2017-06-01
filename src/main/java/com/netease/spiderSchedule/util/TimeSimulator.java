@@ -79,6 +79,6 @@ public class TimeSimulator {
 	}
 	
 	public boolean inStopGrapSegment(){
-		return calendar.get(Calendar.HOUR_OF_DAY)==4||calendar.get(Calendar.HOUR_OF_DAY)==5||calendar.get(Calendar.HOUR_OF_DAY)==6;
+		return calendar.get(Calendar.HOUR_OF_DAY)==3||calendar.get(Calendar.HOUR_OF_DAY)==4||calendar.get(Calendar.HOUR_OF_DAY)==5;
 	}
 }

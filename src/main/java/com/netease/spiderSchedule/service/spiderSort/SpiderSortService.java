@@ -8,5 +8,5 @@ import com.netease.spiderSchedule.service.spiderRateInfo.SpiderRateInfoService;
 public interface SpiderSortService {
 	
 	List<SpiderScheduleDto> getTask(int taskNum, SpiderRateInfoService spiderRateInfoService);
-	void addTask(SpiderRateInfoService spiderRateInfoService);
+	int addTask(SpiderRateInfoService spiderRateInfoService);
 }

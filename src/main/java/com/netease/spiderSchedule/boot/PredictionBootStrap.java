@@ -55,10 +55,10 @@ public class PredictionBootStrap {
 		List<SpiderRecordInfo> todaySpiderRecordList = spiderRecordInfoServie.selectInterval(start, start + 1);
 		System.out.println(todaySpiderRecordList.size());
 		// sort
-		int i = 0;
+		int i = 0,addCount=0;
 		while (!timeSimulator.isNextDay()) {
 			if (!timeSimulator.inStopGrapSegment()) {
-				smoothingAlgorithmSpiderSortServiceImpl.addTask(predictionSpiderRateInfoServiceImpl);
+				addCount += smoothingAlgorithmSpiderSortServiceImpl.addTask(predictionSpiderRateInfoServiceImpl);
 				for (SpiderScheduleDto spiderScheduleDto : smoothingAlgorithmSpiderSortServiceImpl.getTask(15,
 						predictionSpiderRateInfoServiceImpl)) {
 					i++;
@@ -73,7 +73,7 @@ public class PredictionBootStrap {
 			}
 			timeSimulator.getFiveMinuteAfter();
 		}
-		System.out.println("total count :" + i);
+		System.out.println("total count :" + i + "; add count:" + addCount);
 		// prediction
 		Map<SpiderRecordInfo, PredictionSpiderRecordInfo> todayPredictionSpiderRecordMap = new HashMap<SpiderRecordInfo, PredictionSpiderRecordInfo>();
 

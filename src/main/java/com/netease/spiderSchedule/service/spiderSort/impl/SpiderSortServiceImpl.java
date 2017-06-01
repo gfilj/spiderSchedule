@@ -21,7 +21,7 @@ public class SpiderSortServiceImpl implements SpiderSortService{
 	protected MaxHeap<SpiderScheduleDto> heapSort = new MaxHeap<SpiderScheduleDto>();
 	
 	@Override
-	public void addTask(SpiderRateInfoService spiderRateInfoService) {
+	public int addTask(SpiderRateInfoService spiderRateInfoService) {
 		int addCount = 0;
 		for(SpiderRateInfo spiderRateInfo:spiderRateInfoService.getRateMap().values()){
 			SpiderScheduleDto spiderScheduleDto = new SpiderScheduleDto(spiderRateInfo);
@@ -35,6 +35,7 @@ public class SpiderSortServiceImpl implements SpiderSortService{
 		int timeSliceKey = (calendar.get(Calendar.HOUR)*60 + calendar.get(Calendar.MINUTE))/5;
 		
 		System.out.println("do call perFiveMinutesSchedule add " + addCount + " currentSliceKey " + timeSliceKey);
+		return addCount;
 	}
 
 	@Override

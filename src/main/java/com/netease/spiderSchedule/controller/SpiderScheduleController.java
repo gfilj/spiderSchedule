@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.netease.spiderSchedule.boot.PredictionBootStrap;
@@ -56,7 +58,9 @@ public class SpiderScheduleController extends AbstractVerticle {
 	public static CalAbility calAbility = new CalAbility();
 
 	public static Map<String, Integer> errorHandleMap = Collections.synchronizedMap(new HashMap<String, Integer>());
-
+	
+	protected Logger logger = LoggerFactory.getLogger(getClass());
+	
 	public static void main(String[] args) {
 		context = new ClassPathXmlApplicationContext("classpath*:config/spring-application.xml");
 		context.start();
@@ -126,13 +130,13 @@ public class SpiderScheduleController extends AbstractVerticle {
 			ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, "text/plain");
 			JsonArray arr = new JsonArray();
 			if (predirctSpiderRecordInfo1.size() == 0) {
-				predirctSpiderRecordInfo1 = PredictionBootStrap.predirctSpiderRecordInfo(context, 1);
-				predirctSpiderRecordInfo2 = PredictionBootStrap.predirctSpiderRecordInfo(context, 2);
-				predirctSpiderRecordInfo3 = PredictionBootStrap.predirctSpiderRecordInfo(context, 3);
-				predirctSpiderRecordInfo4 = PredictionBootStrap.predirctSpiderRecordInfo(context, 4);
-				predirctSpiderRecordInfo5 = PredictionBootStrap.predirctSpiderRecordInfo(context, 5);
-				predirctSpiderRecordInfo6 = PredictionBootStrap.predirctSpiderRecordInfo(context, 6);
-				predirctSpiderRecordInfo7 = PredictionBootStrap.predirctSpiderRecordInfo(context, 7);
+				predirctSpiderRecordInfo1 = PredictionBootStrap.predirctSpiderRecordInfo(context, 2);
+				predirctSpiderRecordInfo2 = PredictionBootStrap.predirctSpiderRecordInfo(context, 3);
+				predirctSpiderRecordInfo3 = PredictionBootStrap.predirctSpiderRecordInfo(context, 4);
+				predirctSpiderRecordInfo4 = PredictionBootStrap.predirctSpiderRecordInfo(context, 5);
+				predirctSpiderRecordInfo5 = PredictionBootStrap.predirctSpiderRecordInfo(context, 6);
+				predirctSpiderRecordInfo6 = PredictionBootStrap.predirctSpiderRecordInfo(context, 7);
+				predirctSpiderRecordInfo7 = PredictionBootStrap.predirctSpiderRecordInfo(context, 8);
 			}
 			predirctSpiderRecordInfo1.forEach((v) -> {
 				arr.add(JsonObject.mapFrom(v));
@@ -199,7 +203,8 @@ public class SpiderScheduleController extends AbstractVerticle {
 		if (errorHandleMap.get(sourceId) <= 10) {
 			if (spiderRateInfoService.getRateMap().containsKey(sourceId)) {
 				spiderRateInfoService.getRateMap().get(sourceId).getTimeSlicePredict()
-						.put(TimeSimulator.getTimeSliceKey(new Date()), Double.valueOf(RateLevel.TEN.getRateVal()));
+						.put(TimeSimulator.getTimeSliceKey(new Date()) + 8, Double.valueOf(RateLevel.TEN.getRateVal()));
+				logger.info("spiderSchedule handleTaskError:" + sourceId);
 			}
 		}
 		sendOK(200, response);

@@ -17,7 +17,7 @@ public class RedditSpiderSortServiceImpl extends SpiderSortServiceImpl {
 
 
 	@Override
-	public void addTask(SpiderRateInfoService spiderRateInfoService) {
+	public int addTask(SpiderRateInfoService spiderRateInfoService) {
 		int addCount = 0;
 		for (SpiderRateInfo spiderRateInfo : spiderRateInfoService.getRateMap().values()) {
 			RedditSpiderScheduleDto redditSpiderScheduleDto = new RedditSpiderScheduleDto(spiderRateInfo,
@@ -30,5 +30,6 @@ public class RedditSpiderSortServiceImpl extends SpiderSortServiceImpl {
 		int timeSliceKey = timeSimulator.getTimeSliceKey();
 
 		System.out.println("PredictionSpiderSortServiceImpl do call addTask add " + addCount + " currentSliceKey " + timeSliceKey);
+		return addCount;
 	}
 }
