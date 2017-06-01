@@ -2,8 +2,7 @@ package com.netease.spiderSchedule.service.spiderSort.impl;
 
 import java.util.Date;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.netease.spiderSchedule.model.SpiderRateInfo;
@@ -15,7 +14,7 @@ import com.netease.spiderSchedule.util.TimeSimulator;
 @Service("smoothingAlgorithmSpiderSortService")
 public class SmoothingAlgorithmSpiderSortServiceImpl extends SpiderSortServiceImpl implements SpiderSortService {
 	private TimeSimulator timeSimulator;
-	protected Logger logger = LoggerFactory.getLogger(getClass());
+	protected Logger logger = Logger.getLogger(getClass());
 	public void setTimeSimulator(TimeSimulator timeSimulator) {
 		this.timeSimulator = timeSimulator;
 	}

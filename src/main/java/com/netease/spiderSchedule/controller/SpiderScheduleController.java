@@ -6,8 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.netease.spiderSchedule.boot.PredictionBootStrap;
@@ -59,7 +58,7 @@ public class SpiderScheduleController extends AbstractVerticle {
 
 	public static Map<String, Integer> errorHandleMap = Collections.synchronizedMap(new HashMap<String, Integer>());
 	
-	protected Logger logger = LoggerFactory.getLogger(getClass());
+	protected Logger logger = Logger.getLogger(getClass());
 	
 	public static void main(String[] args) {
 		context = new ClassPathXmlApplicationContext("classpath*:config/spring-application.xml");
