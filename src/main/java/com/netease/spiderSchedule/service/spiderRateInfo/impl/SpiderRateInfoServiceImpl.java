@@ -261,8 +261,6 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 		SpiderRateInfo spiderRateInfo = rateMap.get(spiderScheduleDto.getSourceId());
 		if (spiderRateInfo != null) {
 			spiderRateInfo.setUpdate_time(new Date());
-			//
-			// spiderRateInfo.setTooOld(true);
 		}
 	}
 
