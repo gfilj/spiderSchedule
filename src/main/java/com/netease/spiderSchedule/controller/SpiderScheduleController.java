@@ -68,6 +68,10 @@ public class SpiderScheduleController extends AbstractVerticle {
 		spiderRecordInfoService = (SpiderRecodeInfoService) context.getBean("spiderRecordInfoServie");
 		Runner.runExample(SpiderScheduleController.class);
 		System.out.println("init down!");
+		for (int i = 0; i < 15; i++) {
+			calAbility.getSpiderScheduleAbility().addAndGet(-2);
+		}
+		System.out.println();
 	}
 
 	@Override
@@ -81,11 +85,11 @@ public class SpiderScheduleController extends AbstractVerticle {
 		router.get("/handleTaskError/:sourceId").handler(this::handleTaskError);
 		router.get("/daychart").handler(routingContext -> {
 			routingContext.response().putHeader("content-type", "text/html")
-					.end("<form action=\"/form\" method=\"post\">\n" + "    <div>\n"
-							+ "        <label for=\"name\">Enter your name:</label>\n"
-							+ "        <input type=\"text\" id=\"name\" name=\"name\" />\n" + "    </div>\n"
-							+ "    <div class=\"button\">\n" + "        <button type=\"submit\">Send</button>\n"
-							+ "    </div>" + "</form>");
+					.end("<form action=\"/form\" method=\"post\">\n" + "<div>\n"
+							+ "<label for=\"name\">Enter your name:</label>\n"
+							+ "<input type=\"text\" id=\"name\" name=\"name\" />\n" + "</div>\n"
+							+ "<div class=\"button\">\n" + "<button type=\"submit\">Send</button>\n"
+							+ "</div>" + "</form>");
 		});
 		router.route("/*").handler(StaticHandler.create());
 
@@ -165,7 +169,7 @@ public class SpiderScheduleController extends AbstractVerticle {
 		vertx.createHttpServer().requestHandler(router::accept).listen(8079);
 	}
 
-	private static synchronized void handleGetTask(RoutingContext routingContext) {
+	private static void handleGetTask(RoutingContext routingContext) {
 		HttpServerResponse response = routingContext.response();
 		int taskNum = 1;
 		try {
@@ -181,7 +185,7 @@ public class SpiderScheduleController extends AbstractVerticle {
 		JsonArray arr = new JsonArray();
 		spiderSortService.getTask(taskNum, spiderRateInfoService).forEach((v) -> arr.add(JsonObject.mapFrom(v)));
 		calAbility.getSpiderScheduleAbility().addAndGet(0 - arr.size());
-		logger.info("当前可获取的公众号数目：" + taskNum + ",5分钟内的剩余抓取量：" + calAbility.getSpiderScheduleAbility());
+		logger.info("当前可获取的公众号数目：" + taskNum + ",5分钟内的剩余抓取量：" + calAbility.getSpiderScheduleAbility() + ",时间获取的队列大小:" + arr.size());
 		response.putHeader("content-type", "application/json").end(arr.encodePrettily());
 
 	}
@@ -244,5 +248,4 @@ public class SpiderScheduleController extends AbstractVerticle {
 	private void sendOK(int statusCode, HttpServerResponse response) {
 		response.setStatusCode(statusCode).end("200 ok");
 	}
-
 }

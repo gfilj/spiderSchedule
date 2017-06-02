@@ -40,6 +40,7 @@ public class CalAbility {
 		if(reset){
 //			 spiderScheduleAbility = new AtomicInteger(ipNum*ipAbility/sourceidConsume);
 			 spiderScheduleAbility = new AtomicInteger(15);
+			 reset = false;
 		}
 		return spiderScheduleAbility;
 	}
