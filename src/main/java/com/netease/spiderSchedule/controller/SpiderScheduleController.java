@@ -11,6 +11,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.netease.spiderSchedule.boot.PredictionBootStrap;
 import com.netease.spiderSchedule.model.SpiderRateInfoDto;
+import com.netease.spiderSchedule.model.SpiderScheduleDto;
 import com.netease.spiderSchedule.model.prediction.PredictionSpiderRecordStaticInfo;
 import com.netease.spiderSchedule.service.spiderRateInfo.SpiderRateInfoService;
 import com.netease.spiderSchedule.service.spiderRateInfo.impl.SpiderRateInfoServiceImpl;
@@ -68,7 +69,6 @@ public class SpiderScheduleController extends AbstractVerticle {
 		spiderRecordInfoService = (SpiderRecodeInfoService) context.getBean("spiderRecordInfoServie");
 		Runner.runExample(SpiderScheduleController.class);
 		System.out.println("init down!");
-		System.err.println(calAbility.getSpiderScheduleAbility().addAndGet(-2));
 	}
 
 	@Override
@@ -176,12 +176,15 @@ public class SpiderScheduleController extends AbstractVerticle {
 			return;
 		}
 		JsonArray arr = new JsonArray();
-		if(calAbility.getSpiderScheduleAbility().get() >0){
+		if(calAbility.getSpiderScheduleAbility().get() > 0){
 			if (calAbility.getSpiderScheduleAbility().addAndGet(0 - taskNum) < 0) {
 				taskNum = calAbility.getSpiderScheduleAbility().addAndGet(taskNum);
+			}else{
+				calAbility.getSpiderScheduleAbility().addAndGet(taskNum);
 			}
-			spiderSortService.getTask(taskNum, spiderRateInfoService).forEach((v) -> arr.add(JsonObject.mapFrom(v)));
-			int size = arr.size();
+			List<SpiderScheduleDto> list =  spiderSortService.getTask(taskNum, spiderRateInfoService);
+			list.forEach((v)->arr.add(JsonObject.mapFrom(v)));
+			int size = list.size();
 			calAbility.getSpiderScheduleAbility().addAndGet(0 - size);
 			logger.info("当前要的公众号数目：" + taskNum + ",5分钟内的剩余抓取量：" + calAbility.getSpiderScheduleAbility() + ",获取的队列大小:" + size);
 			response.putHeader("content-type", "application/json").end(arr.encodePrettily());
