@@ -68,6 +68,7 @@ public class SpiderScheduleController extends AbstractVerticle {
 		spiderRecordInfoService = (SpiderRecodeInfoService) context.getBean("spiderRecordInfoServie");
 		Runner.runExample(SpiderScheduleController.class);
 		System.out.println("init down!");
+		System.err.println(calAbility.getSpiderScheduleAbility().addAndGet(-2));
 	}
 
 	@Override
@@ -174,15 +175,19 @@ public class SpiderScheduleController extends AbstractVerticle {
 			sendError(400, response);
 			return;
 		}
-		if (calAbility.getSpiderScheduleAbility().addAndGet(0 - taskNum) < 0) {
-			
-			taskNum = calAbility.getSpiderScheduleAbility().addAndGet(taskNum);
-		}
 		JsonArray arr = new JsonArray();
-		spiderSortService.getTask(taskNum, spiderRateInfoService).forEach((v) -> arr.add(JsonObject.mapFrom(v)));
-		calAbility.getSpiderScheduleAbility().addAndGet(0 - arr.size());
-		logger.info("当前可获取的公众号数目：" + taskNum + ",5分钟内的剩余抓取量：" + calAbility.getSpiderScheduleAbility() + ",时间获取的队列大小:" + arr.size());
-		response.putHeader("content-type", "application/json").end(arr.encodePrettily());
+		if(calAbility.getSpiderScheduleAbility().get() >0){
+			if (calAbility.getSpiderScheduleAbility().addAndGet(0 - taskNum) < 0) {
+				taskNum = calAbility.getSpiderScheduleAbility().addAndGet(taskNum);
+			}
+			spiderSortService.getTask(taskNum, spiderRateInfoService).forEach((v) -> arr.add(JsonObject.mapFrom(v)));
+			int size = arr.size();
+			calAbility.getSpiderScheduleAbility().addAndGet(0 - size);
+			logger.info("当前要的公众号数目：" + taskNum + ",5分钟内的剩余抓取量：" + calAbility.getSpiderScheduleAbility() + ",获取的队列大小:" + size);
+			response.putHeader("content-type", "application/json").end(arr.encodePrettily());
+		}else{
+			response.putHeader("content-type", "application/json").end(arr.encodePrettily());
+		}
 
 	}
 
