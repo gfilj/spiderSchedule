@@ -12,6 +12,7 @@ import java.util.Random;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import com.netease.spiderSchedule.model.SpiderRateInfo;
@@ -21,6 +22,7 @@ import com.netease.spiderSchedule.model.SpiderScheduleDto;
 import com.netease.spiderSchedule.model.SpiderSourceInfo;
 import com.netease.spiderSchedule.service.spiderRateInfo.SpiderRateInfoService;
 import com.netease.spiderSchedule.service.spiderRecordInfo.SpiderRecodeInfoService;
+import com.netease.spiderSchedule.service.spiderSort.SpiderSortService;
 import com.netease.spiderSchedule.service.spiderSourceInfo.SpiderSourceInfoService;
 import com.netease.spiderSchedule.util.TimeSimulator;
 
@@ -33,6 +35,9 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 	protected SpiderSourceInfoService spiderSourceInfoServie;
 	@Autowired
 	private SpiderRecodeInfoService spiderRecordInfoServie;
+	@Autowired
+	@Qualifier("smoothingAlgorithmSpiderSortService")
+	private SpiderSortService spiderSortService;
 
 	private static final int TIMESLICE = 5;
 	private static final int TIMESLICECOUNT = 24 * 60 / TIMESLICE;
@@ -293,6 +298,7 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		generateRateMap(0, 9);
+		spiderSortService.addTask(this);
 	}
 
 }
