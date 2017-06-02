@@ -179,9 +179,9 @@ public class SpiderScheduleController extends AbstractVerticle {
 			taskNum = calAbility.getSpiderScheduleAbility().addAndGet(taskNum);
 		}
 		JsonArray arr = new JsonArray();
-		logger.info("当前可获取的公众号数目：" + taskNum + "5分钟内的剩余抓取量：" + calAbility.getSpiderScheduleAbility());
 		spiderSortService.getTask(taskNum, spiderRateInfoService).forEach((v) -> arr.add(JsonObject.mapFrom(v)));
-		calAbility.getSpiderScheduleAbility().addAndGet(taskNum - arr.size());
+		calAbility.getSpiderScheduleAbility().addAndGet(0 - arr.size());
+		logger.info("当前可获取的公众号数目：" + taskNum + ",5分钟内的剩余抓取量：" + calAbility.getSpiderScheduleAbility());
 		response.putHeader("content-type", "application/json").end(arr.encodePrettily());
 
 	}
@@ -192,7 +192,7 @@ public class SpiderScheduleController extends AbstractVerticle {
 		try {
 			sourceId = String.valueOf(routingContext.request().getParam("sourceId"));
 		} catch (Exception e) {
-			sendError(400, response);
+			sendError(400, response);	
 			return;
 		}
 		// 整理次数
