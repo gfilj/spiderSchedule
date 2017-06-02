@@ -68,10 +68,6 @@ public class SpiderScheduleController extends AbstractVerticle {
 		spiderRecordInfoService = (SpiderRecodeInfoService) context.getBean("spiderRecordInfoServie");
 		Runner.runExample(SpiderScheduleController.class);
 		System.out.println("init down!");
-		for (int i = 0; i < 15; i++) {
-			calAbility.getSpiderScheduleAbility().addAndGet(-2);
-		}
-		System.out.println();
 	}
 
 	@Override
