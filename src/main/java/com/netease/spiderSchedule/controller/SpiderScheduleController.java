@@ -58,7 +58,7 @@ public class SpiderScheduleController extends AbstractVerticle {
 
 	public static Map<String, Integer> errorHandleMap = Collections.synchronizedMap(new HashMap<String, Integer>());
 	
-	protected Logger logger = Logger.getLogger(getClass());
+	protected static Logger logger = Logger.getLogger(SpiderScheduleController.class);
 	
 	public static void main(String[] args) {
 		context = new ClassPathXmlApplicationContext("classpath*:config/spring-application.xml");
@@ -74,7 +74,7 @@ public class SpiderScheduleController extends AbstractVerticle {
 	public void start() {
 		Router router = Router.router(vertx);
 		router.route().handler(BodyHandler.create());
-		router.get("/getTask/:taskNum").handler(this::handleGetTask);
+		router.get("/getTask/:taskNum").handler(SpiderScheduleController::handleGetTask);
 		router.put("/addTask").handler(this::handleAddTask);
 		router.get("/getRateMap/:sourceId").handler(this::handleGetRateMap);
 		router.get("/getRateMap/:sourceId").handler(this::handleGetRateMap);
@@ -165,7 +165,7 @@ public class SpiderScheduleController extends AbstractVerticle {
 		vertx.createHttpServer().requestHandler(router::accept).listen(8079);
 	}
 
-	private void handleGetTask(RoutingContext routingContext) {
+	private static synchronized void handleGetTask(RoutingContext routingContext) {
 		HttpServerResponse response = routingContext.response();
 		int taskNum = 1;
 		try {
@@ -237,7 +237,7 @@ public class SpiderScheduleController extends AbstractVerticle {
 		}
 	}
 
-	private void sendError(int statusCode, HttpServerResponse response) {
+	private static void sendError(int statusCode, HttpServerResponse response) {
 		response.setStatusCode(statusCode).end("400 error");
 	}
 

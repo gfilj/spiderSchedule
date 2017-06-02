@@ -7,7 +7,8 @@ public class CalAbility {
 	private int ipNum=10;
 	private int ipAbility=50;
 	private int sourceidConsume=18;
-	private AtomicInteger spiderScheduleAbility = new AtomicInteger(ipNum*ipAbility/sourceidConsume);
+//	private AtomicInteger spiderScheduleAbility = new AtomicInteger(ipNum*ipAbility/sourceidConsume);
+	private AtomicInteger spiderScheduleAbility = new AtomicInteger(15);
 	private boolean reset = false;
 	private static CalAbility instance = new CalAbility();
 	
