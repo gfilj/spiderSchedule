@@ -181,7 +181,7 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 					int combinekey = i - j;
 					if (combinekey >= 0) {
 						Double combineValue = timeSlicePredict.get(combinekey);
-						System.out.println(v.getSourceId() + " " + i + "/" + combinekey + " " + combineValue);
+//						System.out.println(v.getSourceId() + " " + i + "/" + combinekey + " " + combineValue);
 						timeSlicePredict.put(combinekey, -1d);
 						if (combineValue < 0) {
 							if (combineMax > 0) {
@@ -242,7 +242,7 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 			if (v.isTooOld()) {
 				v.setUpdate_time(cal.getTime());
 			} else {
-				System.out.println(v);
+//				System.out.println(v);
 				v.setUpdate_time(new Date());
 			}
 		});
