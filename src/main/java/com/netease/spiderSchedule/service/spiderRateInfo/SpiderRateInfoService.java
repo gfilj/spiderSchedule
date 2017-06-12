@@ -12,4 +12,5 @@ public interface SpiderRateInfoService {
 	void addRateMap(SpiderRateInfoDto spiderRateInfoDto);
 	void generateRateMap(int start, int end);
 	Map<String, SpiderRateInfo> getRateMap();
+	int getCountTooOld();
 }

@@ -52,6 +52,11 @@ public class TimeSimulator {
 		return this;
 	}
 	
+	public TimeSimulator get20sAfter() {
+		calendar.add(Calendar.SECOND, 20);
+		return this;
+	}
+	
 	public Date getMinuteAfterWithoutModify(int minute) {
 		Calendar calendarTemp = Calendar.getInstance();
 		calendarTemp.setTime(calendar.getTime());
@@ -79,6 +84,15 @@ public class TimeSimulator {
 	}
 	
 	public boolean inStopGrapSegment(){
-		return calendar.get(Calendar.HOUR_OF_DAY)==3||calendar.get(Calendar.HOUR_OF_DAY)==4||calendar.get(Calendar.HOUR_OF_DAY)==5;
+		return calendar.get(Calendar.HOUR_OF_DAY)==2||calendar.get(Calendar.HOUR_OF_DAY)==3||calendar.get(Calendar.HOUR_OF_DAY)==4||calendar.get(Calendar.HOUR_OF_DAY)==5||calendar.get(Calendar.HOUR_OF_DAY)==6;
+	}
+	
+	public boolean inStopAddSegment(){
+//		return calendar.get(Calendar.HOUR_OF_DAY)==9;
+		return inStopGrapSegment();
+	}
+	
+	public boolean inIncreaseAddSegment(){
+		return calendar.get(Calendar.HOUR_OF_DAY)==7||calendar.get(Calendar.HOUR_OF_DAY)==8;
 	}
 }

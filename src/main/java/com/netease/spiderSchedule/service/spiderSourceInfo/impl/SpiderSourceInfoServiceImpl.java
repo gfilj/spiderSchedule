@@ -29,6 +29,7 @@ public class SpiderSourceInfoServiceImpl extends AbsBaseServiceImpl<SpiderSource
 			return spiderSourceMapper.selectBySourceid(sourceid);
 		} catch (Exception e) {
 			e.printStackTrace();
+			System.err.println(sourceid);
 		}
 		return null;
 	}

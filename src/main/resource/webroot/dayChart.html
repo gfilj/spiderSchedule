@@ -2,27 +2,47 @@
 	<head>
 		<meta charset="utf-8">
 		<title>dayChart</title>
-		<script src="../static/Chart.js"></script>
-		<style> 
-			body{ text-align:center} 
-		</style> 
-	</head>
+		
+		
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<link rel="stylesheet" href="../static/bootstrap.min.css">
+	<script src="../static/jquery.min.js"></script>
+	<script src="../static/tether.min.js"></script>
+	<script src="../static/bootstrap.min.js"></script>
+	<script src="../static/Chart.js"></script>
+</head>
 	<body>
-		<div style="width:50%f " >
-			<div>
-				<canvas id="canvas" height="50%" width="70%"></canvas>
-			</div>
+	<div class="container">
+		<div>
+			<h1>Day Chart</h1>
 		</div>
-		<div style="width:50%" >
-			<div>
-				<canvas id="canvas1" height="50%" width="70%"></canvas>
+		<form>
+			<div class="form-group">
+				<label for="inputUrls">Day before current</label>
+				<textarea class="form-control" placeholder="1"
+					id="txtToDealId" rows="1"></textarea>
 			</div>
+		</form>
+		<div>
+			<button onclick="mySubmit()" class="btn btn-default">submit</button>
 		</div>
-
+		<div style="width:100%;margin:auto " >
+			<div id = "datanum"></div>
+		</div>
+		<div style="width:100%;margin:auto" >
+			
+			<div id = "percent"></div>
+		</div>
+<div>
 
 <script type="text/javascript">
 	function loadChart()
-	{
+	{	
+		var child = document.getElementById("datanum");
+		child.innerHTML = "<h4>数据比对图</h4><canvas id=\"canvas\" height=\"50%\" width=\"70%\"></canvas>";
+		child = document.getElementById("percent");
+		child.innerHTML = "<h4>百分比比对图</h4><canvas id=\"canvas1\" height=\"50%\" width=\"70%\"></canvas>";
 		var xmlhttp;
 		if (window.XMLHttpRequest)
 		{
@@ -40,7 +60,7 @@
                 //使用eval函数使返回的字符串变成js对象
                 var datas = eval("(" + result + ")");
 				var lineChartData = {
-					labels : ["5","10","20","30","40","50","60","70","80","90","100","110","120","130","140","150","160","170","180","up"],
+					labels : ["5","10","20","30","40","50","60","70","80","90","100","110","120","130","140","150","160","170","180","190","200","210","220","230","240","all"],
 					datasets : [
 						{
 							label: "My First dataset",
@@ -69,6 +89,12 @@
 							        datas[0].count160,
 							        datas[0].count170,
 							        datas[0].count180,
+							        datas[0].count190,
+							        datas[0].count200,
+							        datas[0].count210,
+							        datas[0].count220,
+							        datas[0].count230,
+							        datas[0].count240,
 							        datas[0].countAll]
 						},
 						{
@@ -98,6 +124,12 @@
 							        datas[1].count160,
 							        datas[1].count170,
 							        datas[1].count180,
+							        datas[1].count190,
+							        datas[1].count200,
+							        datas[1].count210,
+							        datas[1].count220,
+							        datas[1].count230,
+							        datas[1].count240,
 							        datas[1].countAll]
 						}
 					]
@@ -111,7 +143,7 @@
 				
 				
 				var lineChartData = {
-						labels : ["5","10","20","30","40","50","60","70","80","90","100","110","120","130","140","150","160","170","180","up"],
+						labels : ["5","10","20","30","40","50","60","70","80","90","100","110","120","130","140","150","160","170","180","190","200","210","220","230","240","all"],
 						datasets : [
 							{
 								label: "My First dataset",
@@ -140,7 +172,13 @@
 								        datas[0].count160Percent,
 								        datas[0].count170Percent,
 								        datas[0].count180Percent,
-								        datas[0].countUpPercent]
+								        datas[0].count190Percent,
+								        datas[0].count200Percent,
+								        datas[0].count210Percent,
+								        datas[0].count220Percent,
+								        datas[0].count230Percent,
+								        datas[0].count240Percent,
+								        datas[0].countAllPercent]
 							},
 							{
 								label: "My Second dataset",
@@ -169,7 +207,13 @@
 								        datas[1].count160Percent,
 								        datas[1].count170Percent,
 								        datas[1].count180Percent,
-								        datas[1].countUpPercent]
+								        datas[1].count190Percent,
+								        datas[1].count200Percent,
+								        datas[1].count210Percent,
+								        datas[1].count220Percent,
+								        datas[1].count230Percent,
+								        datas[1].count240Percent,
+								        datas[1].countAllPercent]
 							}
 						]
 			
@@ -181,11 +225,10 @@
 			}
 			
 		}
-		xmlhttp.open("POST","/statistics",true);
+		xmlhttp.open("POST" , "/statistics/"+$("#txtToDealId").val() , true);
 		xmlhttp.send();
 	}	
-
-	window.onload = function(){
+	function mySubmit() {
 		loadChart();
 	}
 </script>

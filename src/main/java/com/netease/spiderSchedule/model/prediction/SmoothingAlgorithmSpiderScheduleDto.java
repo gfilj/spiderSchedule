@@ -42,7 +42,7 @@ public class SmoothingAlgorithmSpiderScheduleDto extends SpiderScheduleDto{
 
 
 	public Double getTimeSliceCountValue(SpiderRateInfo spiderRateInfo, int timeSliceKey) {
-		return spiderRateInfo.getTimeSlicePredict().get((timeSliceKey + 3)%288);
+		return spiderRateInfo.getTimeSlicePredict().get((timeSliceKey)%288);
 	}
 
 }

@@ -29,8 +29,14 @@ public class SpiderScheduleTask {
 	 */
 	
 	public void perFiveMinutesSchedule(){
-		SpiderScheduleController.calAbility.setReset(true);
+		
 		spiderSortService.addTask(spiderRateInfoService);
 	}
-
+	
+	/**
+	 * 相隔20s
+	 */
+	public void per20sSchedule(){
+		SpiderScheduleController.calAbility.setReset(true);
+	}
 }

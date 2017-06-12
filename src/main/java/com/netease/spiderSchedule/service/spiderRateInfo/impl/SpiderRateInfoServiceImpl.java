@@ -42,9 +42,33 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 	private static final int TIMESLICE = 5;
 	private static final int TIMESLICECOUNT = 24 * 60 / TIMESLICE;
 
-	// public static final int
+	private int combineInterval = 5;
+
+	public int getCombineInterval() {
+		return combineInterval;
+	}
+
+	public void setCombineInterval(int combineInterval) {
+		this.combineInterval = combineInterval;
+	}
+
+	private int countTooOld = 200;
+
+	public int getCountTooOld() {
+		return countTooOld;
+	}
+
+	public void setCountTooOld(int countTooOld) {
+		this.countTooOld = countTooOld;
+	}
+
 	@Override
 	public void generateRateMap(int start, int end) {
+		generateRateMapDetail(start, end, 2, 7);
+
+	}
+
+	public void generateRateMapDetail(int start, int end, int freeStart, int freeEnd) {
 		rateMap.clear();
 		List<SpiderRecordInfo> spiderRecordInfoList = spiderRecordInfoServie.selectInterval(start, end);
 		Calendar calendar = Calendar.getInstance();
@@ -134,41 +158,43 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 		}
 
 		// 合并时间片
-		// 针对4,5,6期间的时间片按照最大的分数合并到6点对应的时间片为
+		// 针对2,3,4,5,6,7期间的时间片按照最大的分数合并到6点对应的时间片为
 		// 针对半个小时有连续概率大于0的全部合并到其后
 		int spiderRateInfoTimes = 0;
 		for (SpiderRateInfo v : rateMap.values()) {
 			spiderRateInfoTimes++;
 			Map<Integer, Double> timeSlicePredict = v.getTimeSlicePredict();
+			int offset = spiderRateInfoTimes % combineInterval;
+
 			double freeMax = 0.0d;
-			for (int i = 35; i < 72; i++) {
+			for (int i = freeStart * 12 + 1; i < freeEnd * 12 + offset; i++) {
+				timeSlicePredict.put(i, -1d);
 				if (freeMax < timeSlicePredict.get(i)) {
 					freeMax = timeSlicePredict.get(i);
-					timeSlicePredict.put(i, -1d);
 				}
 			}
-			timeSlicePredict.put(72, freeMax);
-			final int combineInterval = 5;//new Random().nextInt(3)+
-			for (int i = timeSlicePredict.size() - spiderRateInfoTimes%5-1; i >= 0; i--) {
-				double combineMax = 0.0d;
-				for (int j = 0; j <= combineInterval; j++) {
-
+			timeSlicePredict.put(freeEnd * 12 + offset + 1, freeMax);
+			int j = 1;
+			for (int i = timeSlicePredict.size() - 1 - offset; i >= 0; i -= j) {
+				double combineMax = timeSlicePredict.get(i);
+				for (j = 1; j < combineInterval; j++) {
 					int combinekey = i - j;
 					if (combinekey >= 0) {
 						Double combineValue = timeSlicePredict.get(combinekey);
+						System.out.println(v.getSourceId() + " " + i + "/" + combinekey + " " + combineValue);
 						timeSlicePredict.put(combinekey, -1d);
-						if (combineValue < 0 || j == combineInterval) {
+						if (combineValue < 0) {
 							if (combineMax > 0) {
 								timeSlicePredict.put(i, combineMax);
 							}
-							i = combinekey;
+							// i = combinekey;
 							break;
 						} else {
 							if (combineMax < combineValue) {
 								combineMax = combineValue;
 							}
 						}
-					}else{
+					} else {
 						if (combineMax > 0) {
 							timeSlicePredict.put(i, combineMax);
 						}
@@ -177,11 +203,14 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 				}
 			}
 
+			for (int i = timeSlicePredict.size() - 1; i > timeSlicePredict.size() - 1 - offset; i--) {
+				timeSlicePredict.put(i, -1d);
+			}
+
 		}
 		// makeup all source
 		List<SpiderSourceInfo> sourceList = spiderSourceInfoServie.selectAll();
 
-		int countTooOld = 0;
 		System.out.println("before add sourceId ---------------->" + rateMap.size());
 		for (SpiderSourceInfo spiderSourceInfo : sourceList) {
 			String sourceid = spiderSourceInfo.getSourceid();
@@ -213,10 +242,10 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 			if (v.isTooOld()) {
 				v.setUpdate_time(cal.getTime());
 			} else {
+				System.out.println(v);
 				v.setUpdate_time(new Date());
 			}
 		});
-
 	}
 
 	public Double getValueST(LinkedList<Double> spiderRateInfoS, int i) {

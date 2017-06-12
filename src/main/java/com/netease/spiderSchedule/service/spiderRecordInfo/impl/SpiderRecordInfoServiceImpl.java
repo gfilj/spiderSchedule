@@ -29,7 +29,8 @@ public class SpiderRecordInfoServiceImpl extends AbsBaseServiceImpl<SpiderRecord
 	@Override
 	public List<SpiderRecordInfo> selectInterval(int start, int end) {
 		try {
-			return spiderRecordMapper.selectJointInterval(start, end);
+//			return spiderRecordMapper.selectJointInterval(start, end);
+			return spiderRecordMapper.selectInterval(start, end);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

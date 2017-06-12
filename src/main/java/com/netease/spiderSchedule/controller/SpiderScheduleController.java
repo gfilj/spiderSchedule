@@ -10,6 +10,8 @@ import org.apache.log4j.Logger;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.netease.spiderSchedule.boot.PredictionBootStrap;
+import com.netease.spiderSchedule.model.PredictionRecordStaticInfoKey;
+import com.netease.spiderSchedule.model.PredictionRecordStaticInfoValue;
 import com.netease.spiderSchedule.model.SpiderRateInfoDto;
 import com.netease.spiderSchedule.model.SpiderScheduleDto;
 import com.netease.spiderSchedule.model.prediction.PredictionSpiderRecordStaticInfo;
@@ -41,22 +43,9 @@ public class SpiderScheduleController extends AbstractVerticle {
 	private static SpiderRateInfoService spiderRateInfoService;
 	private static SpiderSortService spiderSortService;
 	private static SpiderRecodeInfoService spiderRecordInfoService;
-	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo1 = Collections
-			.<PredictionSpiderRecordStaticInfo> emptyList();
-	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo2 = Collections
-			.<PredictionSpiderRecordStaticInfo> emptyList();
-	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo3 = Collections
-			.<PredictionSpiderRecordStaticInfo> emptyList();
-	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo4 = Collections
-			.<PredictionSpiderRecordStaticInfo> emptyList();
-	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo5 = Collections
-			.<PredictionSpiderRecordStaticInfo> emptyList();
-	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo6 = Collections
-			.<PredictionSpiderRecordStaticInfo> emptyList();
-	private static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo7 = Collections
-			.<PredictionSpiderRecordStaticInfo> emptyList();
 	public static CalAbility calAbility = new CalAbility();
-
+	private static Map<PredictionRecordStaticInfoKey,PredictionRecordStaticInfoValue> predirctSpiderRecordInfoMap = new HashMap<PredictionRecordStaticInfoKey, PredictionRecordStaticInfoValue>();
+	
 	public static Map<String, Integer> errorHandleMap = Collections.synchronizedMap(new HashMap<String, Integer>());
 	
 	protected static Logger logger = Logger.getLogger(SpiderScheduleController.class);
@@ -69,6 +58,11 @@ public class SpiderScheduleController extends AbstractVerticle {
 		spiderRecordInfoService = (SpiderRecodeInfoService) context.getBean("spiderRecordInfoServie");
 		Runner.runExample(SpiderScheduleController.class);
 		System.out.println("init down!");
+//		String str = "";
+//		for(int i=0;i<=287;i++){
+//			str += ("datas[i + 2].key"+i+",");
+//		}
+//		System.out.println(str);
 	}
 
 	@Override
@@ -97,17 +91,28 @@ public class SpiderScheduleController extends AbstractVerticle {
 			ctx.response().end("Hello " + ctx.request().getParam("name") + "!");
 		});
 
-		router.post("/statistics").handler(ctx -> {
+		router.post("/statistics/:dayBeforeCurrent").handler(ctx -> {
+			String paramval = "";
+			int dayBeforeCurrent = 1;
+			try {
+				paramval = ctx.request().getParam("dayBeforeCurrent");
+				dayBeforeCurrent = Integer.parseInt(paramval);
+			} catch (Exception e) {
+				e.printStackTrace();
+				sendError(400,ctx.response());
+				
+			}
+			
 			ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, "text/plain");
 			// note the form attribute matches the html form element name.
 			PredictionSpiderRecordStaticInfo spiderRecordStaticInfo = new PredictionSpiderRecordStaticInfo();
-			spiderRecordInfoService.selectIntervalDataBase("spider_record_info_test", 1, 2).forEach((v) -> {
+			spiderRecordInfoService.selectIntervalDataBase("spider_record_info_test", dayBeforeCurrent, dayBeforeCurrent+1).forEach((v) -> {
 				long timeDelay = v.getUpdate_time().getTime() - v.getCreate_time().getTime();
 				spiderRecordStaticInfo.statistics(timeDelay, v);
 			});
 
 			PredictionSpiderRecordStaticInfo spiderRecordStaticInfo1 = new PredictionSpiderRecordStaticInfo();
-			spiderRecordInfoService.selectIntervalDataBase("spider_record_info_test_1", 1, 2).forEach((v) -> {
+			spiderRecordInfoService.selectIntervalDataBase("spider_record_info_test_1", dayBeforeCurrent, dayBeforeCurrent+1).forEach((v) -> {
 				long timeDelay = v.getUpdate_time().getTime() - v.getCreate_time().getTime();
 				spiderRecordStaticInfo1.statistics(timeDelay, v);
 			});
@@ -125,40 +130,31 @@ public class SpiderScheduleController extends AbstractVerticle {
 			});
 			ctx.response().end(arr.encodePrettily());
 		});
-		router.post("/predictRecord").handler(ctx -> {
-
+		router.post("/predictRecord/:dayInterval/:combineTimeSlice/:taskNum").handler(ctx -> {
+			
 			ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, "text/plain");
 			JsonArray arr = new JsonArray();
-			if (predirctSpiderRecordInfo1.size() == 0) {
-				predirctSpiderRecordInfo1 = PredictionBootStrap.predirctSpiderRecordInfo(context, 2);
-				predirctSpiderRecordInfo2 = PredictionBootStrap.predirctSpiderRecordInfo(context, 3);
-				predirctSpiderRecordInfo3 = PredictionBootStrap.predirctSpiderRecordInfo(context, 4);
-				predirctSpiderRecordInfo4 = PredictionBootStrap.predirctSpiderRecordInfo(context, 5);
-				predirctSpiderRecordInfo5 = PredictionBootStrap.predirctSpiderRecordInfo(context, 6);
-				predirctSpiderRecordInfo6 = PredictionBootStrap.predirctSpiderRecordInfo(context, 7);
-				predirctSpiderRecordInfo7 = PredictionBootStrap.predirctSpiderRecordInfo(context, 8);
+			int dayInterval = 7;
+			int combineTimeSlice = 5;
+			int taskNum = 15;
+			try {
+				dayInterval = Integer.parseInt(ctx.request().getParam("dayInterval"));
+				combineTimeSlice = Integer.parseInt(ctx.request().getParam("combineTimeSlice"));
+				taskNum = Integer.parseInt(ctx.request().getParam("taskNum"));
+			} catch (Exception e) {
+				e.printStackTrace();
+				sendError(400,ctx.response());
 			}
-			predirctSpiderRecordInfo1.forEach((v) -> {
-				arr.add(JsonObject.mapFrom(v));
-			});
-			predirctSpiderRecordInfo2.forEach((v) -> {
-				arr.add(JsonObject.mapFrom(v));
-			});
-			predirctSpiderRecordInfo3.forEach((v) -> {
-				arr.add(JsonObject.mapFrom(v));
-			});
-			predirctSpiderRecordInfo4.forEach((v) -> {
-				arr.add(JsonObject.mapFrom(v));
-			});
-			predirctSpiderRecordInfo5.forEach((v) -> {
-				arr.add(JsonObject.mapFrom(v));
-			});
-			predirctSpiderRecordInfo6.forEach((v) -> {
-				arr.add(JsonObject.mapFrom(v));
-			});
-			predirctSpiderRecordInfo7.forEach((v) -> {
-				arr.add(JsonObject.mapFrom(v));
-			});
+			
+			PredictionRecordStaticInfoKey predictionRecordStaticInfoKey = PredictionRecordStaticInfoKey.getInstance(dayInterval, combineTimeSlice, taskNum);
+			PredictionRecordStaticInfoValue predictionRecordStaticInfoValue = predirctSpiderRecordInfoMap.get(predictionRecordStaticInfoKey);
+			if(predictionRecordStaticInfoValue == null){
+				predirctSpiderRecordInfoMap.put(predictionRecordStaticInfoKey, PredictionBootStrap.predirctSpiderRecordInfo(context, dayInterval, combineTimeSlice, taskNum));
+			}
+			PredictionRecordStaticInfoValue predictionRecordStaticInfoValueNotNull = predirctSpiderRecordInfoMap.get(predictionRecordStaticInfoKey);
+			arr.add(JsonObject.mapFrom(predictionRecordStaticInfoValueNotNull.getPredictRecord()));
+			arr.add(JsonObject.mapFrom(predictionRecordStaticInfoValueNotNull.getTrueRecord()));
+			arr.add(JsonObject.mapFrom(predictionRecordStaticInfoValueNotNull.getTimeSliceAddNumMap()));
 
 			ctx.response().end(arr.encodePrettily());
 		});

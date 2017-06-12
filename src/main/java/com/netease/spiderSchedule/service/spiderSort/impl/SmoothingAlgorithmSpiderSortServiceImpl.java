@@ -42,15 +42,11 @@ public class SmoothingAlgorithmSpiderSortServiceImpl extends SpiderSortServiceIm
 				if (smoothingAlgorithmSpiderScheduleDto.getScore() > 0) {
 					boolean canPut = true;
 					if (spiderRateInfo.isTooOld()) {
+						canPut = false;
 						countOld++;
-						if (countOld >= 1) {
-							canPut = false;
+						if(timeSliceKey >=9*12&&countOld < (spiderRateInfoService.getCountTooOld()/144)){
+							canPut = true;
 						}
-						// else {
-						// System.out.println(spiderRateInfo + "------" +
-						// smoothingAlgorithmSpiderScheduleDto + "------" +
-						// timeSliceKey);
-						// }
 					}
 					if (canPut) {
 						addCount++;

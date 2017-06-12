@@ -48,6 +48,24 @@
         </property>
     </bean>
     
+     <bean id="per20sScheduleBean" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject">
+            <ref bean="spiderScheduleTask"/>
+        </property>
+        <property name="targetMethod">
+            <value>per20sSchedule</value>
+        </property>
+    </bean>
+    
+    <bean id="per20sScheduleCron" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail">
+            <ref bean="perFiveMinutesScheduleBean"/>
+        </property>
+        <property name="cronExpression">
+            <value>*/20 * 0,1,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23 * * ?</value>
+        </property>
+    </bean>
+    
     
     <bean id="startQuertz" lazy-init="false" autowire="no" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
         <property name="autoStartup" value="true" />
@@ -55,6 +73,7 @@
             <list>
 				<ref bean="zeroScheduleCron"/>
 				<ref bean="perFiveMinutesScheduleCron"/>
+				<ref bean="per20sScheduleCron"/>
             </list>
         </property>
     </bean>

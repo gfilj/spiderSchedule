@@ -10,11 +10,14 @@ import java.util.Map.Entry;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import com.netease.spiderSchedule.model.PredictionRecordStaticInfoKey;
+import com.netease.spiderSchedule.model.PredictionRecordStaticInfoValue;
 import com.netease.spiderSchedule.model.SpiderRecordInfo;
 import com.netease.spiderSchedule.model.SpiderScheduleDto;
 import com.netease.spiderSchedule.model.prediction.PredictionSpiderRecordInfo;
 import com.netease.spiderSchedule.model.prediction.PredictionSpiderRecordStaticInfo;
 import com.netease.spiderSchedule.service.spiderRateInfo.PredictionSpiderRateInfoService;
+import com.netease.spiderSchedule.service.spiderRateInfo.impl.PredictionSpiderRateInfoServiceImpl;
 import com.netease.spiderSchedule.service.spiderRecordInfo.impl.SpiderRecordInfoServiceImpl;
 import com.netease.spiderSchedule.service.spiderSort.impl.SmoothingAlgorithmSpiderSortServiceImpl;
 import com.netease.spiderSchedule.sort.MaxHeap;
@@ -31,14 +34,15 @@ public class PredictionBootStrap {
 	public static void start() {
 		context = new ClassPathXmlApplicationContext("classpath*:config/spring-application.xml");
 		context.start();
-		predirctSpiderRecordInfo(context, 1);
+		predirctSpiderRecordInfo(context, 1, 5, 30);
 	}
 
-	public static List<PredictionSpiderRecordStaticInfo> predirctSpiderRecordInfo(
-			ClassPathXmlApplicationContext context, int start) {
+	public static PredictionRecordStaticInfoValue predirctSpiderRecordInfo(
+			ClassPathXmlApplicationContext context, int start, int combineInterval, int taskNum) {
+		PredictionRecordStaticInfoValue predictionRecordStaticInfoValue = new PredictionRecordStaticInfoValue();
 		Map<SpiderScheduleDto, HashSet<Date>> predictMap = new HashMap<SpiderScheduleDto, HashSet<Date>>();
 		// 查询过去1到8天的
-		PredictionSpiderRateInfoService predictionSpiderRateInfoServiceImpl = (PredictionSpiderRateInfoService) context
+		PredictionSpiderRateInfoServiceImpl predictionSpiderRateInfoServiceImpl = (PredictionSpiderRateInfoServiceImpl) context
 				.getBean("predictionSpiderRateInfoService");
 		SmoothingAlgorithmSpiderSortServiceImpl smoothingAlgorithmSpiderSortServiceImpl = (SmoothingAlgorithmSpiderSortServiceImpl) context
 				.getBean("smoothingAlgorithmSpiderSortService");
@@ -48,20 +52,23 @@ public class PredictionBootStrap {
 		timeSimulator.setDayBegin();
 		predictionSpiderRateInfoServiceImpl.setTimeSimulator(timeSimulator);
 		smoothingAlgorithmSpiderSortServiceImpl.setTimeSimulator(timeSimulator);
-		predictionSpiderRateInfoServiceImpl.generateRateMap(start + 1, start + 9);
+		predictionSpiderRateInfoServiceImpl.setCombineInterval(combineInterval);
+		predictionSpiderRateInfoServiceImpl.generateRateMap(start + 1, start + 10);
 
-		// 计算明天要统计的公众号
-		// int count = 0;
 		List<SpiderRecordInfo> todaySpiderRecordList = spiderRecordInfoServie.selectInterval(start, start + 1);
 		System.out.println(todaySpiderRecordList.size());
 		// sort
-		int i = 0,addCount=0;
+		Map<String, Integer> timeSliceAddNumMap = new HashMap<String, Integer>();
+		int taskNumTemp = taskNum;
 		while (!timeSimulator.isNextDay()) {
+			if(timeSimulator.inStopAddSegment()){
+				timeSliceAddNumMap.put( "key"+timeSimulator.getTimeSliceKey(),0);
+			}else{
+				timeSliceAddNumMap.put( "key"+timeSimulator.getTimeSliceKey(),smoothingAlgorithmSpiderSortServiceImpl.addTask(predictionSpiderRateInfoServiceImpl));
+			}
 			if (!timeSimulator.inStopGrapSegment()) {
-				addCount += smoothingAlgorithmSpiderSortServiceImpl.addTask(predictionSpiderRateInfoServiceImpl);
-				for (SpiderScheduleDto spiderScheduleDto : smoothingAlgorithmSpiderSortServiceImpl.getTask(15,
+				for (SpiderScheduleDto spiderScheduleDto : smoothingAlgorithmSpiderSortServiceImpl.getTask(taskNum,
 						predictionSpiderRateInfoServiceImpl)) {
-					i++;
 					if (predictMap.containsKey(spiderScheduleDto)) {
 						predictMap.get(spiderScheduleDto).add(timeSimulator.getDate());
 					} else {
@@ -73,7 +80,7 @@ public class PredictionBootStrap {
 			}
 			timeSimulator.getFiveMinuteAfter();
 		}
-		System.out.println("total count :" + i + "; add count:" + addCount);
+		predictionRecordStaticInfoValue.setTimeSliceAddNumMap(timeSliceAddNumMap);
 		// prediction
 		Map<SpiderRecordInfo, PredictionSpiderRecordInfo> todayPredictionSpiderRecordMap = new HashMap<SpiderRecordInfo, PredictionSpiderRecordInfo>();
 
@@ -104,15 +111,15 @@ public class PredictionBootStrap {
 			predictionSpiderRecordStaticInfo.statistics(entry, timeDelay, predictionSpiderRateInfoServiceImpl);
 		}
 		System.out.println(predictionSpiderRecordStaticInfo);
-		returnStaticInfo.add(predictionSpiderRecordStaticInfo);
+		predictionRecordStaticInfoValue.setPredictRecord(predictionSpiderRecordStaticInfo);
 		PredictionSpiderRecordStaticInfo spiderRecordStaticInfo = new PredictionSpiderRecordStaticInfo();
 		for (Entry<SpiderRecordInfo, PredictionSpiderRecordInfo> entry : todayPredictionSpiderRecordMap.entrySet()) {
 			long timeDelay = entry.getValue().getUpdate_time().getTime() - entry.getValue().getCreate_time().getTime();
 			spiderRecordStaticInfo.statistics(entry, timeDelay, predictionSpiderRateInfoServiceImpl);
 		}
 		System.out.println(spiderRecordStaticInfo);
-		returnStaticInfo.add(spiderRecordStaticInfo);
-		return returnStaticInfo;
+		predictionRecordStaticInfoValue.setTrueRecord(spiderRecordStaticInfo);
+		return predictionRecordStaticInfoValue;
 	}
 
 }

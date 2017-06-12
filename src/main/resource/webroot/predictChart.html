@@ -1,136 +1,218 @@
 <html>
-	<head>
-		<meta charset="utf-8">
-		<title>predictChart</title>
-		<script src="../static/Chart.js"></script>
-		<style> 
-			body{ text-align:center} 
-		</style> 
-	</head>
-	<body>
-		<div id="content"></div>
+<head>
+<meta charset="utf-8">
+<title>predictChart</title>
+<script src="../static/Chart.js"></script>
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta http-equiv="x-ua-compatible" content="ie=edge">
+<link rel="stylesheet" href="../static/bootstrap.min.css">
+<script src="../static/jquery.min.js"></script>
+<script src="../static/tether.min.js"></script>
+<script src="../static/bootstrap.min.js"></script>
+<script src="../static/Chart.js"></script>
+</head>
+<body>
+	<div class="container">
+		<div>
+			<h1>Day Chart</h1>
+			<div>
+				<form class="form-inline">
+					<div class="form-group">
+						<label for="inputDayInterval">dayInterval</label> <input
+							type="text" class="form-control" id="txtDayInterval"
+							placeholder="1">
+					</div>
+					<div class="form-group">
+						<label for="inputCombineTimeSlice">combineTimeSlice</label> <input
+							type="text" class="form-control" id="txtCombineTimeSlice"
+							placeholder="5">
+					</div>
+					<div class="form-group">
+						<label for="inputTaskNum">taskNum</label> <input type="text"
+							class="form-control" id="txtTaskNum" placeholder="15">
+					</div>
+				</form>
+			</div>
+			<div>
+				<button onclick="mySubmit()" class="btn btn-default">submit</button>
+			</div>
+			<div id="content"></div>
+		</div>
 
 
-<script type="text/javascript">
-	function loadChart()
-	{
-		var xmlhttp;
-		if (window.XMLHttpRequest)
-		{
-			xmlhttp=new XMLHttpRequest();
-		}
-		else
-		{
-			xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-		}
-		xmlhttp.onreadystatechange=function()
-		{
-			if (xmlhttp.readyState==4 && xmlhttp.status==200)
-			{
-			   	var result = xmlhttp.responseText;
-                //使用eval函数使返回的字符串变成js对象
-                var responseHtml = '';
-                var datas = eval("(" + result + ")");
-                for (var i=0; i < datas.length; i+=2) {
-                	var dayBefore = (i/2)+1;
-   	 				responseHtml += '<div style="width:50%;margin:auto" >' + dayBefore +'天的预测数据' + '<div><canvas id="canvas'+ dayBefore +'" height="50%" width="70%"></canvas></div></div>';
+		<script type="text/javascript">
+			function loadChart() {
+				var child = document.getElementById("content");
+				child.innerHTML = "";
+				var xmlhttp;
+				if (window.XMLHttpRequest) {
+					xmlhttp = new XMLHttpRequest();
+				} else {
+					xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
 				}
-				document.getElementById("content").innerHTML = responseHtml;
-				 for (var i=0; i < datas.length; i+=2) {
-	                	var dayBefore = (i/2)+1;
-	                	var lineChartData = {
-	    						labels : ["5","10","20","30","40","50","60","70","80","90","100","110","120","130","140","150","160","170","180","190","200","210","220","230","240","all"],
-	    						datasets : [
-	    							{
-	    								label: "My First dataset",
-	    								fillColor : "rgba(220,220,220,0.2)",
-	    								strokeColor : "rgba(220,220,220,1)",
-	    								pointColor : "rgba(220,220,220,1)",
-	    								pointStrokeColor : "#fff",
-	    								pointHighlightFill : "#fff",
-	    								pointHighlightStroke : "rgba(220,220,220,1)",
-	    								data : [datas[i].count5Percent,
-	    								        datas[i].count10Percent,
-	    								        datas[i].count20Percent,
-	    								        datas[i].count30Percent,
-	    								        datas[i].count40Percent,
-	    								        datas[i].count50Percent,
-	    								        datas[i].count60Percent,
-	    								        datas[i].count70Percent,
-	    								        datas[i].count80Percent,
-	    								        datas[i].count90Percent,
-	    								        datas[i].count100Percent,
-	    								        datas[i].count110Percent,
-	    								        datas[i].count120Percent,
-	    								        datas[i].count130Percent,
-	    								        datas[i].count140Percent,
-	    								        datas[i].count150Percent,
-	    								        datas[i].count160Percent,
-	    								        datas[i].count170Percent,
-	    								        datas[i].count180Percent,
-	    								        datas[i].count190Percent,
-	    								        datas[i].count200Percent,
-	    								        datas[i].count210Percent,
-	    								        datas[i].count220Percent,
-	    								        datas[i].count230Percent,
-	    								        datas[i].count240Percent,
-	    								        datas[i].countAllPercent]
-	    							},
-	    							{
-	    								label: "My Second dataset",
-	    								fillColor : "rgba(151,187,205,0.2)",
-	    								strokeColor : "rgba(151,187,205,1)",
-	    								pointColor : "rgba(151,187,205,1)",
-	    								pointStrokeColor : "#fff",
-	    								pointHighlightFill : "#fff",
-	    								pointHighlightStroke : "rgba(151,187,205,1)",
-	    								data : [datas[i+1].count5Percent,
-	    								        datas[i+1].count10Percent,
-	    								        datas[i+1].count20Percent,
-	    								        datas[i+1].count30Percent,
-	    								        datas[i+1].count40Percent,
-	    								        datas[i+1].count50Percent,
-	    								        datas[i+1].count60Percent,
-	    								        datas[i+1].count70Percent,
-	    								        datas[i+1].count80Percent,
-	    								        datas[i+1].count90Percent,
-	    								        datas[i+1].count100Percent,
-	    								        datas[i+1].count110Percent,
-	    								        datas[i+1].count120Percent,
-	    								        datas[i+1].count130Percent,
-	    								        datas[i+1].count140Percent,
-	    								        datas[i+1].count150Percent,
-	    								        datas[i+1].count160Percent,
-	    								        datas[i+1].count170Percent,
-	    								        datas[i+1].count180Percent,
-	    								        datas[i+1].count190Percent,
-	    								        datas[i+1].count200Percent,
-	    								        datas[i+1].count210Percent,
-	    								        datas[i+1].count220Percent,
-	    								        datas[i+1].count230Percent,
-	    								        datas[i+1].count240Percent,
-	    								        datas[i+1].countAllPercent]
-	    							}
-	    						]
-	    			
-	    					}
-	    					var ctx = document.getElementById("canvas" + dayBefore).getContext("2d");
-	    					window.myLine = new Chart(ctx).Line(lineChartData, {
-	    						responsive: true
-	    					});
+				xmlhttp.onreadystatechange = function() {
+					if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+						var result = xmlhttp.responseText;
+						//使用eval函数使返回的字符串变成js对象
+						var responseHtml = '';
+						var datas = eval("(" + result + ")");
+						for (var i = 0; i < datas.length; i += 3) {
+							var dayBefore = (i / 3) + 1;
+							responseHtml += '<div style="width:100%;margin:auto" >'
+									+ dayBefore
+									+ '天的预测数据'
+									+ '<div><canvas id="canvas'
+									+ dayBefore
+									+ '" height="50%" width="70%"></canvas></div></div>'
+									+ '<div style="width:100%;margin:auto" >'
+									+ dayBefore
+									+ '天的预测数据'
+									+ '<div><canvas id="canvasTimeSlice'
+									+ dayBefore
+									+ '" height="50%" width="70%"></canvas></div></div>';
+						}
+						document.getElementById("content").innerHTML = responseHtml;
+						for (var i = 0; i < datas.length; i += 3) {
+							var dayBefore = (i / 3) + 1;
+							var lineChartData = {
+								labels : [ "5", "10", "20", "30", "40", "50",
+										"60", "70", "80", "90", "100", "110",
+										"120", "130", "140", "150", "160",
+										"170", "180", "190", "200", "210",
+										"220", "230", "240", "all" ],
+								datasets : [
+										{
+											label : "My First dataset",
+											fillColor : "rgba(220,220,220,0.2)",
+											strokeColor : "rgba(220,220,220,1)",
+											pointColor : "rgba(220,220,220,1)",
+											pointStrokeColor : "#fff",
+											pointHighlightFill : "#fff",
+											pointHighlightStroke : "rgba(220,220,220,1)",
+											data : [ datas[i].count5Percent,
+													datas[i].count10Percent,
+													datas[i].count20Percent,
+													datas[i].count30Percent,
+													datas[i].count40Percent,
+													datas[i].count50Percent,
+													datas[i].count60Percent,
+													datas[i].count70Percent,
+													datas[i].count80Percent,
+													datas[i].count90Percent,
+													datas[i].count100Percent,
+													datas[i].count110Percent,
+													datas[i].count120Percent,
+													datas[i].count130Percent,
+													datas[i].count140Percent,
+													datas[i].count150Percent,
+													datas[i].count160Percent,
+													datas[i].count170Percent,
+													datas[i].count180Percent,
+													datas[i].count190Percent,
+													datas[i].count200Percent,
+													datas[i].count210Percent,
+													datas[i].count220Percent,
+													datas[i].count230Percent,
+													datas[i].count240Percent,
+													datas[i].countAllPercent ]
+										},
+										{
+											label : "My Second dataset",
+											fillColor : "rgba(151,187,205,0.2)",
+											strokeColor : "rgba(151,187,205,1)",
+											pointColor : "rgba(151,187,205,1)",
+											pointStrokeColor : "#fff",
+											pointHighlightFill : "#fff",
+											pointHighlightStroke : "rgba(151,187,205,1)",
+											data : [
+													datas[i + 1].count5Percent,
+													datas[i + 1].count10Percent,
+													datas[i + 1].count20Percent,
+													datas[i + 1].count30Percent,
+													datas[i + 1].count40Percent,
+													datas[i + 1].count50Percent,
+													datas[i + 1].count60Percent,
+													datas[i + 1].count70Percent,
+													datas[i + 1].count80Percent,
+													datas[i + 1].count90Percent,
+													datas[i + 1].count100Percent,
+													datas[i + 1].count110Percent,
+													datas[i + 1].count120Percent,
+													datas[i + 1].count130Percent,
+													datas[i + 1].count140Percent,
+													datas[i + 1].count150Percent,
+													datas[i + 1].count160Percent,
+													datas[i + 1].count170Percent,
+													datas[i + 1].count180Percent,
+													datas[i + 1].count190Percent,
+													datas[i + 1].count200Percent,
+													datas[i + 1].count210Percent,
+													datas[i + 1].count220Percent,
+													datas[i + 1].count230Percent,
+													datas[i + 1].count240Percent,
+													datas[i + 1].countAllPercent ]
+										} ]
+
+							}
+							
+							
+							var lineChartDataTimeSlice = {
+									labels : ["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56","57","58","59","60","61","62","63","64","65","66","67","68","69","70","71","72","73","74","75","76","77","78","79","80","81","82","83","84","85","86","87","88","89","90","91","92","93","94","95","96","97","98","99","100","101","102","103","104","105","106","107","108","109","110","111","112","113","114","115","116","117","118","119","120","121","122","123","124","125","126","127","128","129","130","131","132","133","134","135","136","137","138","139","140","141","142","143","144","145","146","147","148","149","150","151","152","153","154","155","156","157","158","159","160","161","162","163","164","165","166","167","168","169","170","171","172","173","174","175","176","177","178","179","180","181","182","183","184","185","186","187","188","189","190","191","192","193","194","195","196","197","198","199","200","201","202","203","204","205","206","207","208","209","210","211","212","213","214","215","216","217","218","219","220","221","222","223","224","225","226","227","228","229","230","231","232","233","234","235","236","237","238","239","240","241","242","243","244","245","246","247","248","249","250","251","252","253","254","255","256","257","258","259","260","261","262","263","264","265","266","267","268","269","270","271","272","273","274","275","276","277","278","279","280","281","282","283","284","285","286","287" ],
+									datasets : [
+											{
+												label : "My Static dataset",
+												fillColor : "rgba(220,220,220,0.2)",
+												strokeColor : "rgba(220,220,220,1)",
+												pointColor : "rgba(220,220,220,1)",
+												pointStrokeColor : "#fff",
+												pointHighlightFill : "#fff",
+												pointHighlightStroke : "rgba(220,220,220,1)",
+												data : [datas[i + 2].key0,
+												        datas[i + 2].key1,
+												        datas[i + 2].key2,
+												        datas[i + 2].key3,
+												        datas[i + 2].key4,
+												        datas[i + 2].key5,
+												        datas[i + 2].key6,
+												        datas[i + 2].key7,
+												        datas[i + 2].key8,
+												        datas[i + 2].key9,
+												        datas[i + 2].key10,
+												        datas[i + 2].key11,
+												        datas[i + 2].key12,
+												        datas[i + 2].key13,
+												        datas[i + 2].key14,datas[i + 2].key15,datas[i + 2].key16,datas[i + 2].key17,datas[i + 2].key18,datas[i + 2].key19,datas[i + 2].key20,datas[i + 2].key21,datas[i + 2].key22,datas[i + 2].key23,datas[i + 2].key24,datas[i + 2].key25,datas[i + 2].key26,datas[i + 2].key27,datas[i + 2].key28,datas[i + 2].key29,datas[i + 2].key30,datas[i + 2].key31,datas[i + 2].key32,datas[i + 2].key33,datas[i + 2].key34,datas[i + 2].key35,datas[i + 2].key36,datas[i + 2].key37,datas[i + 2].key38,datas[i + 2].key39,datas[i + 2].key40,datas[i + 2].key41,datas[i + 2].key42,datas[i + 2].key43,datas[i + 2].key44,datas[i + 2].key45,datas[i + 2].key46,datas[i + 2].key47,datas[i + 2].key48,datas[i + 2].key49,datas[i + 2].key50,datas[i + 2].key51,datas[i + 2].key52,datas[i + 2].key53,datas[i + 2].key54,datas[i + 2].key55,datas[i + 2].key56,datas[i + 2].key57,datas[i + 2].key58,datas[i + 2].key59,datas[i + 2].key60,datas[i + 2].key61,datas[i + 2].key62,datas[i + 2].key63,datas[i + 2].key64,datas[i + 2].key65,datas[i + 2].key66,datas[i + 2].key67,datas[i + 2].key68,datas[i + 2].key69,datas[i + 2].key70,datas[i + 2].key71,datas[i + 2].key72,datas[i + 2].key73,datas[i + 2].key74,datas[i + 2].key75,datas[i + 2].key76,datas[i + 2].key77,datas[i + 2].key78,datas[i + 2].key79,datas[i + 2].key80,datas[i + 2].key81,datas[i + 2].key82,datas[i + 2].key83,datas[i + 2].key84,datas[i + 2].key85,datas[i + 2].key86,datas[i + 2].key87,datas[i + 2].key88,datas[i + 2].key89,datas[i + 2].key90,datas[i + 2].key91,datas[i + 2].key92,datas[i + 2].key93,datas[i + 2].key94,datas[i + 2].key95,datas[i + 2].key96,datas[i + 2].key97,datas[i + 2].key98,datas[i + 2].key99,datas[i + 2].key100,datas[i + 2].key101,datas[i + 2].key102,datas[i + 2].key103,datas[i + 2].key104,datas[i + 2].key105,datas[i + 2].key106,datas[i + 2].key107,datas[i + 2].key108,datas[i + 2].key109,datas[i + 2].key110,datas[i + 2].key111,datas[i + 2].key112,datas[i + 2].key113,datas[i + 2].key114,datas[i + 2].key115,datas[i + 2].key116,datas[i + 2].key117,datas[i + 2].key118,datas[i + 2].key119,datas[i + 2].key120,datas[i + 2].key121,datas[i + 2].key122,datas[i + 2].key123,datas[i + 2].key124,datas[i + 2].key125,datas[i + 2].key126,datas[i + 2].key127,datas[i + 2].key128,datas[i + 2].key129,datas[i + 2].key130,datas[i + 2].key131,datas[i + 2].key132,datas[i + 2].key133,datas[i + 2].key134,datas[i + 2].key135,datas[i + 2].key136,datas[i + 2].key137,datas[i + 2].key138,datas[i + 2].key139,datas[i + 2].key140,datas[i + 2].key141,datas[i + 2].key142,datas[i + 2].key143,datas[i + 2].key144,datas[i + 2].key145,datas[i + 2].key146,datas[i + 2].key147,datas[i + 2].key148,datas[i + 2].key149,datas[i + 2].key150,datas[i + 2].key151,datas[i + 2].key152,datas[i + 2].key153,datas[i + 2].key154,datas[i + 2].key155,datas[i + 2].key156,datas[i + 2].key157,datas[i + 2].key158,datas[i + 2].key159,datas[i + 2].key160,datas[i + 2].key161,datas[i + 2].key162,datas[i + 2].key163,datas[i + 2].key164,datas[i + 2].key165,datas[i + 2].key166,datas[i + 2].key167,datas[i + 2].key168,datas[i + 2].key169,datas[i + 2].key170,datas[i + 2].key171,datas[i + 2].key172,datas[i + 2].key173,datas[i + 2].key174,datas[i + 2].key175,datas[i + 2].key176,datas[i + 2].key177,datas[i + 2].key178,datas[i + 2].key179,datas[i + 2].key180,datas[i + 2].key181,datas[i + 2].key182,datas[i + 2].key183,datas[i + 2].key184,datas[i + 2].key185,datas[i + 2].key186,datas[i + 2].key187,datas[i + 2].key188,datas[i + 2].key189,datas[i + 2].key190,datas[i + 2].key191,datas[i + 2].key192,datas[i + 2].key193,datas[i + 2].key194,datas[i + 2].key195,datas[i + 2].key196,datas[i + 2].key197,datas[i + 2].key198,datas[i + 2].key199,datas[i + 2].key200,datas[i + 2].key201,datas[i + 2].key202,datas[i + 2].key203,datas[i + 2].key204,datas[i + 2].key205,datas[i + 2].key206,datas[i + 2].key207,datas[i + 2].key208,datas[i + 2].key209,datas[i + 2].key210,datas[i + 2].key211,datas[i + 2].key212,datas[i + 2].key213,datas[i + 2].key214,datas[i + 2].key215,datas[i + 2].key216,datas[i + 2].key217,datas[i + 2].key218,datas[i + 2].key219,datas[i + 2].key220,datas[i + 2].key221,datas[i + 2].key222,datas[i + 2].key223,datas[i + 2].key224,datas[i + 2].key225,datas[i + 2].key226,datas[i + 2].key227,datas[i + 2].key228,datas[i + 2].key229,datas[i + 2].key230,datas[i + 2].key231,datas[i + 2].key232,datas[i + 2].key233,datas[i + 2].key234,datas[i + 2].key235,datas[i + 2].key236,datas[i + 2].key237,datas[i + 2].key238,datas[i + 2].key239,datas[i + 2].key240,datas[i + 2].key241,datas[i + 2].key242,datas[i + 2].key243,datas[i + 2].key244,datas[i + 2].key245,datas[i + 2].key246,datas[i + 2].key247,datas[i + 2].key248,datas[i + 2].key249,datas[i + 2].key250,datas[i + 2].key251,datas[i + 2].key252,datas[i + 2].key253,datas[i + 2].key254,datas[i + 2].key255,datas[i + 2].key256,datas[i + 2].key257,datas[i + 2].key258,datas[i + 2].key259,datas[i + 2].key260,datas[i + 2].key261,datas[i + 2].key262,datas[i + 2].key263,datas[i + 2].key264,datas[i + 2].key265,datas[i + 2].key266,datas[i + 2].key267,datas[i + 2].key268,datas[i + 2].key269,datas[i + 2].key270,datas[i + 2].key271,datas[i + 2].key272,datas[i + 2].key273,datas[i + 2].key274,datas[i + 2].key275,datas[i + 2].key276,datas[i + 2].key277,datas[i + 2].key278,datas[i + 2].key279,datas[i + 2].key280,datas[i + 2].key281,datas[i + 2].key282,datas[i + 2].key283,datas[i + 2].key284,datas[i + 2].key285,datas[i + 2].key286,datas[i + 2].key287]
+									} ]
+
+								}
+							var ctx = document.getElementById(
+									"canvas" + dayBefore).getContext("2d");
+							window.myLine = new Chart(ctx).Line(lineChartData,
+									{
+										responsive : true
+									});
+							var ctxTimeSlice = document.getElementById(
+									"canvasTimeSlice" + dayBefore).getContext("2d");
+							window.myLine = new Chart(ctxTimeSlice).Line(lineChartDataTimeSlice,
+									{
+										responsive : true
+									});
+						}
+
 					}
-				
+
+				}
+				xmlhttp.open("POST", "/predictRecord/"
+						+ $("#txtDayInterval").val() + "/"
+						+ $("#txtCombineTimeSlice").val() + "/"
+						+ $("#txtTaskNum").val(), true);
+				xmlhttp.send();
 			}
-			
-		}
-		xmlhttp.open("POST","/predictRecord",true);
-		xmlhttp.send(); 
-	}	
 
-	window.onload = function(){
-		loadChart();
-	}
-</script>
-
-	</body>
+			function mySubmit() {
+				loadChart();
+			}
+		</script>
+</body>
 </html>

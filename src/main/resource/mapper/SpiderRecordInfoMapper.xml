@@ -20,25 +20,28 @@
 	</select>
 	<select id="selectInterval" resultType="com.netease.spiderSchedule.model.SpiderRecordInfo">
 		select 
-		<include refid="Static_Column_List" />
-		from spider_record_info 
-		where to_days(now()) - to_days(date_format(update_time,"%Y-%m-%d")) &gt;= #{0,jdbcType=INTEGER}
-		and to_days(now()) - to_days(date_format(update_time,"%Y-%m-%d")) &lt; #{1,jdbcType=INTEGER} 
+		<include refid="Joint_Column_List" />
+		from spider_record_info r, spider_source_scheduler_info s 
+		where to_days(now()) - to_days(date_format(r.update_time,"%Y-%m-%d")) &gt;= #{0,jdbcType=INTEGER}
+		and to_days(now()) - to_days(date_format(r.update_time,"%Y-%m-%d")) &lt; #{1,jdbcType=INTEGER} 
+		and s.sourceid = r.sourceid 
+		and s.status = 0 and s.appid=2
 	</select>
 	<select id="selectJointInterval" resultType="com.netease.spiderSchedule.model.SpiderRecordInfo">
 		select 
 		<include refid="Joint_Column_List" />
-		from spider_record_info_test r, spider_source_info s 
+		from spider_source_scheduler_info r, spider_source_info s 
 		where to_days(now()) - to_days(date_format(r.update_time,"%Y-%m-%d")) &gt;= #{0,jdbcType=INTEGER}
 		and to_days(now()) - to_days(date_format(r.update_time,"%Y-%m-%d")) &lt; #{1,jdbcType=INTEGER} 
 		and s.sourceid = r.sourceid
 	</select>
 	<select id="selectIntervalDataBase" resultType="com.netease.spiderSchedule.model.SpiderRecordInfo" statementType="STATEMENT">
 		select 
-		<include refid="Static_Column_List" />
-		from ${param1}
-		where to_days(now()) - to_days(date_format(update_time,"%Y-%m-%d")) &gt;= ${param2}
-		and to_days(now()) - to_days(date_format(update_time,"%Y-%m-%d")) &lt; ${param3} 
+		<include refid="Joint_Column_List" />
+		from ${param1} r, spider_source_info s 
+		where to_days(now()) - to_days(date_format(r.update_time,"%Y-%m-%d")) &gt;= ${param2}
+		and to_days(now()) - to_days(date_format(r.update_time,"%Y-%m-%d")) &lt; ${param3} 
+		and s.sourceid = r.sourceid
 	</select>
 	
 	<select id="selectTest1" resultType="com.netease.spiderSchedule.model.SpiderRecordInfo">
