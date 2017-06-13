@@ -14,6 +14,16 @@ public class SpiderScheduleDto implements Comparable<SpiderScheduleDto> {
 	private long lastUpdateTime;
 	private double rate;
 	private int delayVal;
+	private int appId;
+
+
+	public int getAppId() {
+		return appId;
+	}
+
+	public void setAppId(int appId) {
+		this.appId = appId;
+	}
 
 	public int getDelayVal() {
 		return delayVal;
@@ -78,6 +88,7 @@ public class SpiderScheduleDto implements Comparable<SpiderScheduleDto> {
 	public SpiderScheduleDto(SpiderRateInfo spiderRateInfo) {
 		this.sourceId = spiderRateInfo.getSourceId();
 		this.priority = spiderRateInfo.getPriority();
+		this.appId = spiderRateInfo.getAppId();
 		this.lastUpdateTime = spiderRateInfo.getUpdate_time().getTime();
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(new Date());
