@@ -81,7 +81,7 @@ public class SpiderScheduleDto implements Comparable<SpiderScheduleDto> {
 		this.lastUpdateTime = spiderRateInfo.getUpdate_time().getTime();
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(new Date());
-		int timeSliceKey = (calendar.get(Calendar.HOUR) * 60 + calendar.get(Calendar.MINUTE)) / 5;
+		int timeSliceKey = (calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE)) / 5;
 		Integer timeSliceCountValue = spiderRateInfo.getTimeSliceCount().get(timeSliceKey);
 		if (timeSliceCountValue != null) {
 			rate = Double.valueOf(timeSliceCountValue) / spiderRateInfo.getTotalCount();

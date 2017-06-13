@@ -1,6 +1,5 @@
 package com.netease.spiderSchedule.model.prediction;
 
-import java.util.Calendar;
 import java.util.Date;
 
 import com.netease.spiderSchedule.model.SpiderRateInfo;
@@ -26,10 +25,7 @@ public class SmoothingAlgorithmSpiderScheduleDto extends SpiderScheduleDto{
 	
 	public SmoothingAlgorithmSpiderScheduleDto(SpiderRateInfo spiderRateInfo) {
 		super(spiderRateInfo);
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(new Date());
-		int timeSliceKey = (calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE)) / 5 ;
-		Double timeSliceCountValue = getTimeSliceCountValue(spiderRateInfo, timeSliceKey);
+		Double timeSliceCountValue = getTimeSliceCountValue(spiderRateInfo, TimeSimulator.getTimeSliceKey(new Date()));
 		if(timeSliceCountValue == null){
 			timeSliceCountValue = 0d;
 		}
