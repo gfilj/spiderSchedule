@@ -48,9 +48,6 @@ public class SpiderSourceInfo implements Serializable{
 		this.name = name;
 	}
 	public Date getCreate_time() {
-		if(create_time == null) {
-			create_time = new Date();
-		}
 		return create_time;
 	}
 	public void setCreate_time(Date create_time) {

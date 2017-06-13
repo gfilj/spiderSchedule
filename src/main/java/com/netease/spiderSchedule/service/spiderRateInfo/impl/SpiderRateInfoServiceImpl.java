@@ -52,7 +52,7 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 		this.combineInterval = combineInterval;
 	}
 
-	private int countTooOld = 200;
+	private int countTooOld;
 
 	public int getCountTooOld() {
 		return countTooOld;
@@ -211,7 +211,7 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 		// makeup all source
 		List<SpiderSourceInfo> sourceList = spiderSourceInfoServie.selectAll();
 
-		System.out.println("before add sourceId ---------------->" + rateMap.size());
+		System.out.println("before add sourceId rate map size ---------------->" + rateMap.size() + " adding list size :" + sourceList.size());
 		for (SpiderSourceInfo spiderSourceInfo : sourceList) {
 			String sourceid = spiderSourceInfo.getSourceid();
 			if (sourceid == null) {
@@ -220,15 +220,21 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 			if (!rateMap.containsKey(sourceid)) {
 				SpiderRateInfo spiderRateInfo = new SpiderRateInfo(spiderSourceInfo);
 				rateMap.put(sourceid, spiderRateInfo);
-
+				//过滤刚创建的公众号
 				Calendar cal = Calendar.getInstance();
-				cal.setTime(spiderSourceInfo.getCreate_time());
-				int dayUpdate = cal.get(Calendar.DAY_OF_YEAR);
-				cal.setTimeInMillis(System.currentTimeMillis());
-				int dayCur = cal.get(Calendar.DAY_OF_YEAR);
-				if ((dayCur - dayUpdate) >= end) {
+				Date create_time = spiderSourceInfo.getCreate_time();
+				if(create_time==null){
 					spiderRateInfo.setTooOld(true);
 					countTooOld++;
+				}else{
+					cal.setTime(create_time);
+					int dayUpdate = cal.get(Calendar.DAY_OF_YEAR);
+					cal.setTimeInMillis(System.currentTimeMillis());
+					int dayCur = cal.get(Calendar.DAY_OF_YEAR);
+					if ((dayCur - dayUpdate) >= end) {
+						spiderRateInfo.setTooOld(true);
+						countTooOld++;
+					}
 				}
 			}
 		}
@@ -326,7 +332,7 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		generateRateMap(0, 10);
+		generateRateMap(0, 9);
 		spiderSortService.addTask(this);
 	}
 

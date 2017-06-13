@@ -1,7 +1,5 @@
 package com.netease.spiderSchedule.model.prediction;
 
-import java.util.Date;
-
 import com.netease.spiderSchedule.model.SpiderRateInfo;
 import com.netease.spiderSchedule.model.SpiderScheduleDto;
 import com.netease.spiderSchedule.util.DelayLevel;
@@ -11,7 +9,6 @@ public class SmoothingAlgorithmSpiderScheduleDto extends SpiderScheduleDto{
 
 	public SmoothingAlgorithmSpiderScheduleDto(SpiderRateInfo spiderRateInfo, TimeSimulator timeSimulator) {
 		super(spiderRateInfo);
-		
 		Double timeSliceCountValue = getTimeSliceCountValue(spiderRateInfo,timeSimulator.getTimeSliceKey());
 		if(timeSliceCountValue == null){
 			timeSliceCountValue = 0d;
@@ -23,7 +20,7 @@ public class SmoothingAlgorithmSpiderScheduleDto extends SpiderScheduleDto{
 	}
 	
 	
-	public SmoothingAlgorithmSpiderScheduleDto(SpiderRateInfo spiderRateInfo) {
+	/*public SmoothingAlgorithmSpiderScheduleDto(SpiderRateInfo spiderRateInfo) {
 		super(spiderRateInfo);
 		Double timeSliceCountValue = getTimeSliceCountValue(spiderRateInfo, TimeSimulator.getTimeSliceKey(new Date()));
 		if(timeSliceCountValue == null){
@@ -34,7 +31,7 @@ public class SmoothingAlgorithmSpiderScheduleDto extends SpiderScheduleDto{
 		setDelayVal(delayLevel.getDelayVal());
 		countScore(spiderRateInfo);
 		
-	}
+	}*/
 
 
 	public Double getTimeSliceCountValue(SpiderRateInfo spiderRateInfo, int timeSliceKey) {

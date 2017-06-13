@@ -15,6 +15,7 @@ import com.netease.spiderSchedule.util.TimeSimulator;
 public class SmoothingAlgorithmSpiderSortServiceImpl extends SpiderSortServiceImpl implements SpiderSortService {
 	private TimeSimulator timeSimulator;
 	protected Logger logger = Logger.getLogger(getClass());
+
 	public void setTimeSimulator(TimeSimulator timeSimulator) {
 		this.timeSimulator = timeSimulator;
 	}
@@ -22,29 +23,24 @@ public class SmoothingAlgorithmSpiderSortServiceImpl extends SpiderSortServiceIm
 	@Override
 	public int addTask(SpiderRateInfoService spiderRateInfoService) {
 		try {
-			int addCount = 0;
-			int timeSliceKey = 0;
 			if (timeSimulator == null) {
-				timeSliceKey = TimeSimulator.getTimeSliceKey(new Date());
-			} else {
-				timeSliceKey = timeSimulator.getTimeSliceKey();
+				timeSimulator = TimeSimulator.getNow();
 			}
+
+			int addCount = 0;
+			int timeSliceKey = timeSimulator.getTimeSliceKey();
 			int countOld = 0;
 			for (SpiderRateInfo spiderRateInfo : spiderRateInfoService.getRateMap().values()) {
 				SmoothingAlgorithmSpiderScheduleDto smoothingAlgorithmSpiderScheduleDto;
-				if (timeSimulator == null) {
-
-					smoothingAlgorithmSpiderScheduleDto = new SmoothingAlgorithmSpiderScheduleDto(spiderRateInfo);
-				} else {
-					smoothingAlgorithmSpiderScheduleDto = new SmoothingAlgorithmSpiderScheduleDto(spiderRateInfo,
-							timeSimulator);
-				}
+				smoothingAlgorithmSpiderScheduleDto = new SmoothingAlgorithmSpiderScheduleDto(spiderRateInfo,
+						timeSimulator);
 				if (smoothingAlgorithmSpiderScheduleDto.getScore() > 0) {
 					boolean canPut = true;
 					if (spiderRateInfo.isTooOld()) {
 						canPut = false;
 						countOld++;
-						if(timeSliceKey >=9*12&&countOld < (spiderRateInfoService.getCountTooOld()/144)){
+						//在9点以后才进行抓取
+						if (timeSliceKey >= 9 * 12 && countOld < (spiderRateInfoService.getCountTooOld() / 144)) {
 							canPut = true;
 						}
 					}
@@ -55,8 +51,8 @@ public class SmoothingAlgorithmSpiderSortServiceImpl extends SpiderSortServiceIm
 				}
 			}
 
-			logger.info("SmoothingAlgorithmSpiderSortServiceImpl do call addTask add " + addCount
-					+ " currentSliceKey " + timeSliceKey);
+			logger.info("SmoothingAlgorithmSpiderSortServiceImpl do call addTask add " + addCount + " currentSliceKey "
+					+ timeSliceKey);
 			return addCount;
 
 		} catch (Exception e) {

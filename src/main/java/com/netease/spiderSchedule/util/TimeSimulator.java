@@ -77,11 +77,26 @@ public class TimeSimulator {
 		return (calendar.get(Calendar.HOUR_OF_DAY)*60 + calendar.get(Calendar.MINUTE))/5;
 	}
 	
+	/**
+	 * 根绝当前的时间获取片
+	 * @param date
+	 * @return
+	 */
 	public static int getTimeSliceKey(Date date){
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
 		return (calendar.get(Calendar.HOUR_OF_DAY)*60 + calendar.get(Calendar.MINUTE))/5;
 	}
+	
+	/**
+	 * 获取当前时间
+	 * @return
+	 */
+	public static TimeSimulator getNow(){
+		return new TimeSimulator();
+	}
+	
+	
 	
 	public boolean inStopGrapSegment(){
 		return calendar.get(Calendar.HOUR_OF_DAY)==2||calendar.get(Calendar.HOUR_OF_DAY)==3||calendar.get(Calendar.HOUR_OF_DAY)==4||calendar.get(Calendar.HOUR_OF_DAY)==5||calendar.get(Calendar.HOUR_OF_DAY)==6;
