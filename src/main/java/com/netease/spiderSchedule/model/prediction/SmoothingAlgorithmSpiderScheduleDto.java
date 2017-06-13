@@ -28,7 +28,7 @@ public class SmoothingAlgorithmSpiderScheduleDto extends SpiderScheduleDto{
 		super(spiderRateInfo);
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(new Date());
-		int timeSliceKey = (calendar.get(Calendar.HOUR) * 60 + calendar.get(Calendar.MINUTE)) / 5 ;
+		int timeSliceKey = (calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE)) / 5 ;
 		Double timeSliceCountValue = getTimeSliceCountValue(spiderRateInfo, timeSliceKey);
 		if(timeSliceCountValue == null){
 			timeSliceCountValue = 0d;

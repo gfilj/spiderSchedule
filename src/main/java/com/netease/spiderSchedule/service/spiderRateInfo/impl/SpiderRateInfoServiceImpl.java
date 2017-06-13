@@ -326,7 +326,7 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		generateRateMap(0, 9);
+		generateRateMap(0, 10);
 		spiderSortService.addTask(this);
 	}
 

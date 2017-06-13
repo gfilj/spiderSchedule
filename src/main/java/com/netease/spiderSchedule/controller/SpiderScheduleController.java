@@ -58,11 +58,6 @@ public class SpiderScheduleController extends AbstractVerticle {
 		spiderRecordInfoService = (SpiderRecodeInfoService) context.getBean("spiderRecordInfoServie");
 		Runner.runExample(SpiderScheduleController.class);
 		System.out.println("init down!");
-//		String str = "";
-//		for(int i=0;i<=287;i++){
-//			str += ("datas[i + 2].key"+i+",");
-//		}
-//		System.out.println(str);
 	}
 
 	@Override
