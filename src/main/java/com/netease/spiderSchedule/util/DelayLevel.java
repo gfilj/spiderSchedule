@@ -2,7 +2,7 @@ package com.netease.spiderSchedule.util;
 
 public enum DelayLevel {
 
-	HALFDAY(200), FOUR(100), THREE(70), TWO(50), ONE(10), ZERO(1);
+	HALFDAY(100), FOUR(100), THREE(40), TWO(20), ONE(10), ZERO(1);
 
 	private int levelVal;
 
