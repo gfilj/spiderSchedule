@@ -77,6 +77,11 @@ public class TimeSimulator {
 		return (calendar.get(Calendar.HOUR_OF_DAY)*60 + calendar.get(Calendar.MINUTE))/5;
 	}
 	
+	public Date getHoursBefore(int hours){
+		calendar.add(Calendar.HOUR, 0-hours);
+		return getDate();
+	}
+	
 	/**
 	 * 根绝当前的时间获取片
 	 * @param date
@@ -109,5 +114,9 @@ public class TimeSimulator {
 	
 	public boolean inIncreaseAddSegment(){
 		return calendar.get(Calendar.HOUR_OF_DAY)==7||calendar.get(Calendar.HOUR_OF_DAY)==8;
+	}
+	
+	public static void main(String[] args) {
+		System.out.println(TimeSimulator.getNow().getHoursBefore(2));
 	}
 }

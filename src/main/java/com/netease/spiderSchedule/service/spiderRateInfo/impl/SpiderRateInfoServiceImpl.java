@@ -293,7 +293,8 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 				v.setUpdate_time(cal.getTime());
 			} else {
 //				System.out.println(v);
-				v.setUpdate_time(new Date());
+				//重新启动默认轮刷
+				v.setUpdate_time(TimeSimulator.getNow().getHoursBefore(2));
 			}
 		});
 	}
