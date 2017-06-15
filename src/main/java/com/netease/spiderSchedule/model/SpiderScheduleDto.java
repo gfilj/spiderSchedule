@@ -15,7 +15,28 @@ public class SpiderScheduleDto implements Comparable<SpiderScheduleDto> {
 	private double rate;
 	private int delayVal;
 	private int appId;
+	private boolean wheel = false;// 甄别轮刷策略
+	private boolean highQuality = false;// 甄别高质量公众号
+	
+	public static boolean wheelSwitch = false;
+	public static int wheelScore = 10000;
+	
 
+	public boolean isHighQuality() {
+		return highQuality;
+	}
+
+	public void setHighQuality(boolean highQuality) {
+		this.highQuality = highQuality;
+	}
+
+	public boolean isWheel() {
+		return wheel;
+	}
+
+	public void setWheel(boolean wheel) {
+		this.wheel = wheel;
+	}
 
 	public int getAppId() {
 		return appId;
@@ -90,6 +111,10 @@ public class SpiderScheduleDto implements Comparable<SpiderScheduleDto> {
 		this.priority = spiderRateInfo.getPriority();
 		this.appId = spiderRateInfo.getAppId();
 		this.lastUpdateTime = spiderRateInfo.getUpdate_time().getTime();
+		int size = spiderRateInfo.getTimeSliceCount().size();
+		if (size == 1 || size == 2 || size == 3 || size == 4 || size == 5 || size == 6) {
+			this.highQuality = true;
+		}
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(new Date());
 		int timeSliceKey = (calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE)) / 5;
@@ -105,19 +130,20 @@ public class SpiderScheduleDto implements Comparable<SpiderScheduleDto> {
 	}
 
 	public void countScore(SpiderRateInfo spiderRateInfo) {
-		if (spiderRateInfo.isTooOld()) {
-			if (delayVal >= DelayLevel.HALFDAY.getDelayVal()) {
-				this.score = delayVal * RateLevel.TEN.getRateVal();
-			} else {
-				this.score = -1;
-			}
-		} else {
-			if (delayVal >= DelayLevel.TWO.getDelayVal()) {
-				this.score = delayVal * RateLevel.TEN.getRateVal();
-			} else {
+//		if (spiderRateInfo.isTooOld()) {
+//			if (delayVal >= DelayLevel.HALFDAY.getDelayVal()) {
+//				this.score = delayVal * RateLevel.TEN.getRateVal();
+//			} else {
+//				this.score = -1;
+//			}
+//		} else {
+//			if (delayVal >= DelayLevel.TWO.getDelayVal() && rate <= 0) {
+//				setWheel(true);
+//				this.score = delayVal * RateLevel.TEN.getRateVal();
+//			} else {
 				this.score = delayVal * rate;
-			}
-		}
+//			}
+//		}
 	}
 
 	@Override

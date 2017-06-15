@@ -81,7 +81,7 @@ public class SpiderScheduleController extends AbstractVerticle {
 
 		// handle the form
 		router.post("/form").handler(ctx -> {
-			ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, "text/plain");
+			ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, "text/plain"); 
 			// note the form attribute matches the html form element name.
 			ctx.response().end("Hello " + ctx.request().getParam("name") + "!");
 		});
@@ -101,13 +101,13 @@ public class SpiderScheduleController extends AbstractVerticle {
 			ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, "text/plain");
 			// note the form attribute matches the html form element name.
 			PredictionSpiderRecordStaticInfo spiderRecordStaticInfo = new PredictionSpiderRecordStaticInfo();
-			spiderRecordInfoService.selectIntervalDataBase("spider_record_info_test", dayBeforeCurrent, dayBeforeCurrent+1).forEach((v) -> {
+			spiderRecordInfoService.selectIntervalDataBase("spider_record_info", dayBeforeCurrent, dayBeforeCurrent+1).forEach((v) -> {
 				long timeDelay = v.getUpdate_time().getTime() - v.getCreate_time().getTime();
 				spiderRecordStaticInfo.statistics(timeDelay, v);
 			});
 
 			PredictionSpiderRecordStaticInfo spiderRecordStaticInfo1 = new PredictionSpiderRecordStaticInfo();
-			spiderRecordInfoService.selectIntervalDataBase("spider_record_info_test_1", dayBeforeCurrent, dayBeforeCurrent+1).forEach((v) -> {
+			spiderRecordInfoService.selectIntervalDataBase("spider_record_info", dayBeforeCurrent, dayBeforeCurrent+1).forEach((v) -> {
 				long timeDelay = v.getUpdate_time().getTime() - v.getCreate_time().getTime();
 				spiderRecordStaticInfo1.statistics(timeDelay, v);
 			});

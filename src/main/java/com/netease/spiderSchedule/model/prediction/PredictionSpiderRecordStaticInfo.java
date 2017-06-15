@@ -293,6 +293,8 @@ public class PredictionSpiderRecordStaticInfo {
 					}
 				}
 			}
+		}else{
+			System.out.println(v);
 		}
 		generatePercent();
 	}

@@ -116,16 +116,61 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 
 		// 置信区间
 		final double z = 1.96;
+		int count = 0;
+		int count2 = 0;
+		int count3= 0;
+		int count4 = 0;
+		int count5 = 0;
+		int count6 = 0;
+		int count7 = 0;
+		int count8 = 0;
+		int count9 = 0;
 		for (SpiderRateInfo spiderRateInfo : rateMap.values()) {
+			boolean canCount = false;
 			for (Entry<Integer, Integer> timeSlice : spiderRateInfo.getTimeSliceCount().entrySet()) {
 				int n = spiderRateInfo.getTotalCount();
 				double phat = Double.valueOf(timeSlice.getValue()) / n;
 				double redditP = (phat + z * z / (2 * n) - z * Math.sqrt((phat * (1 - phat) + z * z / (4 * n)) / n))
 						/ (1 + z * z / n);
 				timeSlice.setValue((int) (redditP * 1000000));
+				if (redditP * 1000000 >= 50000){
+					canCount =true;
+				}
 			}
+			/*if(canCount){
+				count++;
+			}*/
+			if(spiderRateInfo.getTimeSliceCount().size()==1){
+				count++;
+			}
+			if(spiderRateInfo.getTimeSliceCount().size()==2){
+				count2++;
+			}
+			if(spiderRateInfo.getTimeSliceCount().size()==3){
+				count3++;
+			}
+			if(spiderRateInfo.getTimeSliceCount().size()==4){
+				count4++;
+			}
+			if(spiderRateInfo.getTimeSliceCount().size()==5){
+				count5++;
+			}
+			if(spiderRateInfo.getTimeSliceCount().size()==6){
+				count6++;
+			}
+			if(spiderRateInfo.getTimeSliceCount().size()==7){
+				count7++;
+			}
+			if(spiderRateInfo.getTimeSliceCount().size()==8){
+				count8++;
+			}
+			if(spiderRateInfo.getTimeSliceCount().size()==9){
+				count9++;
+			}
+		
 		}
-
+		System.out.println(count + "--" + count2 + "--" + count3 + "--" + count4  + "--" + count5 + "--" + count6 
+				+ "--" + count7 + "--" + count8 + "--" + count9 );
 		// 三次平滑
 		final double a = 0.4, b = 0.05, y = 0.9;
 		final int k = 2;
@@ -165,15 +210,15 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 			spiderRateInfoTimes++;
 			Map<Integer, Double> timeSlicePredict = v.getTimeSlicePredict();
 			int offset = spiderRateInfoTimes % combineInterval;
-
+			int offset2To7 = spiderRateInfoTimes % (combineInterval*3);
 			double freeMax = 0.0d;
-			for (int i = freeStart * 12 + 1; i < freeEnd * 12 + offset; i++) {
+			for (int i = freeStart * 12 + 1; i < freeEnd * 12 + offset2To7; i++) {
 				timeSlicePredict.put(i, -1d);
 				if (freeMax < timeSlicePredict.get(i)) {
 					freeMax = timeSlicePredict.get(i);
 				}
 			}
-			timeSlicePredict.put(freeEnd * 12 + offset + 1, freeMax);
+			int putIntoKey = freeEnd * 12 + offset2To7;
 			int j = 1;
 			for (int i = timeSlicePredict.size() - 1 - offset; i >= 0; i -= j) {
 				double combineMax = timeSlicePredict.get(i);
@@ -202,7 +247,6 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 					}
 				}
 			}
-
 			for (int i = timeSlicePredict.size() - 1; i > timeSlicePredict.size() - 1 - offset; i--) {
 				timeSlicePredict.put(i, -1d);
 			}

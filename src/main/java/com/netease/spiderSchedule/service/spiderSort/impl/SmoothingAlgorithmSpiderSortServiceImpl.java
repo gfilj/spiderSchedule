@@ -27,9 +27,10 @@ public class SmoothingAlgorithmSpiderSortServiceImpl extends SpiderSortServiceIm
 				timeSimulator = TimeSimulator.getNow();
 			}
 
-			int addCount = 0;
+			int addCount = 0;//static的数目
 			int timeSliceKey = timeSimulator.getTimeSliceKey();
-			int countOld = 0;
+			int countOld = 0;//static tooold的数目
+			int countWheel = 0;
 			for (SpiderRateInfo spiderRateInfo : spiderRateInfoService.getRateMap().values()) {
 				SmoothingAlgorithmSpiderScheduleDto smoothingAlgorithmSpiderScheduleDto;
 				smoothingAlgorithmSpiderScheduleDto = new SmoothingAlgorithmSpiderScheduleDto(spiderRateInfo,
@@ -43,6 +44,19 @@ public class SmoothingAlgorithmSpiderSortServiceImpl extends SpiderSortServiceIm
 						if (timeSliceKey >= 9 * 12 && countOld < (spiderRateInfoService.getCountTooOld() / 144)) {
 							canPut = true;
 						}
+					}
+					//每5分钟限制放入轮刷的号
+					if(smoothingAlgorithmSpiderScheduleDto.isWheel()){
+						canPut = false;
+						countWheel++;
+						if(countWheel <=(spiderRateInfoService.getRateMap().size()/6) ){
+							canPut = true;
+						}
+					}
+					
+					//
+					if(timeSliceKey == 85){
+						System.out.println(smoothingAlgorithmSpiderScheduleDto.getScore());
 					}
 					if (canPut) {
 						addCount++;

@@ -15,7 +15,7 @@
 <body>
 	<div class="container">
 		<div>
-			<h1>Day Chart</h1>
+			<h1>Predict Chart</h1>
 			<div>
 				<form class="form-inline">
 					<div class="form-group">
@@ -61,13 +61,13 @@
 							var dayBefore = (i / 3) + 1;
 							responseHtml += '<div style="width:100%;margin:auto" >'
 									+ dayBefore
-									+ '天的预测数据'
+									+ '预测数量曲线图'
 									+ '<div><canvas id="canvas'
 									+ dayBefore
 									+ '" height="50%" width="70%"></canvas></div></div>'
 									+ '<div style="width:100%;margin:auto" >'
 									+ dayBefore
-									+ '天的预测数据'
+									+ '预测百分比曲线图'
 									+ '<div><canvas id="canvasTimeSlice'
 									+ dayBefore
 									+ '" height="50%" width="70%"></canvas></div></div>';
