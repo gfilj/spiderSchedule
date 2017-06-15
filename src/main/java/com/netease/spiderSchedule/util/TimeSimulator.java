@@ -78,7 +78,7 @@ public class TimeSimulator {
 	}
 	
 	public Date getHoursBefore(int hours){
-		calendar.add(Calendar.HOUR, 0-hours);
+		calendar.add(Calendar.HOUR_OF_DAY, 0-hours);
 		return getDate();
 	}
 	
@@ -117,6 +117,6 @@ public class TimeSimulator {
 	}
 	
 	public static void main(String[] args) {
-		System.out.println(TimeSimulator.getNow().getHoursBefore(2));
+		System.out.println(new TimeSimulator(1497503043035l).getDate());
 	}
 }

@@ -10,6 +10,7 @@ import com.netease.spiderSchedule.service.spiderSort.SpiderSortService;
 public class SpiderScheduleTask {
 
 	@Autowired
+	@Qualifier("spiderRateInfoService")
 	private SpiderRateInfoService spiderRateInfoService;
 	
 	@Autowired

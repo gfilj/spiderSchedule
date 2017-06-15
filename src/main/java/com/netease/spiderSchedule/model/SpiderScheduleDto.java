@@ -130,20 +130,20 @@ public class SpiderScheduleDto implements Comparable<SpiderScheduleDto> {
 	}
 
 	public void countScore(SpiderRateInfo spiderRateInfo) {
-//		if (spiderRateInfo.isTooOld()) {
-//			if (delayVal >= DelayLevel.HALFDAY.getDelayVal()) {
-//				this.score = delayVal * RateLevel.TEN.getRateVal();
-//			} else {
-//				this.score = -1;
-//			}
-//		} else {
-//			if (delayVal >= DelayLevel.TWO.getDelayVal() && rate <= 0) {
-//				setWheel(true);
-//				this.score = delayVal * RateLevel.TEN.getRateVal();
-//			} else {
+		if (spiderRateInfo.isTooOld()) {
+			if (delayVal >= DelayLevel.HALFDAY.getDelayVal()) {
+				this.score = delayVal * RateLevel.TEN.getRateVal();
+			} else {
+				this.score = -1;
+			}
+		} else {
+			if (delayVal >= DelayLevel.TWO.getDelayVal() && rate <= 0) {
+				setWheel(true);
+				this.score = delayVal * RateLevel.TEN.getRateVal();
+			} else {
 				this.score = delayVal * rate;
-//			}
-//		}
+			}
+		}
 	}
 
 	@Override

@@ -1,7 +1,5 @@
 package com.netease.spiderSchedule.service.spiderSort.impl;
 
-import java.util.Date;
-
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
@@ -46,20 +44,21 @@ public class SmoothingAlgorithmSpiderSortServiceImpl extends SpiderSortServiceIm
 						}
 					}
 					//每5分钟限制放入轮刷的号
-					if(smoothingAlgorithmSpiderScheduleDto.isWheel()){
-						canPut = false;
-						countWheel++;
-						if(countWheel <=(spiderRateInfoService.getRateMap().size()/6) ){
-							canPut = true;
-						}
-					}
+//					if(smoothingAlgorithmSpiderScheduleDto.isWheel()){
+//						canPut = false;
+//						countWheel++;
+//						if(countWheel <=(spiderRateInfoService.getRateMap().size()/6) ){
+//							canPut = true;
+//						}
+//					}
 					
 					//
-					if(timeSliceKey == 85){
-						System.out.println(smoothingAlgorithmSpiderScheduleDto.getScore());
-					}
+//					if(timeSliceKey == 85){
+//						System.out.println(smoothingAlgorithmSpiderScheduleDto.getScore());
+//					}
 					if (canPut) {
 						addCount++;
+						System.out.println(smoothingAlgorithmSpiderScheduleDto);
 						heapSort.add(smoothingAlgorithmSpiderScheduleDto);
 					}
 				}
