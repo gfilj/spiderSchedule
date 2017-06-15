@@ -10,13 +10,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.junit.experimental.max.MaxCore;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import com.alibaba.druid.pool.vendor.SybaseExceptionSorter;
 import com.netease.spiderSchedule.model.SpiderRateInfo;
 import com.netease.spiderSchedule.model.SpiderRateInfoDto;
 import com.netease.spiderSchedule.model.SpiderRecordInfo;
@@ -26,11 +24,8 @@ import com.netease.spiderSchedule.service.spiderRateInfo.SpiderRateInfoService;
 import com.netease.spiderSchedule.service.spiderRecordInfo.SpiderRecodeInfoService;
 import com.netease.spiderSchedule.service.spiderSort.SpiderSortService;
 import com.netease.spiderSchedule.service.spiderSourceInfo.SpiderSourceInfoService;
-import com.netease.spiderSchedule.sort.MaxHeap;
 import com.netease.spiderSchedule.util.RateLevel;
 import com.netease.spiderSchedule.util.TimeSimulator;
-
-import io.vertx.ext.web.impl.HeaderParser;
 
 @Service("spiderRateInfoService")
 public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, InitializingBean {
