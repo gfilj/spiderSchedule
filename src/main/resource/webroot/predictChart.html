@@ -33,6 +33,12 @@
 							class="form-control" id="txtTaskNum" placeholder="15">
 					</div>
 				</form>
+				<form class="form-inline">
+					<div class="form-group">
+						<label for="inputWheelScore">wheelScore</label> <input type="text"
+							class="form-control" id="txtWheelScore" placeholder="15">
+					</div>
+				</form>
 			</div>
 			<div>
 				<button onclick="mySubmit()" class="btn btn-default">submit</button>
@@ -42,15 +48,16 @@
 
 
 		<script type="text/javascript">
+			var xmlhttp;
+			if (window.XMLHttpRequest) {
+				xmlhttp = new XMLHttpRequest();
+			} else {
+				xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+			}
 			function loadChart() {
 				var child = document.getElementById("content");
 				child.innerHTML = "";
-				var xmlhttp;
-				if (window.XMLHttpRequest) {
-					xmlhttp = new XMLHttpRequest();
-				} else {
-					xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-				}
+				
 				xmlhttp.onreadystatechange = function() {
 					if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
 						var result = xmlhttp.responseText;
@@ -206,12 +213,24 @@
 				xmlhttp.open("POST", "/predictRecord/"
 						+ $("#txtDayInterval").val() + "/"
 						+ $("#txtCombineTimeSlice").val() + "/"
-						+ $("#txtTaskNum").val(), true);
+						+ $("#txtTaskNum").val() + "/"
+						+ $("#txtWheelScore").val(), true);
 				xmlhttp.send();
 			}
 
 			function mySubmit() {
 				loadChart();
+			}
+			window.onload = function(){
+				xmlhttp.onreadystatechange = function() {
+					if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+						var result = xmlhttp.responseText;
+						document.getElementById("txtWheelScore").placeholder = result;
+					}
+				}
+				xmlhttp.open("POST", "/getWheelScore", true);
+				xmlhttp.send();
+				
 			}
 		</script>
 </body>

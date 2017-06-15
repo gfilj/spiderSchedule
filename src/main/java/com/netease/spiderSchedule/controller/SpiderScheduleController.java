@@ -125,23 +125,29 @@ public class SpiderScheduleController extends AbstractVerticle {
 			});
 			ctx.response().end(arr.encodePrettily());
 		});
-		router.post("/predictRecord/:dayInterval/:combineTimeSlice/:taskNum").handler(ctx -> {
+		router.post("/getWheelScore").handler(ctx -> {
+			ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, "text/plain");
+			ctx.response().end(String.valueOf(RateLevel.TEN.getRateVal()));
+		});
+		router.post("/predictRecord/:dayInterval/:combineTimeSlice/:taskNum/:wheelScore").handler(ctx -> {
 			
 			ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, "text/plain");
 			JsonArray arr = new JsonArray();
 			int dayInterval = 7;
 			int combineTimeSlice = 5;
 			int taskNum = 15;
+			int wheelScore = 2000;
 			try {
 				dayInterval = Integer.parseInt(ctx.request().getParam("dayInterval"));
 				combineTimeSlice = Integer.parseInt(ctx.request().getParam("combineTimeSlice"));
 				taskNum = Integer.parseInt(ctx.request().getParam("taskNum"));
+				wheelScore = Integer.parseInt(ctx.request().getParam("wheelScore"));
 			} catch (Exception e) {
 				e.printStackTrace();
 				sendError(400,ctx.response());
 			}
-			
-			PredictionRecordStaticInfoKey predictionRecordStaticInfoKey = PredictionRecordStaticInfoKey.getInstance(dayInterval, combineTimeSlice, taskNum);
+			RateLevel.TEN.setRateVal(wheelScore);
+			PredictionRecordStaticInfoKey predictionRecordStaticInfoKey = PredictionRecordStaticInfoKey.getInstance(dayInterval, combineTimeSlice, taskNum, wheelScore);
 			PredictionRecordStaticInfoValue predictionRecordStaticInfoValue = predirctSpiderRecordInfoMap.get(predictionRecordStaticInfoKey);
 			if(predictionRecordStaticInfoValue == null){
 				predirctSpiderRecordInfoMap.put(predictionRecordStaticInfoKey, PredictionBootStrap.predirctSpiderRecordInfo(context, dayInterval, combineTimeSlice, taskNum));
@@ -174,11 +180,13 @@ public class SpiderScheduleController extends AbstractVerticle {
 				calAbility.getSpiderScheduleAbility().addAndGet(taskNum);
 			}
 			List<SpiderScheduleDto> list =  spiderSortService.getTask(taskNum, spiderRateInfoService);
-			list.forEach((v)->arr.add(JsonObject.mapFrom(v)));
+			list.forEach((v)->{
+				arr.add(JsonObject.mapFrom(v));
+				logger.info(v);
+			});
 			int size = list.size();
 			calAbility.getSpiderScheduleAbility().addAndGet(0 - size);
 			logger.info("当前要的公众号数目：" + taskNum + ",5分钟内的剩余抓取量：" + calAbility.getSpiderScheduleAbility() + ",获取的队列大小:" + size);
-			logger.info(arr.encodePrettily());
 			response.putHeader("content-type", "application/json").end(arr.encodePrettily());
 		}else{
 			response.putHeader("content-type", "application/json").end(arr.encodePrettily());

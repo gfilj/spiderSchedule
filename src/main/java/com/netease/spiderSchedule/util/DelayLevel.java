@@ -39,9 +39,9 @@ public enum DelayLevel {
 			return DelayLevel.TWO;
 		} else if (3 * HOURVAL <= interVal && interVal < 4 * HOURVAL) {
 			return DelayLevel.THREE;
-		} else if (4 * HOURVAL <= interVal && interVal < 24 * HOURVAL) {
+		} else if (4 * HOURVAL <= interVal && interVal < 12 * HOURVAL) {
 			return DelayLevel.FOUR;
-		} else if (24 * HOURVAL <=interVal ){
+		} else if (12 * HOURVAL <=interVal ){
 			return DelayLevel.HALFDAY;
 		}
 		return DelayLevel.ZERO;

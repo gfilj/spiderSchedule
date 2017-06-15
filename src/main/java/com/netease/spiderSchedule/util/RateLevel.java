@@ -2,7 +2,7 @@ package com.netease.spiderSchedule.util;
 
 public enum RateLevel {
 
-	ZERO(0), ONE(1), TWO(2), THREE(3), FOUR(4), FIVE(5), SIX(6), SEVEN(7), EIGHT(8), NINE(9), TEN(100);
+	ZERO(0), ONE(1), TWO(2), THREE(3), FOUR(4), FIVE(5), SIX(6), SEVEN(7), EIGHT(8), NINE(9), TEN(5000);
 
 	private int rate;
 
@@ -13,7 +13,10 @@ public enum RateLevel {
 	public int getRateVal() {
 		return rate;
 	}
-
+	
+	public void setRateVal(int rate){
+		this.rate = rate;
+	}
 	public static RateLevel getRate(double inputFate) {
 		if (0.0d < inputFate && inputFate <= 0.1d) {
 			return RateLevel.ONE;

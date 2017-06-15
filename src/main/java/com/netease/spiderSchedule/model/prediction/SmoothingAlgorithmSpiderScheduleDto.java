@@ -40,8 +40,6 @@ public class SmoothingAlgorithmSpiderScheduleDto extends SpiderScheduleDto{
 			Integer d = spiderRateInfo.getTimeSliceCount().get(highTimeSliceKey<0?288+timeSliceKey-2:highTimeSliceKey);
 			if(d==null){
 				d=0;
-			}else{
-				d=10000000;
 			}
 			return Double.valueOf(d);
 		}else{

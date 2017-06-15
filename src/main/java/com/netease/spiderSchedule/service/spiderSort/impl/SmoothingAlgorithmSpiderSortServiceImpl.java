@@ -58,7 +58,6 @@ public class SmoothingAlgorithmSpiderSortServiceImpl extends SpiderSortServiceIm
 //					}
 					if (canPut) {
 						addCount++;
-						System.out.println(smoothingAlgorithmSpiderScheduleDto);
 						heapSort.add(smoothingAlgorithmSpiderScheduleDto);
 					}
 				}

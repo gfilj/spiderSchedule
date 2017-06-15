@@ -5,7 +5,14 @@ public class PredictionRecordStaticInfoKey {
 	private int dayInterval;
 	private int combineTimeSlice;
 	private int tashNum;
+	private int wheelScore;
 	
+	public int getWheelScore() {
+		return wheelScore;
+	}
+	public void setWheelScore(int wheelScore) {
+		this.wheelScore = wheelScore;
+	}
 	public int getDayInterval() {
 		return dayInterval;
 	}
@@ -33,7 +40,10 @@ public class PredictionRecordStaticInfoKey {
 			return false;
 		}
 		PredictionRecordStaticInfoKey predictionRecordStaticInfoKey = (PredictionRecordStaticInfoKey) obj;
-		if (predictionRecordStaticInfoKey.getDayInterval() != this.getDayInterval() || predictionRecordStaticInfoKey.getCombineTimeSlice() != this.getCombineTimeSlice()||predictionRecordStaticInfoKey.getTashNum() != this.getTashNum()) {
+		if (predictionRecordStaticInfoKey.getDayInterval() != this.getDayInterval() 
+				|| predictionRecordStaticInfoKey.getCombineTimeSlice() != this.getCombineTimeSlice()
+				||predictionRecordStaticInfoKey.getTashNum() != this.getTashNum()
+				||predictionRecordStaticInfoKey.getWheelScore() != this.getWheelScore()) {
 			return false;
 		}
 		return true;
@@ -41,14 +51,15 @@ public class PredictionRecordStaticInfoKey {
 
 	@Override
 	public int hashCode() {
-		return (getDayInterval() + "/" + getCombineTimeSlice() + "/" + getTashNum() ).hashCode();
+		return (getDayInterval() + "/" + getCombineTimeSlice() + "/" + getTashNum() + "/" + getWheelScore() ).hashCode();
 	}
 	
-	public static PredictionRecordStaticInfoKey getInstance(int dayInterval, int combineTimeSlice, int taskNum){
+	public static PredictionRecordStaticInfoKey getInstance(int dayInterval, int combineTimeSlice, int taskNum, int wheelScore){
 		PredictionRecordStaticInfoKey predictionRecordStaticInfoKey = new PredictionRecordStaticInfoKey();
 		predictionRecordStaticInfoKey.setCombineTimeSlice(combineTimeSlice);
 		predictionRecordStaticInfoKey.setDayInterval(dayInterval);
 		predictionRecordStaticInfoKey.setTashNum(taskNum);
+		predictionRecordStaticInfoKey.setWheelScore(wheelScore);
 		return predictionRecordStaticInfoKey;
 	}
 }
