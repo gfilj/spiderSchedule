@@ -9,4 +9,5 @@ public interface SpiderSortService {
 	
 	List<SpiderScheduleDto> getTask(int taskNum, SpiderRateInfoService spiderRateInfoService);
 	int addTask(SpiderRateInfoService spiderRateInfoService);
+	void addTask(String sourceID,SpiderRateInfoService spiderRateInfoService);
 }

@@ -4,9 +4,11 @@ import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.netease.spiderSchedule.model.SpiderRateInfo;
+import com.netease.spiderSchedule.model.SpiderScheduleDto;
 import com.netease.spiderSchedule.model.prediction.SmoothingAlgorithmSpiderScheduleDto;
 import com.netease.spiderSchedule.service.spiderRateInfo.SpiderRateInfoService;
 import com.netease.spiderSchedule.service.spiderSort.SpiderSortService;
+import com.netease.spiderSchedule.util.RateLevel;
 import com.netease.spiderSchedule.util.TimeSimulator;
 
 @Service("smoothingAlgorithmSpiderSortService")
@@ -72,4 +74,6 @@ public class SmoothingAlgorithmSpiderSortServiceImpl extends SpiderSortServiceIm
 		}
 		return 0;
 	}
+	
+	
 }

@@ -41,15 +41,15 @@ public class SpiderScheduleController extends AbstractVerticle {
 	private static ClassPathXmlApplicationContext context;
 
 	private static SpiderRateInfoService spiderRateInfoService;
-	private static SpiderSortService spiderSortService;
+	private static SpiderSortServiceImpl spiderSortService;
 	private static SpiderRecodeInfoService spiderRecordInfoService;
 	public static CalAbility calAbility = new CalAbility();
-	private static Map<PredictionRecordStaticInfoKey,PredictionRecordStaticInfoValue> predirctSpiderRecordInfoMap = new HashMap<PredictionRecordStaticInfoKey, PredictionRecordStaticInfoValue>();
-	
+	private static Map<PredictionRecordStaticInfoKey, PredictionRecordStaticInfoValue> predirctSpiderRecordInfoMap = new HashMap<PredictionRecordStaticInfoKey, PredictionRecordStaticInfoValue>();
+
 	public static Map<String, Integer> errorHandleMap = Collections.synchronizedMap(new HashMap<String, Integer>());
-	
+
 	protected static Logger logger = Logger.getLogger(SpiderScheduleController.class);
-	
+
 	public static void main(String[] args) {
 		context = new ClassPathXmlApplicationContext("classpath*:config/spring-application.xml");
 		context.start();
@@ -74,14 +74,14 @@ public class SpiderScheduleController extends AbstractVerticle {
 					.end("<form action=\"/form\" method=\"post\">\n" + "<div>\n"
 							+ "<label for=\"name\">Enter your name:</label>\n"
 							+ "<input type=\"text\" id=\"name\" name=\"name\" />\n" + "</div>\n"
-							+ "<div class=\"button\">\n" + "<button type=\"submit\">Send</button>\n"
-							+ "</div>" + "</form>");
+							+ "<div class=\"button\">\n" + "<button type=\"submit\">Send</button>\n" + "</div>"
+							+ "</form>");
 		});
 		router.route("/*").handler(StaticHandler.create());
 
 		// handle the form
 		router.post("/form").handler(ctx -> {
-			ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, "text/plain"); 
+			ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, "text/plain");
 			// note the form attribute matches the html form element name.
 			ctx.response().end("Hello " + ctx.request().getParam("name") + "!");
 		});
@@ -94,23 +94,25 @@ public class SpiderScheduleController extends AbstractVerticle {
 				dayBeforeCurrent = Integer.parseInt(paramval);
 			} catch (Exception e) {
 				e.printStackTrace();
-				sendError(400,ctx.response());
-				
+				sendError(400, ctx.response());
+
 			}
-			
+
 			ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, "text/plain");
 			// note the form attribute matches the html form element name.
 			PredictionSpiderRecordStaticInfo spiderRecordStaticInfo = new PredictionSpiderRecordStaticInfo();
-			spiderRecordInfoService.selectIntervalDataBase("spider_record_info", dayBeforeCurrent, dayBeforeCurrent+1).forEach((v) -> {
-				long timeDelay = v.getUpdate_time().getTime() - v.getCreate_time().getTime();
-				spiderRecordStaticInfo.statistics(timeDelay, v);
-			});
+			spiderRecordInfoService.selectIntervalDataBase("spider_record_info", dayBeforeCurrent, dayBeforeCurrent + 1)
+					.forEach((v) -> {
+						long timeDelay = v.getUpdate_time().getTime() - v.getCreate_time().getTime();
+						spiderRecordStaticInfo.statistics(timeDelay, v);
+					});
 
 			PredictionSpiderRecordStaticInfo spiderRecordStaticInfo1 = new PredictionSpiderRecordStaticInfo();
-			spiderRecordInfoService.selectIntervalDataBase("spider_record_info", dayBeforeCurrent, dayBeforeCurrent+1).forEach((v) -> {
-				long timeDelay = v.getUpdate_time().getTime() - v.getCreate_time().getTime();
-				spiderRecordStaticInfo1.statistics(timeDelay, v);
-			});
+			spiderRecordInfoService.selectIntervalDataBase("spider_record_info", dayBeforeCurrent, dayBeforeCurrent + 1)
+					.forEach((v) -> {
+						long timeDelay = v.getUpdate_time().getTime() - v.getCreate_time().getTime();
+						spiderRecordStaticInfo1.statistics(timeDelay, v);
+					});
 			JsonArray arr = new JsonArray();
 			arr.add(JsonObject.mapFrom(spiderRecordStaticInfo));
 			arr.add(JsonObject.mapFrom(spiderRecordStaticInfo1));
@@ -130,7 +132,7 @@ public class SpiderScheduleController extends AbstractVerticle {
 			ctx.response().end(String.valueOf(RateLevel.TEN.getRateVal()));
 		});
 		router.post("/predictRecord/:dayInterval/:combineTimeSlice/:taskNum/:wheelScore").handler(ctx -> {
-			
+
 			ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, "text/plain");
 			JsonArray arr = new JsonArray();
 			int dayInterval = 7;
@@ -144,15 +146,19 @@ public class SpiderScheduleController extends AbstractVerticle {
 				wheelScore = Integer.parseInt(ctx.request().getParam("wheelScore"));
 			} catch (Exception e) {
 				e.printStackTrace();
-				sendError(400,ctx.response());
+				sendError(400, ctx.response());
 			}
 			RateLevel.TEN.setRateVal(wheelScore);
-			PredictionRecordStaticInfoKey predictionRecordStaticInfoKey = PredictionRecordStaticInfoKey.getInstance(dayInterval, combineTimeSlice, taskNum, wheelScore);
-			PredictionRecordStaticInfoValue predictionRecordStaticInfoValue = predirctSpiderRecordInfoMap.get(predictionRecordStaticInfoKey);
-			if(predictionRecordStaticInfoValue == null){
-				predirctSpiderRecordInfoMap.put(predictionRecordStaticInfoKey, PredictionBootStrap.predirctSpiderRecordInfo(context, dayInterval, combineTimeSlice, taskNum));
+			PredictionRecordStaticInfoKey predictionRecordStaticInfoKey = PredictionRecordStaticInfoKey
+					.getInstance(dayInterval, combineTimeSlice, taskNum, wheelScore);
+			PredictionRecordStaticInfoValue predictionRecordStaticInfoValue = predirctSpiderRecordInfoMap
+					.get(predictionRecordStaticInfoKey);
+			if (predictionRecordStaticInfoValue == null) {
+				predirctSpiderRecordInfoMap.put(predictionRecordStaticInfoKey,
+						PredictionBootStrap.predirctSpiderRecordInfo(context, dayInterval, combineTimeSlice, taskNum));
 			}
-			PredictionRecordStaticInfoValue predictionRecordStaticInfoValueNotNull = predirctSpiderRecordInfoMap.get(predictionRecordStaticInfoKey);
+			PredictionRecordStaticInfoValue predictionRecordStaticInfoValueNotNull = predirctSpiderRecordInfoMap
+					.get(predictionRecordStaticInfoKey);
 			arr.add(JsonObject.mapFrom(predictionRecordStaticInfoValueNotNull.getPredictRecord()));
 			arr.add(JsonObject.mapFrom(predictionRecordStaticInfoValueNotNull.getTrueRecord()));
 			arr.add(JsonObject.mapFrom(predictionRecordStaticInfoValueNotNull.getTimeSliceAddNumMap()));
@@ -173,22 +179,23 @@ public class SpiderScheduleController extends AbstractVerticle {
 			return;
 		}
 		JsonArray arr = new JsonArray();
-		if(calAbility.getSpiderScheduleAbility().get() > 0){
+		if (calAbility.getSpiderScheduleAbility().get() > 0) {
 			if (calAbility.getSpiderScheduleAbility().addAndGet(0 - taskNum) < 0) {
 				taskNum = calAbility.getSpiderScheduleAbility().addAndGet(taskNum);
-			}else{
+			} else {
 				calAbility.getSpiderScheduleAbility().addAndGet(taskNum);
 			}
-			List<SpiderScheduleDto> list =  spiderSortService.getTask(taskNum, spiderRateInfoService);
-			list.forEach((v)->{
+			List<SpiderScheduleDto> list = spiderSortService.getTask(taskNum, spiderRateInfoService);
+			list.forEach((v) -> {
 				arr.add(JsonObject.mapFrom(v));
 				logger.info(v);
 			});
 			int size = list.size();
 			calAbility.getSpiderScheduleAbility().addAndGet(0 - size);
-			logger.info("当前要的公众号数目：" + taskNum + ",5分钟内的剩余抓取量：" + calAbility.getSpiderScheduleAbility() + ",获取的队列大小:" + size);
+			logger.info("当前要的公众号数目：" + taskNum + ",5分钟内的剩余抓取量：" + calAbility.getSpiderScheduleAbility() + ",获取的队列大小:"
+					+ size);
 			response.putHeader("content-type", "application/json").end(arr.encodePrettily());
-		}else{
+		} else {
 			response.putHeader("content-type", "application/json").end(arr.encodePrettily());
 		}
 
@@ -200,7 +207,7 @@ public class SpiderScheduleController extends AbstractVerticle {
 		try {
 			sourceId = String.valueOf(routingContext.request().getParam("sourceId"));
 		} catch (Exception e) {
-			sendError(400, response);	
+			sendError(400, response);
 			return;
 		}
 		// 整理次数
@@ -225,15 +232,12 @@ public class SpiderScheduleController extends AbstractVerticle {
 		if (sourceId == null) {
 			sendError(400, response);
 		} else {
-			if (spiderRateInfoService.getRateMap().containsKey(sourceId)) {
-				spiderRateInfoService.getRateMap().get(sourceId).getTimeSlicePredict()
-						.put(TimeSimulator.getNow().getTimeSliceKey()+1, Double.valueOf(RateLevel.UP.getRateVal()));
-				logger.info("spiderSchedule handleAddTask:" + sourceId);
-			}
+			spiderSortService.addTask(sourceId, spiderRateInfoService);
+			logger.info("spiderSchedule handleAddTask:" + sourceId);
 			response.end();
 		}
 	}
-	
+
 	private void handleGetRateMap(RoutingContext routingContext) {
 		HttpServerResponse response = routingContext.response();
 		String sourceId = null;
