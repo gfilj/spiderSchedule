@@ -41,8 +41,6 @@
 		from ${param1} r, spider_source_scheduler_info s 
 		where to_days(now()) - to_days(date_format(r.update_time,"%Y-%m-%d")) &gt;= ${param2}
 		and to_days(now()) - to_days(date_format(r.update_time,"%Y-%m-%d")) &lt; ${param3} 
-		and to_days(now()) - to_days(date_format(r.create_time,"%Y-%m-%d")) &gt;= ${param2} 
-		and to_days(now()) - to_days(date_format(r.create_time,"%Y-%m-%d")) &lt; ${param3} 
 		and s.sourceid = r.sourceid and s.appid=2
 	</select>
 	
