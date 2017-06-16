@@ -65,7 +65,7 @@ public class SpiderScheduleController extends AbstractVerticle {
 		Router router = Router.router(vertx);
 		router.route().handler(BodyHandler.create());
 		router.get("/getTask/:taskNum").handler(SpiderScheduleController::handleGetTask);
-		router.put("/addTask").handler(this::handleAddTask);
+		router.put("/addTask/:sourceId").handler(this::handleAddTask);
 		router.get("/getRateMap/:sourceId").handler(this::handleGetRateMap);
 		router.get("/getRateMap/:sourceId").handler(this::handleGetRateMap);
 		router.get("/handleTaskError/:sourceId").handler(this::handleTaskError);
@@ -221,7 +221,7 @@ public class SpiderScheduleController extends AbstractVerticle {
 
 	private void handleAddTask(RoutingContext routingContext) {
 		HttpServerResponse response = routingContext.response();
-		String sourceId = routingContext.getBodyAsString();
+		String sourceId = routingContext.request().getParam("sourceId");
 		if (sourceId == null) {
 			sendError(400, response);
 		} else {
