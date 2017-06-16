@@ -221,16 +221,19 @@ public class SpiderScheduleController extends AbstractVerticle {
 
 	private void handleAddTask(RoutingContext routingContext) {
 		HttpServerResponse response = routingContext.response();
-		String postValue = routingContext.getBodyAsString();
-		if (postValue == null) {
+		String sourceId = routingContext.getBodyAsString();
+		if (sourceId == null) {
 			sendError(400, response);
 		} else {
-			SpiderRateInfoDto spiderRateInfoDto = Json.decodeValue(postValue, SpiderRateInfoDto.class);
-			spiderRateInfoService.addRateMap(spiderRateInfoDto);
+			if (spiderRateInfoService.getRateMap().containsKey(sourceId)) {
+				spiderRateInfoService.getRateMap().get(sourceId).getTimeSlicePredict()
+						.put(TimeSimulator.getNow().getTimeSliceKey()+1, Double.valueOf(RateLevel.UP.getRateVal()));
+				logger.info("spiderSchedule handleTaskError:" + sourceId);
+			}
 			response.end();
 		}
 	}
-
+	
 	private void handleGetRateMap(RoutingContext routingContext) {
 		HttpServerResponse response = routingContext.response();
 		String sourceId = null;
