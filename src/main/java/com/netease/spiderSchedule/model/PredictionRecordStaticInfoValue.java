@@ -1,5 +1,7 @@
 package com.netease.spiderSchedule.model;
 
+import java.util.Date;
+import java.util.HashSet;
 import java.util.Map;
 
 import com.netease.spiderSchedule.model.prediction.PredictionSpiderRecordStaticInfo;
@@ -9,6 +11,8 @@ public class PredictionRecordStaticInfoValue {
 	private Map<String, Integer> timeSliceAddNumMap;
 	private PredictionSpiderRecordStaticInfo predictRecord;
 	private PredictionSpiderRecordStaticInfo trueRecord;
+	private Map<String, HashSet<Date>> predictMap;
+	
 
 	public Map<String, Integer> getTimeSliceAddNumMap() {
 		return timeSliceAddNumMap;
@@ -34,5 +38,14 @@ public class PredictionRecordStaticInfoValue {
 		this.trueRecord = trueRecord;
 	}
 
+	public Map<String, HashSet<Date>> getPredictMap() {
+		return predictMap;
+	}
+
+	public void setPredictMap(Map<String, HashSet<Date>> predictMap) {
+		this.predictMap = predictMap;
+	}
+	
+	
 		
 }

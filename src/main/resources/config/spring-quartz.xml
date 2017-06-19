@@ -67,6 +67,25 @@
     </bean>
     
     
+    <bean id="cleanTaskQueueBean" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject">
+            <ref bean="spiderScheduleTask"/>
+        </property>
+        <property name="targetMethod">
+            <value>cleanTaskQueue</value>
+        </property>
+    </bean>
+    
+    <bean id="cleanTaskCron" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail">
+            <ref bean="cleanTaskQueueBean"/>
+        </property>
+        <property name="cronExpression">
+            <value>0 */5 * * * ?</value>
+        </property>
+    </bean>
+    
+    
     <bean id="startQuertz" lazy-init="false" autowire="no" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
         <property name="autoStartup" value="true" />
         <property name="triggers">
@@ -74,6 +93,7 @@
 				<ref bean="zeroScheduleCron"/>
 				<ref bean="perFiveMinutesScheduleCron"/>
 				<ref bean="per20sScheduleCron"/>
+				<ref bean="cleanTaskCron"/>
             </list>
         </property>
     </bean>

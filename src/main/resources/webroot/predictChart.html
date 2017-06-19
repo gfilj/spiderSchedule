@@ -44,6 +44,19 @@
 				<button onclick="mySubmit()" class="btn btn-default">submit</button>
 			</div>
 			<div id="content"></div>
+			
+			<div>
+				<form class="form-inline">
+					<div class="form-group">
+						<label for="inputSouceId">souceId</label> <input type="text"
+							class="form-control" id="txtSourceId" placeholder="15">
+					</div>
+				</form>
+			</div>
+			<div>
+				<button onclick="sourceIdSubmit()" class="btn btn-default">sourceIdSubmit</button>
+			</div>
+			<div id="dateContent"></div>
 		</div>
 
 
@@ -53,6 +66,21 @@
 				xmlhttp = new XMLHttpRequest();
 			} else {
 				xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+			}
+			function sourceIdSubmit(){
+				xmlhttp.onreadystatechange = function() {
+					if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+						var result = xmlhttp.responseText;
+						document.getElementById("dateContent").innerHTML = result;
+					}
+				}
+				xmlhttp.open("POST", "/getSpecialPredictRecord/"
+						+ $("#txtDayInterval").val() + "/"
+						+ $("#txtCombineTimeSlice").val() + "/"
+						+ $("#txtTaskNum").val() + "/"
+						+ $("#txtWheelScore").val() + "/"
+						+ $("#txtSourceId").val(), true);
+				xmlhttp.send();
 			}
 			function loadChart() {
 				var child = document.getElementById("content");

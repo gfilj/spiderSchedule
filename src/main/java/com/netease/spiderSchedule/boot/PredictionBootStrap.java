@@ -40,7 +40,7 @@ public class PredictionBootStrap {
 	public static PredictionRecordStaticInfoValue predirctSpiderRecordInfo(
 			ClassPathXmlApplicationContext context, int start, int combineInterval, int taskNum) {
 		PredictionRecordStaticInfoValue predictionRecordStaticInfoValue = new PredictionRecordStaticInfoValue();
-		Map<SpiderScheduleDto, HashSet<Date>> predictMap = new HashMap<SpiderScheduleDto, HashSet<Date>>();
+		Map<String, HashSet<Date>> predictMap = new HashMap<String, HashSet<Date>>();
 		// 查询过去1到8天的
 		PredictionSpiderRateInfoServiceImpl predictionSpiderRateInfoServiceImpl = (PredictionSpiderRateInfoServiceImpl) context
 				.getBean("predictionSpiderRateInfoService");
@@ -69,12 +69,12 @@ public class PredictionBootStrap {
 			if (!timeSimulator.inStopGrapSegment()) {
 				for (SpiderScheduleDto spiderScheduleDto : smoothingAlgorithmSpiderSortServiceImpl.getTask(taskNum,
 						predictionSpiderRateInfoServiceImpl)) {
-					if (predictMap.containsKey(spiderScheduleDto)) {
-						predictMap.get(spiderScheduleDto).add(timeSimulator.getDate());
+					if (predictMap.containsKey(spiderScheduleDto.getSourceId())) {
+						predictMap.get(spiderScheduleDto.getSourceId()).add(timeSimulator.getDate());
 					} else {
 						HashSet<Date> dateSet = new HashSet<Date>();
 						dateSet.add(timeSimulator.getDate());
-						predictMap.put(spiderScheduleDto, dateSet);
+						predictMap.put(spiderScheduleDto.getSourceId(), dateSet);
 					}
 				}
 			}
@@ -85,8 +85,8 @@ public class PredictionBootStrap {
 		Map<SpiderRecordInfo, PredictionSpiderRecordInfo> todayPredictionSpiderRecordMap = new HashMap<SpiderRecordInfo, PredictionSpiderRecordInfo>();
 
 		for (SpiderRecordInfo spiderRecordInfo : todaySpiderRecordList) {
-			for (Entry<SpiderScheduleDto, HashSet<Date>> entry : predictMap.entrySet()) {
-				if (spiderRecordInfo.getSourceId().equals(entry.getKey().getSourceId())) {
+			for (Entry<String, HashSet<Date>> entry : predictMap.entrySet()) {
+				if (spiderRecordInfo.getSourceId().equals(entry.getKey())) {
 					// sort get period time
 					MaxHeap<Date> dateMap = new MaxHeap<Date>();
 					dateMap.add(entry.getValue());
@@ -119,6 +119,7 @@ public class PredictionBootStrap {
 		}
 		System.out.println(spiderRecordStaticInfo);
 		predictionRecordStaticInfoValue.setTrueRecord(spiderRecordStaticInfo);
+		predictionRecordStaticInfoValue.setPredictMap(predictMap);
 		return predictionRecordStaticInfoValue;
 	}
 

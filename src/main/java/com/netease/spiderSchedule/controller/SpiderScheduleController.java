@@ -3,6 +3,7 @@ package com.netease.spiderSchedule.controller;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -165,7 +166,40 @@ public class SpiderScheduleController extends AbstractVerticle {
 
 			ctx.response().end(arr.encodePrettily());
 		});
+		
+		router.post("/getSpecialPredictRecord/:dayInterval/:combineTimeSlice/:taskNum/:wheelScore/:sourceId").handler(ctx -> {
 
+			ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, "text/plain");
+			JsonArray arr = new JsonArray();
+			int dayInterval = 7;
+			int combineTimeSlice = 5;
+			int taskNum = 15;
+			int wheelScore = 2000;
+			String sourceId = "";
+			try {
+				dayInterval = Integer.parseInt(ctx.request().getParam("dayInterval"));
+				combineTimeSlice = Integer.parseInt(ctx.request().getParam("combineTimeSlice"));
+				taskNum = Integer.parseInt(ctx.request().getParam("taskNum"));
+				wheelScore = Integer.parseInt(ctx.request().getParam("wheelScore"));
+				sourceId = ctx.request().getParam("sourceId");
+			} catch (Exception e) {
+				e.printStackTrace();
+				sendError(400, ctx.response());
+			}
+			RateLevel.TEN.setRateVal(wheelScore);
+			PredictionRecordStaticInfoKey predictionRecordStaticInfoKey = PredictionRecordStaticInfoKey
+					.getInstance(dayInterval, combineTimeSlice, taskNum, wheelScore);
+			PredictionRecordStaticInfoValue predictionRecordStaticInfoValue = predirctSpiderRecordInfoMap
+					.get(predictionRecordStaticInfoKey);
+			if (predictionRecordStaticInfoValue == null) {
+				predirctSpiderRecordInfoMap.put(predictionRecordStaticInfoKey,
+						PredictionBootStrap.predirctSpiderRecordInfo(context, dayInterval, combineTimeSlice, taskNum));
+			}
+			PredictionRecordStaticInfoValue predictionRecordStaticInfoValueNotNull = predirctSpiderRecordInfoMap
+					.get(predictionRecordStaticInfoKey);
+			HashSet<Date> hashSet = predictionRecordStaticInfoValueNotNull.getPredictMap().get(sourceId);
+			ctx.response().end(hashSet.toString());
+		});
 		vertx.createHttpServer().requestHandler(router::accept).listen(8079);
 	}
 
@@ -216,10 +250,10 @@ public class SpiderScheduleController extends AbstractVerticle {
 		} else {
 			errorHandleMap.put(sourceId, 1);
 		}
-		if (errorHandleMap.get(sourceId) <= 10) {
+		if (errorHandleMap.get(sourceId) <= 50) {
 			if (spiderRateInfoService.getRateMap().containsKey(sourceId)) {
 				spiderRateInfoService.getRateMap().get(sourceId).getTimeSlicePredict()
-						.put(TimeSimulator.getTimeSliceKey(new Date()) + 8, Double.valueOf(RateLevel.TEN.getRateVal()));
+						.put(TimeSimulator.getTimeSliceKey(new Date()) , Double.valueOf(RateLevel.UP.getRateVal()));
 				logger.info("spiderSchedule handleTaskError:" + sourceId);
 			}
 		}

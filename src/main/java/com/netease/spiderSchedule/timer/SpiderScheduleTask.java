@@ -40,4 +40,12 @@ public class SpiderScheduleTask {
 	public void per20sSchedule(){
 		SpiderScheduleController.calAbility.setReset(true);
 	}
+	
+	/**
+	 * 半个小时清除队列任务
+	 */
+	
+	public void cleanTaskQueue(){
+		spiderRateInfoService.cleanTaskQueue();
+	}
 }

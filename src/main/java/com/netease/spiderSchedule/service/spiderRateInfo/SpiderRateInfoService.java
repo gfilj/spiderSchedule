@@ -13,4 +13,5 @@ public interface SpiderRateInfoService {
 	void generateRateMap(int start, int end);
 	Map<String, SpiderRateInfo> getRateMap();
 	int getCountTooOld();
+	void cleanTaskQueue();
 }

@@ -10,11 +10,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import com.netease.spiderSchedule.controller.SpiderScheduleController;
 import com.netease.spiderSchedule.model.SpiderRateInfo;
 import com.netease.spiderSchedule.model.SpiderRateInfoDto;
 import com.netease.spiderSchedule.model.SpiderRecordInfo;
@@ -39,7 +41,8 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 	@Autowired
 	@Qualifier("smoothingAlgorithmSpiderSortService")
 	private SpiderSortService spiderSortService;
-
+	
+	protected static Logger logger = Logger.getLogger(SpiderRateInfoServiceImpl.class);
 	private static final int TIMESLICE = 5;
 	private static final int TIMESLICECOUNT = 24 * 60 / TIMESLICE;
 
@@ -68,7 +71,17 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 		generateRateMapDetail(start, end, 2, 7);
 
 	}
-
+	
+	@Override
+	public void cleanTaskQueue(){
+		//清除
+		spiderRecordInfoServie.selectInterval(0, 1).forEach((v)->{
+			if(rateMap.containsKey(v.getSourceId())){
+				rateMap.remove(v.getSourceId());
+			}
+		});
+		logger.info("SpiderRateInfoServiceImpl  after clean 要抓取的公众号" + rateMap.size());
+	}
 	public void generateRateMapDetail(int start, int end, int freeStart, int freeEnd) {
 		rateMap.clear();
 		List<SpiderRecordInfo> spiderRecordInfoList = spiderRecordInfoServie.selectInterval(start, end);
@@ -391,6 +404,7 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		generateRateMap(0, 9);
+		cleanTaskQueue();
 		spiderSortService.addTask(this);
 	}
 

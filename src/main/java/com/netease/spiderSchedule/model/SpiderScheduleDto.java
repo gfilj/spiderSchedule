@@ -112,9 +112,9 @@ public class SpiderScheduleDto implements Comparable<SpiderScheduleDto> {
 		this.appId = spiderRateInfo.getAppId();
 		this.lastUpdateTime = spiderRateInfo.getUpdate_time().getTime();
 		int size = spiderRateInfo.getTimeSliceCount().size();
-//		if (size == 1 || size == 2 || size == 3 || size == 4 || size == 5 || size == 6) {
-//			this.highQuality = true;
-//		}
+		if (size == 1 || size == 2 || size == 3 || size == 4 || size == 5 || size == 6) {
+			this.highQuality = true;
+		}
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(new Date());
 		int timeSliceKey = (calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE)) / 5;
@@ -137,7 +137,7 @@ public class SpiderScheduleDto implements Comparable<SpiderScheduleDto> {
 				this.score = -1;
 			}
 		} else {
-			if (delayVal >= DelayLevel.TWO.getDelayVal() && rate <= 0) {
+			if (delayVal >= DelayLevel.TWO.getDelayVal() && rate <= 0d) {
 				setWheel(true);
 				this.score = delayVal * RateLevel.TEN.getRateVal();
 			} else {
