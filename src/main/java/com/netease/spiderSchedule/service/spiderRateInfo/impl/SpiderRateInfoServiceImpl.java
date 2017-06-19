@@ -303,7 +303,7 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 					cal.setTimeInMillis(System.currentTimeMillis());
 					int dayCur = cal.get(Calendar.DAY_OF_YEAR);
 					if ((dayCur - dayUpdate) >= end) {
-						spiderRateInfo.setTooOld(true);
+//						spiderRateInfo.setTooOld(true);
 						countTooOld++;
 					}
 				}
