@@ -273,9 +273,9 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 					}
 				}
 			}
-			for (int i = timeSlicePredict.size() - 1; i > timeSlicePredict.size() - 1 - offset; i--) {
-				timeSlicePredict.put(i, -1d);
-			}
+//			for (int i = timeSlicePredict.size() - 1; i > timeSlicePredict.size() - 1 - offset; i--) {
+//				timeSlicePredict.put(i, -1d);
+//			}
 
 		}
 		// makeup all source
@@ -303,7 +303,7 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 					cal.setTimeInMillis(System.currentTimeMillis());
 					int dayCur = cal.get(Calendar.DAY_OF_YEAR);
 					if ((dayCur - dayUpdate) >= end) {
-//						spiderRateInfo.setTooOld(true);
+						spiderRateInfo.setTooOld(true);
 						countTooOld++;
 					}
 				}
@@ -403,7 +403,7 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		generateRateMap(0, 9);
+		generateRateMap(0, 14);
 		cleanTaskQueue();
 		spiderSortService.addTask(this);
 	}

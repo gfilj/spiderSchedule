@@ -12,6 +12,7 @@ import com.netease.spiderSchedule.model.SpiderScheduleDto;
 import com.netease.spiderSchedule.service.spiderRateInfo.SpiderRateInfoService;
 import com.netease.spiderSchedule.service.spiderSort.SpiderSortService;
 import com.netease.spiderSchedule.sort.MaxHeap;
+import com.netease.spiderSchedule.util.DelayLevel;
 import com.netease.spiderSchedule.util.RateLevel;
 @Service("spiderSortService")
 public class SpiderSortServiceImpl implements SpiderSortService{
@@ -61,6 +62,12 @@ public class SpiderSortServiceImpl implements SpiderSortService{
 	public void addTask(String sourceId, SpiderRateInfoService spiderRateInfoService){
 		SpiderScheduleDto spiderScheduleDto = new SpiderScheduleDto(spiderRateInfoService.getRateMap().get(sourceId));
 		spiderScheduleDto.setScore(RateLevel.UP.getRateVal());
+		heapSort.add(spiderScheduleDto);
+	}
+	
+	public void addErrorTask(String sourceId, SpiderRateInfoService spiderRateInfoService){
+		SpiderScheduleDto spiderScheduleDto = new SpiderScheduleDto(spiderRateInfoService.getRateMap().get(sourceId));
+		spiderScheduleDto.setScore(RateLevel.TEN.getRateVal() + DelayLevel.TWO.getDelayVal());
 		heapSort.add(spiderScheduleDto);
 	}
 

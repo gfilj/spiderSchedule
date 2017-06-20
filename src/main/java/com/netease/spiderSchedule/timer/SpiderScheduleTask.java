@@ -22,7 +22,6 @@ public class SpiderScheduleTask {
 	 */
 	public void zeroSchedule(){
 		spiderRateInfoService.generateRateMap(0,9);
-		SpiderScheduleController.errorHandleMap.clear();
 	}
 	
 	/**
@@ -32,6 +31,7 @@ public class SpiderScheduleTask {
 	public void perFiveMinutesSchedule(){
 		
 		spiderSortService.addTask(spiderRateInfoService);
+		SpiderScheduleController.errorHandleMap.clear();
 	}
 	
 	/**

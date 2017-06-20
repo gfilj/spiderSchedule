@@ -250,12 +250,12 @@ public class SpiderScheduleController extends AbstractVerticle {
 		} else {
 			errorHandleMap.put(sourceId, 1);
 		}
-		if (errorHandleMap.get(sourceId) <= 50) {
+//		if (errorHandleMap.get(sourceId) <= 15) {
 			if (spiderRateInfoService.getRateMap().containsKey(sourceId)) {
-				spiderSortService.addTask(sourceId, spiderRateInfoService);
+				spiderSortService.addErrorTask(sourceId, spiderRateInfoService);
 				logger.info("spiderSchedule handleTaskError:" + sourceId);
 			}
-		}
+//		}
 		sendOK(200, response);
 	}
 
