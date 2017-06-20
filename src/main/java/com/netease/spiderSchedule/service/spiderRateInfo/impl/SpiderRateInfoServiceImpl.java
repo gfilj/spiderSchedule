@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
@@ -75,43 +76,38 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 	@Override
 	public void cleanTaskQueue(){
 		//清除
+		Map<String, SpiderRateInfo> rateMap3 = Collections.synchronizedMap(new HashMap<String, SpiderRateInfo>());
+		generateOriginalRateMap(0, 3, rateMap3);
 		spiderRecordInfoServie.selectInterval(0, 1).forEach((v)->{
 			if(rateMap.containsKey(v.getSourceId())){
 				rateMap.remove(v.getSourceId());
 			}
+			if(rateMap3.containsKey(v.getSourceId())){
+				rateMap3.remove(v.getSourceId());
+			}
 		});
-		logger.info("SpiderRateInfoServiceImpl  after clean 要抓取的公众号" + rateMap.size());
+		//更新概率
+		//统计最近三天的
+		System.out.println(rateMap3);
+		int timeSliceKey = TimeSimulator.getNow().getTimeSliceKey();
+		final AtomicInteger delayNum = new AtomicInteger(0);
+		rateMap3.forEach((k,v)->{
+			
+			for(Integer key :v.getTimeSliceCount().keySet() ){
+				if(key<=timeSliceKey){
+					logger.info(key +"----" +timeSliceKey + v.getTimeSliceCount() +"----" +v.getSourceId());
+					spiderSortService.addTask(v.getSourceId(), this);
+					delayNum.incrementAndGet();
+					break;
+				}
+			}
+		});
+		//q
+		logger.info("SpiderRateInfoServiceImpl  after clean go to crab " + rateMap.size() + " delay num  " + delayNum.get());
 	}
 	public void generateRateMapDetail(int start, int end, int freeStart, int freeEnd) {
 		rateMap.clear();
-		List<SpiderRecordInfo> spiderRecordInfoList = spiderRecordInfoServie.selectInterval(start, end);
-		Calendar calendar = Calendar.getInstance();
-		for (SpiderRecordInfo spiderRecordInfo : spiderRecordInfoList) {
-			String rateMapKey = spiderRecordInfo.getSourceId();
-			SpiderRateInfo spiderRateInfo;
-			if (!rateMap.containsKey(rateMapKey)) {
-				spiderRateInfo = new SpiderRateInfo(spiderRecordInfo);
-				rateMap.put(rateMapKey, spiderRateInfo);
-			} else {
-				spiderRateInfo = rateMap.get(rateMapKey);
-				spiderRateInfo.increateTotalCount();
-
-			}
-			calendar.setTime(spiderRecordInfo.getCreate_time());
-			int key = (calendar.get(Calendar.HOUR) * 60 + calendar.get(Calendar.MINUTE)) / TIMESLICE;
-			Map<Integer, Integer> timeSliceCount = spiderRateInfo.getTimeSliceCount();
-			putInfoSliceCount(key, timeSliceCount);
-			/*
-			 * if (key + 1 < 288) { putInfoSliceCount(key + 1, timeSliceCount);
-			 * spiderRateInfo.increateTotalCount(); } if (key + 12 < 288) {
-			 * putInfoSliceCount(key + 2, timeSliceCount);
-			 * spiderRateInfo.increateTotalCount(); } if (key + 3 < 288) {
-			 * putInfoSliceCount(key + 3, timeSliceCount);
-			 * spiderRateInfo.increateTotalCount(); } if (key - 3 > 0) {
-			 * putInfoSliceCount(key - 3, timeSliceCount);
-			 * spiderRateInfo.increateTotalCount(); }
-			 */
-		}
+		generateOriginalRateMap(start, end, rateMap);
 
 		for (SpiderRateInfo spiderRateInfo : rateMap.values()) {
 			try {
@@ -130,18 +126,6 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 
 		// 置信区间
 		final double z = 1.96;
-		int count = 0;
-		int count2 = 0;
-		int count3 = 0;
-		int count4 = 0;
-		int count5 = 0;
-		int count6 = 0;
-		int count7 = 0;
-		int count8 = 0;
-		int count9 = 0;
-		int lawMin = 1000000;
-		int irregularMax = 0;
-		ArrayList<Integer> arr = new ArrayList<Integer>();
 		for (SpiderRateInfo spiderRateInfo : rateMap.values()) {
 			boolean canCount = false;
 			for (Entry<Integer, Integer> timeSlice : spiderRateInfo.getTimeSliceCount().entrySet()) {
@@ -150,52 +134,10 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 				double redditP = (phat + z * z / (2 * n) - z * Math.sqrt((phat * (1 - phat) + z * z / (4 * n)) / n))
 						/ (1 + z * z / n);
 				timeSlice.setValue((int) (redditP * 1000000));
-				arr.add(timeSlice.getValue());
-			}
-			/*
-			 * if(canCount){ count++; }
-			 */
-			if (spiderRateInfo.getTimeSliceCount().size() == 1) {
-				count++;
-			}
-			if (spiderRateInfo.getTimeSliceCount().size() == 2) {
-				count2++;
-			}
-			if (spiderRateInfo.getTimeSliceCount().size() == 3) {
-				count3++;
-			}
-			if (spiderRateInfo.getTimeSliceCount().size() == 4) {
-				count4++;
-			}
-			if (spiderRateInfo.getTimeSliceCount().size() == 5) {
-				count5++;
-			}
-			if (spiderRateInfo.getTimeSliceCount().size() == 6) {
-				count6++;
-			}
-			if (spiderRateInfo.getTimeSliceCount().size() == 7) {
-				count7++;
-			}
-			if (spiderRateInfo.getTimeSliceCount().size() == 8) {
-				count8++;
-			}
-			if (spiderRateInfo.getTimeSliceCount().size() == 9) {
-				count9++;
 			}
 
 		}
-		Collections.sort(arr);
-		RateLevel.TEN.setRateVal(arr.get(arr.size()*1/40+1));
-//		System.out.println(arr);
-//		for(int i =0; i< arr.size();i++){
-//			System.out.println(arr.get(i));
-//			if(arr.get(i)>5000){
-//				System.out.println("---------------------------"+ i + "---" + );
-//				break;
-//			}
-//		}
-		System.out.println(count + "--" + count2 + "--" + count3 + "--" + count4 + "--" + count5 + "--" + count6 + "--"
-				+ count7 + "--" + count8 + "--" + count9 );
+		setWheelRate();
 		// 三次平滑
 		final double a = 0.4, b = 0.05, y = 0.9;
 		final int k = 2;
@@ -323,6 +265,83 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 				v.setUpdate_time(TimeSimulator.getNow().getHoursBefore(2));
 			}
 		});
+	}
+
+	public void generateOriginalRateMap(int start, int end, Map<String, SpiderRateInfo> rateMapTemp ) {
+		List<SpiderRecordInfo> spiderRecordInfoList = spiderRecordInfoServie.selectInterval(start, end);
+		for (SpiderRecordInfo spiderRecordInfo : spiderRecordInfoList) {
+			String rateMapKey = spiderRecordInfo.getSourceId();
+			SpiderRateInfo spiderRateInfo;
+			if (!rateMapTemp.containsKey(rateMapKey)) {
+				spiderRateInfo = new SpiderRateInfo(spiderRecordInfo);
+				rateMapTemp.put(rateMapKey, spiderRateInfo);
+			} else {
+				spiderRateInfo = rateMapTemp.get(rateMapKey);
+				spiderRateInfo.increateTotalCount();
+
+			}
+			int key = TimeSimulator.getTimeSliceKey(spiderRecordInfo.getCreate_time());
+			Map<Integer, Integer> timeSliceCount = spiderRateInfo.getTimeSliceCount();
+			putInfoSliceCount(key, timeSliceCount);
+		}
+	}
+	/**
+	 * 统计时间片比例
+	 */
+	public void staticSliceRate(){
+		int count = 0;
+		int count2 = 0;
+		int count3 = 0;
+		int count4 = 0;
+		int count5 = 0;
+		int count6 = 0;
+		int count7 = 0;
+		int count8 = 0;
+		int count9 = 0;
+		for (SpiderRateInfo spiderRateInfo : rateMap.values()) {
+			if (spiderRateInfo.getTimeSliceCount().size() == 1) {
+				count++;
+			}
+			if (spiderRateInfo.getTimeSliceCount().size() == 2) {
+				count2++;
+			}
+			if (spiderRateInfo.getTimeSliceCount().size() == 3) {
+				count3++;
+			}
+			if (spiderRateInfo.getTimeSliceCount().size() == 4) {
+				count4++;
+			}
+			if (spiderRateInfo.getTimeSliceCount().size() == 5) {
+				count5++;
+			}
+			if (spiderRateInfo.getTimeSliceCount().size() == 6) {
+				count6++;
+			}
+			if (spiderRateInfo.getTimeSliceCount().size() == 7) {
+				count7++;
+			}
+			if (spiderRateInfo.getTimeSliceCount().size() == 8) {
+				count8++;
+			}
+			if (spiderRateInfo.getTimeSliceCount().size() == 9) {
+				count9++;
+			}
+		}
+		System.out.println(count + "--" + count2 + "--" + count3 + "--" + count4 + "--" + count5 + "--" + count6 + "--"
+				+ count7 + "--" + count8 + "--" + count9 );
+	}
+	/**
+	 * 设置轮刷分数
+	 */
+	public void setWheelRate() {
+		ArrayList<Integer> arr = new ArrayList<Integer>();
+		for (SpiderRateInfo spiderRateInfo : rateMap.values()) {
+			for (Entry<Integer, Integer> timeSlice : spiderRateInfo.getTimeSliceCount().entrySet()) {
+				arr.add(timeSlice.getValue());
+			}
+		}
+		Collections.sort(arr);
+		RateLevel.TEN.setRateVal(arr.get(arr.size()*1/40+1));
 	}
 
 	public Double getValueST(LinkedList<Double> spiderRateInfoS, int i) {
