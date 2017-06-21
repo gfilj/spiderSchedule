@@ -76,22 +76,21 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 	@Override
 	public void cleanTaskQueue(){
 		//清除
-		Map<String, SpiderRateInfo> rateMap3 = Collections.synchronizedMap(new HashMap<String, SpiderRateInfo>());
-		generateOriginalRateMap(0, 3, rateMap3);
+		Map<String, SpiderRateInfo> rateMap2 = Collections.synchronizedMap(new HashMap<String, SpiderRateInfo>());
+		generateOriginalRateMap(0, 2, rateMap2);
 		spiderRecordInfoServie.selectInterval(0, 1).forEach((v)->{
 			if(rateMap.containsKey(v.getSourceId())){
 				rateMap.remove(v.getSourceId());
 			}
-			if(rateMap3.containsKey(v.getSourceId())){
-				rateMap3.remove(v.getSourceId());
+			if(rateMap2.containsKey(v.getSourceId())){
+				rateMap2.remove(v.getSourceId());
 			}
 		});
 		//更新概率
 		//统计最近三天的
-		System.out.println(rateMap3);
 		int timeSliceKey = TimeSimulator.getNow().getTimeSliceKey();
 		final AtomicInteger delayNum = new AtomicInteger(0);
-		rateMap3.forEach((k,v)->{
+		rateMap2.forEach((k,v)->{
 			
 			for(Integer key :v.getTimeSliceCount().keySet() ){
 				if(key<=timeSliceKey){
