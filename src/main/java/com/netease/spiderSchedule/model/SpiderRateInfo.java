@@ -21,15 +21,24 @@ public class SpiderRateInfo implements Serializable{
 	private String sourceId;	//源id
 	private Date update_time;//最后更新时间
 	private String rateJson;
-	private Map<Integer,Integer> timeSliceCount;
-	private int totalCount;
-	private int priority;
+	private Map<Integer,Integer> timeSliceCount;//真实预测时间表
+	private int totalCount;//总数
+	private int priority;//优先级
 	private Map<Integer, SliceStatistics> sliceStisticsMap;
-	private List<Integer> timeSliceList;
-	private Map<Integer,Double> timeSlicePredict;
-	private boolean tooOld;
+	private List<Integer> timeSliceList;//预测时间片列表
+	private Map<Integer,Double> timeSlicePredict;//预测数据
+	private boolean tooOld;//是否太老了
+	private boolean moreOnceTime=false;//一天超过一次更新
 	
-	
+
+	public boolean isMoreOnceTime() {
+		return moreOnceTime;
+	}
+
+	public void setMoreOnceTime(boolean moreOnceTime) {
+		this.moreOnceTime = moreOnceTime;
+	}
+
 	public boolean isTooOld() {
 		return tooOld;
 	}
@@ -149,8 +158,6 @@ public class SpiderRateInfo implements Serializable{
 	public void setTotalCount(int totalCount) {
 		this.totalCount = totalCount;
 	}
-
-	
 
 
 

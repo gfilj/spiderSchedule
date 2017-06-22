@@ -2,6 +2,7 @@ package com.netease.spiderSchedule.service.spiderRateInfo.impl;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -80,11 +81,23 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 		generateOriginalRateMap(0, 2, rateMap2);
 		spiderRecordInfoServie.selectInterval(0, 1).forEach((v)->{
 			if(rateMap.containsKey(v.getSourceId())){
-				rateMap.remove(v.getSourceId());
+				SpiderRateInfo spiderRateInfo = rateMap.get(v.getSourceId());
+				//获取最大的key
+				int max = 0;
+				for(int key:spiderRateInfo.getTimeSliceCount().keySet()){
+					if(max<key){
+						max=key;
+					}
+				}
+				if(spiderRateInfo.isMoreOnceTime()){
+					if(TimeSimulator.getTimeSliceKey(v.getCreate_time())>=max){
+						removeTaskFromRateMap(rateMap2, v);
+					}
+				}else{
+					removeTaskFromRateMap(rateMap2, v);
+				}
 			}
-			if(rateMap2.containsKey(v.getSourceId())){
-				rateMap2.remove(v.getSourceId());
-			}
+			
 		});
 		//更新概率
 		//统计最近三天的
@@ -101,13 +114,23 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 				}
 			}
 		});
-		//q
 		logger.info("SpiderRateInfoServiceImpl  after clean go to crab " + rateMap.size() + " delay num  " + delayNum.get());
+	}
+	/**
+	 * 
+	 * @param rateMap2
+	 * @param v
+	 */
+	public void removeTaskFromRateMap(Map<String, SpiderRateInfo> rateMap2, SpiderRecordInfo v) {
+		rateMap.remove(v.getSourceId());
+		if(rateMap2.containsKey(v.getSourceId())){
+			rateMap2.remove(v.getSourceId());
+		}
 	}
 	public void generateRateMapDetail(int start, int end, int freeStart, int freeEnd) {
 		rateMap.clear();
 		generateOriginalRateMap(start, end, rateMap);
-
+		nakeUpOnceTime(start, end);
 		for (SpiderRateInfo spiderRateInfo : rateMap.values()) {
 			try {
 				// make up priority
@@ -265,6 +288,25 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 			}
 		});
 	}
+
+	public void nakeUpOnceTime(int start, int end) {
+		for(int i=start; i<end; i++){
+			Map<String, SpiderRateInfo> rateMap = new HashMap<String, SpiderRateInfo>();
+			generateOriginalRateMap(i, i+1, rateMap);
+			for(Entry<String, SpiderRateInfo> entry :rateMap.entrySet()){
+				if(entry.getValue().getTimeSliceCount().size()>1){
+					this.rateMap.get(entry.getKey()).setMoreOnceTime(true);;
+				}
+			}
+		}
+		int moreOnceTimeCount = 0;
+		for(SpiderRateInfo spiderRateInfo : this.rateMap.values()){
+			if(spiderRateInfo.isMoreOnceTime()){
+				moreOnceTimeCount++;
+			}
+		}
+		logger.info("more than once public is " + moreOnceTimeCount);
+	} 
 
 	public void generateOriginalRateMap(int start, int end, Map<String, SpiderRateInfo> rateMapTemp ) {
 		List<SpiderRecordInfo> spiderRecordInfoList = spiderRecordInfoServie.selectInterval(start, end);
