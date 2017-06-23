@@ -81,7 +81,7 @@
             <ref bean="cleanTaskQueueBean"/>
         </property>
         <property name="cronExpression">
-            <value>0 */5 * * * ?</value>
+            <value>0 */20 * * * ?</value>
         </property>
     </bean>
     
