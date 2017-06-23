@@ -25,7 +25,7 @@
 		where to_days(now()) - to_days(date_format(r.create_time,"%Y-%m-%d")) &gt;= #{0,jdbcType=INTEGER}
 		and to_days(now()) - to_days(date_format(r.create_time,"%Y-%m-%d")) &lt; #{1,jdbcType=INTEGER} 
 		and s.sourceid = r.sourceid 
-		and s.status = 0 and s.appid=2
+		and s.status = 0
 	</select>
 	<select id="selectJointInterval" resultType="com.netease.spiderSchedule.model.SpiderRecordInfo">
 		select 

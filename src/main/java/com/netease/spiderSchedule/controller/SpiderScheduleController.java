@@ -222,12 +222,11 @@ public class SpiderScheduleController extends AbstractVerticle {
 			List<SpiderScheduleDto> list = spiderSortService.getTask(taskNum, spiderRateInfoService);
 			list.forEach((v) -> {
 				arr.add(JsonObject.mapFrom(v));
-				logger.info(v);
 			});
 			int size = list.size();
 			calAbility.getSpiderScheduleAbility().addAndGet(0 - size);
-			logger.info("当前要的公众号数目：" + taskNum + ",5分钟内的剩余抓取量：" + calAbility.getSpiderScheduleAbility() + ",获取的队列大小:"
-					+ size);
+			logger.info("当前要的公众号数目：" + taskNum + ",20s内的剩余抓取量：" + calAbility.getSpiderScheduleAbility() + ",获取的队列大小:"
+					+ size + " 要抓的数据为：" + list);
 			response.putHeader("content-type", "application/json").end(arr.encodePrettily());
 		} else {
 			response.putHeader("content-type", "application/json").end(arr.encodePrettily());
@@ -245,11 +244,11 @@ public class SpiderScheduleController extends AbstractVerticle {
 			return;
 		}
 		// 整理次数
-		if (errorHandleMap.containsKey(sourceId)) {
-			errorHandleMap.put(sourceId, errorHandleMap.get(sourceId) + 1);
-		} else {
-			errorHandleMap.put(sourceId, 1);
-		}
+//		if (errorHandleMap.containsKey(sourceId)) {
+//			errorHandleMap.put(sourceId, errorHandleMap.get(sourceId) + 1);
+//		} else {
+//			errorHandleMap.put(sourceId, 1);
+//		}
 //		if (errorHandleMap.get(sourceId) <= 15) {
 			if (spiderRateInfoService.getRateMap().containsKey(sourceId)) {
 				spiderSortService.addErrorTask(sourceId, spiderRateInfoService);

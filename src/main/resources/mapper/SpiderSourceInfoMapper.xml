@@ -8,13 +8,13 @@
 		select 
 		<include refid="Base_Column_List" />
 		from spider_source_scheduler_info 
-		where status = 0 and openid is not null and openid != '' and appid=2
+		where status = 0 and openid is not null and openid != '' 
 	</select>
 	
 	<select id="selectBySourceid" resultType="com.netease.spiderSchedule.model.SpiderSourceInfo" parameterType="java.lang.String">
 		select 
 		<include refid="Base_Column_List" />
 		from spider_source_scheduler_info 
-		where sourceid = #{sourceid,jdbcType=VARCHAR} and status = 0 and appid=2
+		where sourceid = #{sourceid,jdbcType=VARCHAR} and status = 0 
 	</select>
 </mapper>

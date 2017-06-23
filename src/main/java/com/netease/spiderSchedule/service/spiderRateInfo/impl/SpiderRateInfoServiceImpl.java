@@ -35,6 +35,7 @@ import com.netease.spiderSchedule.util.TimeSimulator;
 public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, InitializingBean {
 
 	protected Map<String, SpiderRateInfo> rateMap = Collections.synchronizedMap(new HashMap<String, SpiderRateInfo>());
+	protected Map<String, SpiderRateInfo> rateMap2 = Collections.synchronizedMap(new HashMap<String, SpiderRateInfo>());
 
 	@Autowired
 	protected SpiderSourceInfoService spiderSourceInfoServie;
@@ -74,12 +75,12 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 
 	}
 	
+	
 	@Override
 	public void cleanTaskQueue(){
 		//清除
-		Map<String, SpiderRateInfo> rateMap2 = Collections.synchronizedMap(new HashMap<String, SpiderRateInfo>());
-		generateOriginalRateMap(0, 2, rateMap2);
-		spiderRecordInfoServie.selectInterval(0, 1).forEach((v)->{
+		List<SpiderRecordInfo> yesterDayList = spiderRecordInfoServie.selectInterval(0, 1);
+		yesterDayList.forEach((v)->{
 			if(rateMap.containsKey(v.getSourceId())){
 				SpiderRateInfo spiderRateInfo = rateMap.get(v.getSourceId());
 				//获取最大的key
@@ -129,7 +130,9 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 	}
 	public void generateRateMapDetail(int start, int end, int freeStart, int freeEnd) {
 		rateMap.clear();
+		rateMap2.clear();
 		generateOriginalRateMap(start, end, rateMap);
+		generateOriginalRateMap(0, 2, rateMap2);
 		nakeUpOnceTime(start, end);
 		for (SpiderRateInfo spiderRateInfo : rateMap.values()) {
 			try {
