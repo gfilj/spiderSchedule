@@ -2,7 +2,7 @@ package com.netease.spiderSchedule.util;
 
 public enum DelayLevel {
 
-	HALFDAY(100), FOUR(100), THREE(40), TWO(20), ONE(10), ZERO(1);
+	HALFDAY(10000 ),SIX(6000), FIVE(3000), FOUR(2000), THREE(1000), TWO(20), ONE(10), ZERO(1);
 
 	private int levelVal;
 
@@ -39,8 +39,12 @@ public enum DelayLevel {
 			return DelayLevel.TWO;
 		} else if (3 * HOURVAL <= interVal && interVal < 4 * HOURVAL) {
 			return DelayLevel.THREE;
-		} else if (4 * HOURVAL <= interVal && interVal < 12 * HOURVAL) {
+		} else if (4 * HOURVAL <= interVal && interVal < 5 * HOURVAL) {
 			return DelayLevel.FOUR;
+		} else if (5 * HOURVAL <= interVal && interVal < 6 * HOURVAL) {
+			return DelayLevel.FIVE;
+		} else if (6 * HOURVAL <= interVal && interVal <7 * HOURVAL) {
+			return DelayLevel.SIX;
 		} else if (12 * HOURVAL <=interVal ){
 			return DelayLevel.HALFDAY;
 		}

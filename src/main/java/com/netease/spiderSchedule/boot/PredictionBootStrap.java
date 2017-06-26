@@ -56,7 +56,7 @@ public class PredictionBootStrap {
 		predictionSpiderRateInfoServiceImpl.generateRateMap(start + 1, start + 10);
 
 		List<SpiderRecordInfo> todaySpiderRecordList = spiderRecordInfoServie.selectInterval(start, start + 1);
-		System.out.println(todaySpiderRecordList.size());
+//		System.out.println(todaySpiderRecordList.size());
 		// sort
 		Map<String, Integer> timeSliceAddNumMap = new HashMap<String, Integer>();
 		int taskNumTemp = taskNum;
@@ -79,6 +79,10 @@ public class PredictionBootStrap {
 				}
 			}
 			timeSimulator.getFiveMinuteAfter();
+		}
+		System.out.println("--------predictMap" + predictMap);
+		for (Entry<String, HashSet<Date>> entry : predictMap.entrySet()) {
+			System.out.println(entry.toString());
 		}
 		predictionRecordStaticInfoValue.setTimeSliceAddNumMap(timeSliceAddNumMap);
 		// prediction

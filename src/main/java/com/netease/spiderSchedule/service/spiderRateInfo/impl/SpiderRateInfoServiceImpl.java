@@ -132,7 +132,7 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 		rateMap.clear();
 		rateMap2.clear();
 		generateOriginalRateMap(start, end, rateMap);
-		generateOriginalRateMap(0, 2, rateMap2);
+		generateOriginalRateMap(0, 4, rateMap2);
 		nakeUpOnceTime(start, end);
 		for (SpiderRateInfo spiderRateInfo : rateMap.values()) {
 			try {
