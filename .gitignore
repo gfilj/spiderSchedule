@@ -1,7 +1,6 @@
 /target/
+/logs/
 .classpath
 .project
 .settings/
-springpom.xml
 .vertx
-logs
