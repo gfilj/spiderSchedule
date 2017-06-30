@@ -242,7 +242,7 @@ public class SpiderScheduleController extends AbstractVerticle {
 				getSize=weixinListRequest.size();
 			}
 			for(int i=0; i< getSize; i++){
-				arr.add(JsonObject.mapFrom(weixinListRequest.remove(i)));
+				arr.add(JsonObject.mapFrom(weixinListRequest.remove(0)));
 			}
 			response.putHeader("content-type", "application/json").end(arr.encodePrettily());
 		}
