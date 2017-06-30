@@ -1,5 +1,6 @@
 package com.netease.spiderSchedule.controller;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -13,23 +14,20 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import com.netease.spiderSchedule.boot.PredictionBootStrap;
 import com.netease.spiderSchedule.model.PredictionRecordStaticInfoKey;
 import com.netease.spiderSchedule.model.PredictionRecordStaticInfoValue;
-import com.netease.spiderSchedule.model.SpiderRateInfoDto;
 import com.netease.spiderSchedule.model.SpiderScheduleDto;
 import com.netease.spiderSchedule.model.prediction.PredictionSpiderRecordStaticInfo;
 import com.netease.spiderSchedule.service.spiderRateInfo.SpiderRateInfoService;
 import com.netease.spiderSchedule.service.spiderRateInfo.impl.SpiderRateInfoServiceImpl;
 import com.netease.spiderSchedule.service.spiderRecordInfo.SpiderRecodeInfoService;
-import com.netease.spiderSchedule.service.spiderSort.SpiderSortService;
 import com.netease.spiderSchedule.service.spiderSort.impl.SpiderSortServiceImpl;
+import com.netease.spiderSchedule.timer.model.Request;
 import com.netease.spiderSchedule.util.CalAbility;
 import com.netease.spiderSchedule.util.RateLevel;
 import com.netease.spiderSchedule.util.Runner;
-import com.netease.spiderSchedule.util.TimeSimulator;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpServerResponse;
-import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
@@ -46,8 +44,18 @@ public class SpiderScheduleController extends AbstractVerticle {
 	private static SpiderRecodeInfoService spiderRecordInfoService;
 	public static CalAbility calAbility = new CalAbility();
 	private static Map<PredictionRecordStaticInfoKey, PredictionRecordStaticInfoValue> predirctSpiderRecordInfoMap = new HashMap<PredictionRecordStaticInfoKey, PredictionRecordStaticInfoValue>();
+	public static Map<String, Integer> errorHandleMap = Collections.synchronizedMap(new HashMap<String, Integer>());//errorHandleMap
+//	private static Map<String,JSONObject> ipJsonMap = Collections.synchronizedMap(new HashMap<String,JSONObject>());
+	private static List<Request> weixinListRequest = Collections.synchronizedList(new ArrayList<Request>());//微信列表页list
+	
+	/**
+	 * 获取任务进行执行
+	 * @return
+	 */
+	public static List<Request> getWeixinListRequest() {
+		return weixinListRequest;
+	}
 
-	public static Map<String, Integer> errorHandleMap = Collections.synchronizedMap(new HashMap<String, Integer>());
 
 	protected static Logger logger = Logger.getLogger(SpiderScheduleController.class);
 
@@ -225,10 +233,17 @@ public class SpiderScheduleController extends AbstractVerticle {
 			});
 			int size = list.size();
 			calAbility.getSpiderScheduleAbility().addAndGet(0 - size);
-			logger.info("当前要的公众号数目：" + taskNum + ",20s内的剩余抓取量：" + calAbility.getSpiderScheduleAbility() + ",获取的队列大小:"
+			logger.info("当前要的公众号数目：" + taskNum + ",5s内的剩余抓取量：" + calAbility.getSpiderScheduleAbility() + ",获取的队列大小:"
 					+ size + " 要抓的数据为：" + list);
 			response.putHeader("content-type", "application/json").end(arr.encodePrettily());
 		} else {
+			int getSize = 3;
+			if(weixinListRequest.size()<3){
+				getSize=weixinListRequest.size();
+			}
+			for(int i=0; i< getSize; i++){
+				arr.add(JsonObject.mapFrom(weixinListRequest.remove(i)));
+			}
 			response.putHeader("content-type", "application/json").end(arr.encodePrettily());
 		}
 

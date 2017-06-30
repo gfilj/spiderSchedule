@@ -17,7 +17,34 @@ public class SpiderScheduleDto implements Comparable<SpiderScheduleDto> {
 	private int appId;
 	private boolean wheel = false;// 甄别轮刷策略
 	private boolean highQuality = false;// 甄别高质量公众号
+	private String proxyip;
+	private String port;
+	private String machine;
 	
+	public String getProxyip() {
+		return proxyip;
+	}
+
+	public void setProxyip(String proxyip) {
+		this.proxyip = proxyip;
+	}
+
+	public String getPort() {
+		return port;
+	}
+
+	public void setPort(String port) {
+		this.port = port;
+	}
+
+	public String getMachine() {
+		return machine;
+	}
+
+	public void setMachine(String machine) {
+		this.machine = machine;
+	}
+
 	public static boolean wheelSwitch = false;
 	public static int wheelScore = 10000;
 	
