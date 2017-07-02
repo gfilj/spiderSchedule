@@ -1,6 +1,5 @@
 package com.netease.spiderSchedule.model;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -11,11 +10,9 @@ import java.util.Map;
  * @author bjluzhangqing
  *
  */
-public class SpiderRateInfo implements Serializable{
+public class SpiderRateInfo implements Comparable<SpiderRateInfo> {
 
 	
-	
-	private static final long serialVersionUID = 8204160602090647578L;
 	
 	private int appId;    //抓取类型
 	private String sourceId;	//源id
@@ -29,7 +26,25 @@ public class SpiderRateInfo implements Serializable{
 	private Map<Integer,Double> timeSlicePredict;//预测数据
 	private boolean tooOld;//是否太老了
 	private boolean moreOnceTime=false;//一天超过一次更新
+	private int nearestInterval;//距离当前时间最近的时间片
+	private int maxTimeSlice=0;//设置当前最大的key
 	
+	
+	public int getMaxTimeSlice() {
+		return maxTimeSlice;
+	}
+
+	public void setMaxTimeSlice(int maxTimeSlice) {
+		this.maxTimeSlice = maxTimeSlice;
+	}
+
+	public int getNearestInterval() {
+		return nearestInterval;
+	}
+
+	public void setNearestInterval(int nearestInterval) {
+		this.nearestInterval = nearestInterval;
+	}
 
 	public boolean isMoreOnceTime() {
 		return moreOnceTime;
@@ -223,5 +238,16 @@ public class SpiderRateInfo implements Serializable{
 		this.totalCount++;
 	}
 	
+
+	@Override
+	public int compareTo(SpiderRateInfo rateInfo) {
+		if (this.nearestInterval > rateInfo.nearestInterval) {
+			return -1;
+		} else if (this.nearestInterval < rateInfo.nearestInterval) {
+			return 1;
+		} else {
+			return 0;
+		}
+	}
 	
 }
