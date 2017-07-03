@@ -111,7 +111,7 @@
 				<ref bean="zeroScheduleCron"/>
 				<ref bean="perFiveMinutesScheduleCron"/>
 				<ref bean="per20sScheduleCron"/>
-				<ref bean="per5sScheduleCron"/>
+				<!-- <ref bean="per5sScheduleCron"/> -->
 				<ref bean="cleanTaskCron"/>
             </list>
         </property>
