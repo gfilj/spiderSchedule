@@ -26,7 +26,7 @@ public class SpiderRateInfo implements Comparable<SpiderRateInfo> {
 	private Map<Integer,Double> timeSlicePredict;//预测数据
 	private boolean tooOld;//是否太老了
 	private boolean moreOnceTime=false;//一天超过一次更新
-	private int nearestInterval;//距离当前时间最近的时间片
+	private int nearestInterval = 288;//距离当前时间最近的时间片
 	private int maxTimeSlice=0;//设置当前最大的key
 	
 	

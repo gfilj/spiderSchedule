@@ -28,6 +28,7 @@ import com.netease.spiderSchedule.service.spiderRateInfo.SpiderRateInfoService;
 import com.netease.spiderSchedule.service.spiderRecordInfo.SpiderRecodeInfoService;
 import com.netease.spiderSchedule.service.spiderSort.SpiderSortService;
 import com.netease.spiderSchedule.service.spiderSourceInfo.SpiderSourceInfoService;
+import com.netease.spiderSchedule.sort.MaxHeap;
 import com.netease.spiderSchedule.util.RateLevel;
 import com.netease.spiderSchedule.util.TimeSimulator;
 
@@ -75,13 +76,13 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 
 	}
 	
-	
 	@Override
 	public void cleanTaskQueue(){
 		//清除
 		List<SpiderRecordInfo> yesterDayList = spiderRecordInfoServie.selectInterval(0, 1);
 		yesterDayList.forEach((v)->{
 			if(rateMap.containsKey(v.getSourceId())){
+				//时间片存在多个时间段当中的直接干掉
 				SpiderRateInfo spiderRateInfo = rateMap2.get(v.getSourceId());
 				
 				if(spiderRateInfo.isMoreOnceTime()){
@@ -95,21 +96,46 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 			
 		});
 		//更新概率
-		//统计最近三天的
-		int timeSliceKey = TimeSimulator.getNow().getTimeSliceKey();
-		final AtomicInteger delayNum = new AtomicInteger(0);
+		//统计最近几天的概率，当前时间段没抓到的我现在下发，针对利当前时间片比较近的下发，最多不会超过500个
+		int nowTimeSliceKey = TimeSimulator.getNow().getTimeSliceKey();
+		MaxHeap<SpiderRateInfo> spiderRateInfoSortedList = new MaxHeap<SpiderRateInfo>();
 		rateMap2.forEach((k,v)->{
+			//计算离当前时间片最近的
 			if(!v.isMoreOnceTime()){
-				if(v.getMaxTimeSlice() < timeSliceKey){
-					if(delayNum.get()<200){
-						spiderSortService.addTask(v.getSourceId(), this);
-						delayNum.incrementAndGet();
+				if(v.getMaxTimeSlice() < nowTimeSliceKey){
+					v.setNearestInterval(nowTimeSliceKey-v.getMaxTimeSlice());
+				}
+			}else{
+				//如果当前存在多个发文时间，比较比當前時間段小的发文是时间段，然后找打最小的进行设置
+				int nearest = 288;
+				for(int timeSlice : v.getTimeSliceCount().keySet()){
+					if(nowTimeSliceKey > timeSlice){
+						int currentSliceInterval = nowTimeSliceKey-timeSlice;
+						if(nearest < currentSliceInterval){
+							nearest = currentSliceInterval;
+						}
 					}
 				}
+				v.setNearestInterval(nearest);
 			}
-//					logger.info(key +"----" +timeSliceKey + v.getTimeSliceCount() +"----" +v.getSourceId());
+			//排序
+			spiderRateInfoSortedList.add(v);
 		});
-		logger.info("SpiderRateInfoServiceImpl  after clean go to crab " + rateMap.size() + " delay num  " + delayNum.get());
+		int delayNum = 0;
+		for(int i = 0; i < 500; i++){
+			SpiderRateInfo delayRateInfo = spiderRateInfoSortedList.removeTop();
+			if(delayRateInfo.getNearestInterval()<5||delayRateInfo.getNearestInterval()>96){
+				continue;
+			}
+			spiderSortService.addTask(delayRateInfo.getSourceId(),this);
+			delayNum++;
+			logger.info(nowTimeSliceKey +"----" +delayRateInfo .getNearestInterval() +"----" +delayRateInfo .getTimeSliceCount()+ "----" + delayRateInfo.getSourceId());
+		}
+		//计算完后所有归位
+		rateMap2.forEach((k,v)->{
+			v.setNearestInterval(288);
+		});
+		logger.info("SpiderRateInfoServiceImpl  after clean go to crab " + rateMap.size() + " delay num  " + delayNum);
 	}
 	/**
 	 * 
@@ -127,9 +153,24 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 		rateMap2.clear();
 		generateOriginalRateMap(start, end, rateMap);
 		generateOriginalRateMap(0, 1, rateMap2);
+		
+		int moreOnceTimeCount14 = 0;
+		for(SpiderRateInfo spiderRateInfo : this.rateMap.values()){
+			if(spiderRateInfo.isMoreOnceTime()){
+				moreOnceTimeCount14++;
+			}
+		}
+		int moreOnceTimeCount2 = 0;
+		for(SpiderRateInfo spiderRateInfo : this.rateMap2.values()){
+			if(spiderRateInfo.isMoreOnceTime()){
+				moreOnceTimeCount2++;
+			}
+		}
+		logger.info("moreOnceTimeCount14:" + moreOnceTimeCount14 + ",moreOnceTimeCount2:" + moreOnceTimeCount2);
+		
+		// make up priority
 		for (SpiderRateInfo spiderRateInfo : rateMap.values()) {
 			try {
-				// make up priority
 				SpiderSourceInfo spiderSourceInfo = spiderSourceInfoServie
 						.selectBySourceid(spiderRateInfo.getSourceId());
 				if (spiderSourceInfo == null || spiderSourceInfo.getPriority() == null) {
@@ -285,27 +326,29 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 		});
 	}
 
-	public void nakeUpOnceTime(Map<String, SpiderRateInfo> rateMapDay) {
+	public void nakeUpOnceTime(Map<String, SpiderRateInfo> rateMapDay, Map<String, SpiderRateInfo> rateMapMutiDay) {
 		for(Entry<String, SpiderRateInfo> entry :rateMapDay.entrySet()){
 			if(entry.getValue().getTimeSliceCount().size()>1){
-				this.rateMap.get(entry.getKey()).setMoreOnceTime(true);;
+				rateMapMutiDay.get(entry.getKey()).setMoreOnceTime(true);;
 			}
 		}
 	} 
 
-	public void generateOriginalRateMap(int start, int end, Map<String, SpiderRateInfo> rateMapTemp ) {
+	public void generateOriginalRateMap(int start, int end, Map<String, SpiderRateInfo> rateMapMutiDay ) {
+		Map<String, SpiderRateInfo> rateMapDay = new HashMap<String, SpiderRateInfo>();
+		//按照天来统计发文重复次数
 		for(int i=start; i<=end; i++){
-			Map<String, SpiderRateInfo> rateMapDay = new HashMap<String, SpiderRateInfo>();
+			rateMapDay.clear();
 			List<SpiderRecordInfo> spiderRecordInfoList = spiderRecordInfoServie.selectInterval(i, i+1);
 			for (SpiderRecordInfo spiderRecordInfo : spiderRecordInfoList) {
 				//确保是在当天多次发问的
 				String rateMapKey = spiderRecordInfo.getSourceId();
 				SpiderRateInfo spiderRateInfo;
-				if (!rateMapTemp.containsKey(rateMapKey)) {
+				if (!rateMapMutiDay.containsKey(rateMapKey)) {
 					spiderRateInfo = new SpiderRateInfo(spiderRecordInfo);
-					rateMapTemp.put(rateMapKey, spiderRateInfo);
+					rateMapMutiDay.put(rateMapKey, spiderRateInfo);
 				} else {
-					spiderRateInfo = rateMapTemp.get(rateMapKey);
+					spiderRateInfo = rateMapMutiDay.get(rateMapKey);
 					spiderRateInfo.increateTotalCount();
 					
 				}
@@ -318,19 +361,7 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 				}
 				rateMapDay.put(rateMapKey, spiderRateInfo);
 			}
-			nakeUpOnceTime(rateMapDay);
-		}
-		int moreOnceTimeCount14 = 0;
-		for(SpiderRateInfo spiderRateInfo : this.rateMap.values()){
-			if(spiderRateInfo.isMoreOnceTime()){
-				moreOnceTimeCount14++;
-			}
-		}
-		int moreOnceTimeCount2 = 0;
-		for(SpiderRateInfo spiderRateInfo : this.rateMap2.values()){
-			if(spiderRateInfo.isMoreOnceTime()){
-				moreOnceTimeCount2++;
-			}
+			nakeUpOnceTime(rateMapDay,rateMapMutiDay);
 		}
 	}
 	/**
