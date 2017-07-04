@@ -17,4 +17,9 @@
 		from spider_source_scheduler_info 
 		where sourceid = #{sourceid,jdbcType=VARCHAR} and status = 0 
 	</select>
+	
+	<update id="updateBySourceid" parameterType="java.lang.String">
+		update spider_source_scheduler_info set status = 1
+		where sourceid= #{sourceid,jdbcType=VARCHAR}
+	</update>	
 </mapper>

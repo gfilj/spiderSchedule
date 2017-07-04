@@ -13,4 +13,11 @@ public interface SpiderSourceInfoMapper extends BaseMapper<SpiderSourceInfo,Seri
 	 * @throws DataAccessException
 	 */
 	SpiderSourceInfo selectBySourceid(String sourceid) throws DataAccessException;
+	/**
+	 * 根据sourceid 进行更新为失败
+	 * @param sourceid
+	 * @return
+	 * @throws DataAccessException
+	 */
+	void updateBySourceid(String sourceid) throws DataAccessException;
 }

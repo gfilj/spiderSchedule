@@ -34,4 +34,9 @@ public class SpiderSourceInfoServiceImpl extends AbsBaseServiceImpl<SpiderSource
 		return null;
 	}
 
+	@Override
+	public void updateBySourceid(String sourceid) throws DataAccessException {
+		spiderSourceMapper.updateBySourceid(sourceid);
+	}
+
 }

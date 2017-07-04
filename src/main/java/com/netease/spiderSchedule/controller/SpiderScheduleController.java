@@ -20,6 +20,7 @@ import com.netease.spiderSchedule.service.spiderRateInfo.SpiderRateInfoService;
 import com.netease.spiderSchedule.service.spiderRateInfo.impl.SpiderRateInfoServiceImpl;
 import com.netease.spiderSchedule.service.spiderRecordInfo.SpiderRecodeInfoService;
 import com.netease.spiderSchedule.service.spiderSort.impl.SpiderSortServiceImpl;
+import com.netease.spiderSchedule.service.spiderSourceInfo.impl.SpiderSourceInfoServiceImpl;
 import com.netease.spiderSchedule.timer.model.Request;
 import com.netease.spiderSchedule.util.CalAbility;
 import com.netease.spiderSchedule.util.RateLevel;
@@ -65,7 +66,14 @@ public class SpiderScheduleController extends AbstractVerticle {
 		spiderRateInfoService = (SpiderRateInfoServiceImpl) context.getBean("spiderRateInfoService");
 		spiderSortService = (SpiderSortServiceImpl) context.getBean("smoothingAlgorithmSpiderSortService");
 		spiderRecordInfoService = (SpiderRecodeInfoService) context.getBean("spiderRecordInfoServie");
+		SpiderSourceInfoServiceImpl spiderSourceInfoServiceImpl = context.getBean(SpiderSourceInfoServiceImpl.class);
 		Runner.runExample(SpiderScheduleController.class);
+		//将失效的全部更新为的状态
+		String errorSourceStr="gx_ngzb,madjoe_china,gh_37319b793698,xingaoweiwxin,nfdsbwhfk,toutiaobanfan,zhongguodiyibzr,zhuyongxinwx,wwwcafe,gh_dd192acbc93c,iArt289,gh_af09129d79b3,CNETkeji,PentaQ-yuanwen,Teamwei,aiwenjk,alkayy,binghanwx,fs_caijingzatan,cangtiangesb,ReadingisReading,gh_d0970b1d6bd0,IAPAAS1984,chinanongji361,wxdian88,mensunochina,gssx12,gh_93a51467c6c5,guoshao22,jyfc1994,kgjinzhanwang,jinghuzi2013,jskjqy,gh_620d2b40bb40,linshuonathan,mingzhentanzhao52,enongzi,ranshiyiwenzhi,sashuchang,lanyu_design,shoutuoweixin,SHUDULIFE,SJYI111,gh_b9b5e2dc02bf,gh_ce5a98b6aa3a,w1151677,wy-baoliao,gh_0a6fd6f09cce,wuycandy,gh_12b28ead5e9b,wuliwen--dianxiang,dwantech,gh_c995e3a566b0,gh_a6e6e9b692cf,gh_15c471b93178,ywjxbwx,LOL-922,youseapp,CameronYue,zhenyouzhehuishi,gh_540c2e5b321b,wm13501290086,zyctd8,zhuizhuimanhua,zuizhubao,gh_df626b70c4f8,gh_8dbedbd5659d,gh_4ca6404103bb,gh_3da1a7da46fa,ikingdong,gh_f94f649c0d9e,gh_92457e69ccb8,news0759,Forfenxiang,chengdu228,bzugcom,jzga528,gwz0826,gh_440462176201,bmsh_fy,hanmm9999,szja11,lstxw7321716,meilicaofeidian,sxzndh,gh_f137dbe841c3,sybxyjq,aianshan8,lixianxuanchuan,gh_495f2c2ec3ba,zhangshangvip";
+		String[] sourceIDArr=errorSourceStr.split(",");
+		for(int i = 0; i< sourceIDArr.length; i ++){
+			spiderSourceInfoServiceImpl.updateBySourceid(sourceIDArr[i]);
+		}
 		System.out.println("init down!");
 	}
 

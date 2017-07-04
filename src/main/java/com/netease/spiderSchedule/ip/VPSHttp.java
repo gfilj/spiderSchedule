@@ -117,7 +117,6 @@ public class VPSHttp {
 				return EntityUtils.toString(response.getEntity(), "UTF-8");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
 			httpGet.abort();  
 			throw e;
 		} finally {
@@ -133,7 +132,7 @@ public class VPSHttp {
 				}
 				
 			} catch (IOException e) {
-				e.printStackTrace();
+				throw e;
 			}
 		}
 	}
