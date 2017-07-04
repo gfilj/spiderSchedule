@@ -14,7 +14,6 @@ import com.netease.spiderSchedule.ip.VPSHttp;
 import com.netease.spiderSchedule.model.SpiderSourceInfo;
 import com.netease.spiderSchedule.service.spiderSourceInfo.impl.SpiderSourceInfoServiceImpl;
 import com.netease.spiderSchedule.timer.GrabSpiderNotExitsTask;
-import com.netease.spiderSchedule.timer.GrabSpiderTask;
 
 public class GrabnoweixinBootStrap {
 	private static ClassPathXmlApplicationContext context;
