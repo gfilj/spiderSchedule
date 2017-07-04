@@ -54,7 +54,7 @@ public class GrabnoweixinBootStrap {
 			Thread.sleep(5000);
 		}
 
-		while (GrabSpiderTask.grabSpiderTaskList.size() > 0) {
+		while (GrabSpiderNotExitsTask.grabSpiderTaskList.size() > 0) {
 			Map<String, String> maps = new HashMap<String, String>();
 			maps.put("size", "5");// 需要ip个数
 			String proxyjson = VPSHttp.getInstance().sendHttpPost("http://test.nbot.netease.com/getProxyUsable.action",
