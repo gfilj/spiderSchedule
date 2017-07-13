@@ -28,7 +28,7 @@ public class GrabSpiderTask implements Runnable {
 	private static final Pattern CONTENT_LIST_PATTERN = Pattern.compile(CONTENTLIST);
 
 	private static final String SEARCH_REFER = "http://weixin.sogou.com/";
-	private static final String ESSAY_HOST = "https://mp.weixin.qq.com";
+	private static final String ESSAY_HOST = "http://mp.weixin.qq.com";
 	private static final String UUID = "content_weixin_spider";
 
 	private Pattern varctPattern = Pattern.compile("var ct = \"([\\s\\S]*?)\"");
