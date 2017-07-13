@@ -20,7 +20,6 @@ import com.netease.spiderSchedule.service.spiderRateInfo.SpiderRateInfoService;
 import com.netease.spiderSchedule.service.spiderRateInfo.impl.SpiderRateInfoServiceImpl;
 import com.netease.spiderSchedule.service.spiderRecordInfo.SpiderRecodeInfoService;
 import com.netease.spiderSchedule.service.spiderSort.impl.SpiderSortServiceImpl;
-import com.netease.spiderSchedule.service.spiderSourceInfo.impl.SpiderSourceInfoServiceImpl;
 import com.netease.spiderSchedule.timer.model.Request;
 import com.netease.spiderSchedule.util.CalAbility;
 import com.netease.spiderSchedule.util.RateLevel;

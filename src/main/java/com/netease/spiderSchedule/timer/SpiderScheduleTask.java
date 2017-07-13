@@ -77,15 +77,16 @@ public class SpiderScheduleTask {
 		// 获取ip
 		Map<String, String> maps = new HashMap<String, String>();
 		maps.put("size", "5");// 需要ip个数
-		String proxyjson = VPSHttp.getInstance().sendHttpPost("http://test.nbot.netease.com/getProxyUsable.action",
+		String proxyjson = VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/getProxyUsable.action",
 				maps);// 获取接口
 		JSONArray json = JSON.parseArray(proxyjson);
 		if (json != null) {
 			for (int i = 0; i < json.size(); i++) {
 				List<SpiderScheduleDto> task = spiderSortService.getTask(1, spiderRateInfoService);
-				SpiderScheduleDto spiderScheduleDto = task.get(0);
-				
-				executor.submit(new GrabSpiderTask(spiderScheduleDto.getSourceId(),json.getJSONObject(i),spiderScheduleDto.getPriority(), spiderScheduleDto.getAppId()));
+				if(task.size()>0){
+					SpiderScheduleDto spiderScheduleDto = task.get(0);
+					executor.submit(new GrabSpiderTask(spiderScheduleDto.getSourceId(),json.getJSONObject(i),spiderScheduleDto.getPriority(), spiderScheduleDto.getAppId()));
+				}
 			}
 		}
 	}

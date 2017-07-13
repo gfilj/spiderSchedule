@@ -60,7 +60,7 @@ public class GrabSpiderTask implements Runnable {
 	// Map<String,String> maps=new HashMap<String, String>();
 	// maps.put("size", "5");//需要ip个数
 	// String
-	// proxyjson=VPSHttp.getInstance().sendHttpPost("http://test.nbot.netease.com/getProxyUsable.action",
+	// proxyjson=VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/getProxyUsable.action",
 	// maps);//获取接口
 	// JSONArray json=JSON.parseArray(proxyjson);
 	// if(json!=null){
@@ -167,14 +167,14 @@ public class GrabSpiderTask implements Runnable {
 
 	public void success(Map<String, String> maps) {
 		logger.info("列表成功：" + listSuccess++);
-		VPSHttp.getInstance().sendHttpPost("http://test.nbot.netease.com/incproxyip.action", maps);// 自增
-		VPSHttp.getInstance().sendHttpPost("http://test.nbot.netease.com/updatefree.action", maps);// 置为空闲，其他项目可以使用
+		VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/incproxyip.action", maps);// 自增
+		VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/updatefree.action", maps);// 置为空闲，其他项目可以使用
 	}
 
 	public void error(Map<String, String> maps, String machine, String message) {
 		logger.info(message);
-//		VPSHttp.getInstance().sendHttpPost("http://test.nbot.netease.com/updatestatus.action", maps);
-		VPSHttp.getInstance().sendHttpPost("http://test.nbot.netease.com/restartip.action", maps);
+//		VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/updatestatus.action", maps);
+		VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/restartip.action", maps);
 	}
 	
 	public static final String WEIXIN_CONTENT = "weixin_content";
