@@ -183,7 +183,7 @@ public class GrabSpiderTask implements Runnable {
 		Request request = new Request();
 		if (url != null && !"".equals(url)) {
 			String contentUrl = url.replace("amp;", "").replace("\\", "");
-			if (!contentUrl.startsWith(ESSAY_HOST)) {
+			if (!contentUrl.startsWith("http")) {
 				contentUrl = ESSAY_HOST + contentUrl;
 			}
 			ConcurrentHashMap<String, Object> extras = new ConcurrentHashMap<String, Object>();
