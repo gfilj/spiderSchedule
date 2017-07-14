@@ -67,7 +67,7 @@ public class SpiderSortServiceImpl implements SpiderSortService{
 	
 	public void addErrorTask(String sourceId, SpiderRateInfoService spiderRateInfoService){
 		SpiderScheduleDto spiderScheduleDto = new SpiderScheduleDto(spiderRateInfoService.getRateMap().get(sourceId));
-		spiderScheduleDto.setScore(RateLevel.TEN.getRateVal() + DelayLevel.TWO.getDelayVal());
+		spiderScheduleDto.setScore(RateLevel.TEN.getRateVal() * DelayLevel.TWO.getDelayVal());
 		heapSort.add(spiderScheduleDto);
 	}
 

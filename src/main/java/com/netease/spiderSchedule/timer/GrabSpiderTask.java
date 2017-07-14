@@ -16,6 +16,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.netease.spiderSchedule.controller.SpiderScheduleController;
 import com.netease.spiderSchedule.ip.VPSHttp;
+import com.netease.spiderSchedule.service.spiderRateInfo.SpiderRateInfoService;
+import com.netease.spiderSchedule.service.spiderSort.SpiderSortService;
 import com.netease.spiderSchedule.timer.model.Request;
 import com.netease.spiderSchedule.timer.model.SpiderRequestInfo;
 import com.netease.spiderSchedule.util.DateUtil;
@@ -45,16 +47,20 @@ public class GrabSpiderTask implements Runnable {
 	private JSONObject ipJson;
 	private int priority;
 	private int appid;
-
+	private SpiderRateInfoService spiderRateInfoService ;
+	
+	private SpiderSortService spiderSortService;
 	/**
 	 * @param sourceid
 	 * @param ipJson
 	 */
-	public GrabSpiderTask(String sourceid, JSONObject ipJson, int priority, int appid) {
+	public GrabSpiderTask(String sourceid, JSONObject ipJson, int priority, int appid,SpiderRateInfoService spiderRateInfoService,SpiderSortService spiderSortService) {
 		this.sourceid = sourceid;
 		this.ipJson = ipJson;
 		this.priority = priority;
 		this.appid = appid;
+		this.spiderRateInfoService = spiderRateInfoService;
+		this.spiderSortService = spiderSortService;
 	}
 
 	// Map<String,String> maps=new HashMap<String, String>();
@@ -82,12 +88,12 @@ public class GrabSpiderTask implements Runnable {
 			try {
 				result = VPSHttp.getInstance().sendHttpGet(searchURl, ip, port, SEARCH_REFER);
 			} catch (Exception e) {
-				error(maps, machine, "代理软件出现问题：" + machine);
+				searchError(maps, machine, "代理软件出现问题：" + machine);
 				return;
 			}
 
 			if (result.equals("error") || result.indexOf("您的访问出错了") != -1) {
-				error(maps, machine, "失败的机器" + machine);
+				searchError(maps, machine, "失败的机器" + machine);
 				return;
 
 			} else {
@@ -108,11 +114,11 @@ public class GrabSpiderTask implements Runnable {
 			try {
 				contentlist = VPSHttp.getInstance().sendHttpGet(listurl, ip, port, searchURl);
 			} catch (Exception e) {
-				error(maps, machine, "代理软件出现问题：" + machine);
+				listError(maps, machine, "代理软件出现问题：" + machine);
 				return;
 			}
 			if (contentlist.equals("error") || contentlist.indexOf("请输入验证码") != -1) {
-				error(maps, machine, "失败的机器" + machine);
+				listError(maps, machine, "失败的机器" + machine);
 				return;
 			} else {
 				success(maps);
@@ -171,10 +177,20 @@ public class GrabSpiderTask implements Runnable {
 		VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/updatefree.action", maps);// 置为空闲，其他项目可以使用
 	}
 
-	public void error(Map<String, String> maps, String machine, String message) {
+	public void searchError(Map<String, String> maps, String machine, String message) {
 		logger.info(message);
 //		VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/updatestatus.action", maps);
 		VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/restartip.action", maps);
+		spiderSortService.addErrorTask(this.sourceid, spiderRateInfoService);
+		
+		
+	}
+	
+	public void listError(Map<String, String> maps, String machine, String message) {
+		logger.info(message);
+		VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/incproxyip.action", maps);// 自增
+		VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/updatefree.action", maps);// 置为空闲，其他项目可以使用
+		spiderSortService.addErrorTask(this.sourceid, spiderRateInfoService);
 	}
 	
 	public static final String WEIXIN_CONTENT = "weixin_content";

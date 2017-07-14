@@ -85,7 +85,7 @@ public class SpiderScheduleTask {
 				List<SpiderScheduleDto> task = spiderSortService.getTask(1, spiderRateInfoService);
 				if(task.size()>0){
 					SpiderScheduleDto spiderScheduleDto = task.get(0);
-					executor.submit(new GrabSpiderTask(spiderScheduleDto.getSourceId(),json.getJSONObject(i),spiderScheduleDto.getPriority(), spiderScheduleDto.getAppId()));
+					executor.submit(new GrabSpiderTask(spiderScheduleDto.getSourceId(),json.getJSONObject(i),spiderScheduleDto.getPriority(), spiderScheduleDto.getAppId(),spiderRateInfoService,spiderSortService));
 				}
 			}
 		}
