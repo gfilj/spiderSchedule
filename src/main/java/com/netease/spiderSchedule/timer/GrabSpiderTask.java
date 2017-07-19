@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,6 +19,7 @@ import com.netease.spiderSchedule.controller.SpiderScheduleController;
 import com.netease.spiderSchedule.ip.VPSHttp;
 import com.netease.spiderSchedule.service.spiderRateInfo.SpiderRateInfoService;
 import com.netease.spiderSchedule.service.spiderSort.SpiderSortService;
+import com.netease.spiderSchedule.service.spiderSourceInfo.SpiderSourceInfoService;
 import com.netease.spiderSchedule.timer.model.Request;
 import com.netease.spiderSchedule.timer.model.SpiderRequestInfo;
 import com.netease.spiderSchedule.util.DateUtil;
@@ -31,15 +33,6 @@ public class GrabSpiderTask implements Runnable {
 
 	private static final String SEARCH_REFER = "http://weixin.sogou.com/";
 	private static final String ESSAY_HOST = "http://mp.weixin.qq.com";
-	private static final String UUID = "content_weixin_spider";
-
-	private Pattern varctPattern = Pattern.compile("var ct = \"([\\s\\S]*?)\"");
-	private Pattern coverPicturePattern = Pattern.compile("var msg_cdn_url = \"([\\s\\S]*?)\"");
-	private Pattern errPattern = Pattern
-			.compile("(<div[^>]*\\s+style=['\"]global_error_msg warn['\"]>*\\s+操作过于频繁，请稍后再试。*\\s+</div>)");
-
-	private static Pattern datasrcPattern = Pattern.compile("<img[^>]*\\s+data-src\\s*=\\s*['\"]([^>]*?)['\"][^>]*/?>");
-	private static Pattern srcPattern = Pattern.compile("<img[^>]*\\s+src\\s*=\\s*['\"]([^>]*?)['\"][^>]*/?>");
 	private static int searchSuccess = 0;
 	private static int listSuccess = 0;
 	protected static Logger logger = Logger.getLogger(GrabSpiderTask.class);
@@ -47,32 +40,26 @@ public class GrabSpiderTask implements Runnable {
 	private JSONObject ipJson;
 	private int priority;
 	private int appid;
-	private SpiderRateInfoService spiderRateInfoService ;
-	
+	private SpiderRateInfoService spiderRateInfoService;
+
 	private SpiderSortService spiderSortService;
+	
+	private SpiderSourceInfoService spiderSourceInfoService;
 	/**
 	 * @param sourceid
 	 * @param ipJson
 	 */
-	public GrabSpiderTask(String sourceid, JSONObject ipJson, int priority, int appid,SpiderRateInfoService spiderRateInfoService,SpiderSortService spiderSortService) {
+	public GrabSpiderTask(String sourceid, JSONObject ipJson, int priority, int appid,
+			SpiderRateInfoService spiderRateInfoService, SpiderSortService spiderSortService, SpiderSourceInfoService spiderSourceInfoService) {
 		this.sourceid = sourceid;
 		this.ipJson = ipJson;
 		this.priority = priority;
 		this.appid = appid;
 		this.spiderRateInfoService = spiderRateInfoService;
 		this.spiderSortService = spiderSortService;
+		this.spiderSourceInfoService = spiderSourceInfoService;
 	}
 
-	// Map<String,String> maps=new HashMap<String, String>();
-	// maps.put("size", "5");//需要ip个数
-	// String
-	// proxyjson=VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/getProxyUsable.action",
-	// maps);//获取接口
-	// JSONArray json=JSON.parseArray(proxyjson);
-	// if(json!=null){
-	// for(int i=0;i<json.size();i++){
-	// }
-	// }
 	public void run() {
 		Map<String, String> maps = new HashMap<String, String>();
 		String ip = ipJson.getString("ip");
@@ -80,6 +67,7 @@ public class GrabSpiderTask implements Runnable {
 		String machine = ipJson.getString("machine");
 		maps.put("machine", machine);
 		String listurl = "";
+		ipJson.put("status", true);
 		try {
 			// search
 			String result = null;
@@ -88,12 +76,12 @@ public class GrabSpiderTask implements Runnable {
 			try {
 				result = VPSHttp.getInstance().sendHttpGet(searchURl, ip, port, SEARCH_REFER);
 			} catch (Exception e) {
-				searchError(maps, machine, "代理软件出现问题：" + machine);
+				ipError(maps, machine, "ip is error：" + machine, false);
 				return;
 			}
 
 			if (result.equals("error") || result.indexOf("您的访问出错了") != -1) {
-				searchError(maps, machine, "失败的机器" + machine);
+				ipError(maps, machine, "search error:" + machine, false);
 				return;
 
 			} else {
@@ -101,24 +89,35 @@ public class GrabSpiderTask implements Runnable {
 				Matcher m = pattern.matcher(result);
 				if (m.find()) {
 					listurl = m.group(1).replace("amp;", "");
-					logger.info("搜索成功：" + searchSuccess++ + ", listurl:" + listurl + ", ip:" + ip);
-				}else{
-					logger.info("搜索失败：" + result  + ", ip:" + ip);
+					logger.info("search success：" + searchSuccess++ + ", listurl:" + listurl + ", ip:" + ip);
+				} else {
+					if (result.contains("相关的官方认证订阅号")) {
+						logger.info("搜索失败：" + sourceid + ", ip:" + ip);
+						ipError(maps, machine, "search false：" + result + ", ip:" + ip, false);
+						spiderRateInfoService.getRateMap().remove(sourceid);
+						// intodb
+						spiderSourceInfoService.updateBySourceid(sourceid);
+					}
+					logger.info("search false：" + result + ", ip:" + ip);
+					ipError(maps, machine, "search false：" + result + ", ip:" + ip, true);
 				}
 			}
-
-			Thread.sleep(500);
+			Random ran = new Random();
+			int sleepTime = ran.nextInt(500) + 500;
+			logger.info("sleep time" + sleepTime);
+			Thread.sleep(sleepTime);
 
 			// list
 			String contentlist = null;
 			try {
 				contentlist = VPSHttp.getInstance().sendHttpGet(listurl, ip, port, searchURl);
 			} catch (Exception e) {
-				listError(maps, machine, "代理软件出现问题：" + machine);
+				ipError(maps, machine, "ip is error：：" + machine, true);
+				// 可以考虑将此消息封装到
 				return;
 			}
 			if (contentlist.equals("error") || contentlist.indexOf("请输入验证码") != -1) {
-				listError(maps, machine, "失败的机器" + machine);
+				listError(maps, machine, "list is error" + machine);
 				return;
 			} else {
 				success(maps);
@@ -145,18 +144,17 @@ public class GrabSpiderTask implements Runnable {
 								JSONObject amei = obj.getJSONObject("app_msg_ext_info");
 								String contentUrl = amei.get("content_url").toString().replaceAll("amp;", "");
 								String title = amei.get("title").toString();
-//								listSpiderRequestInfo.add(new SpiderRequestInfo(time, sourceid, title, contentUrl));
-								SpiderScheduleController.getWeixinListRequest().add(getRequest(contentUrl, title, time, listurl));
+								SpiderScheduleController.getWeixinListRequest()
+										.add(getRequest(contentUrl, title, time, listurl));
 								JSONArray jsonArray = amei.getJSONArray("multi_app_msg_item_list");
 								if (jsonArray != null && !jsonArray.isEmpty()) {
 									for (int z = 0; z < jsonArray.size(); z++) {
 										JSONObject subJson = jsonArray.getJSONObject(z);
 										String subUrl = subJson.getString("content_url").replaceAll("amp;", "");
 										String subTitle = subJson.get("title").toString();
-//										listSpiderRequestInfo
-//												.add(new SpiderRequestInfo(time, sourceid, subTitle, subUrl));
-										//添加文章
-										SpiderScheduleController.getWeixinListRequest().add(getRequest(subUrl, subTitle, time, listurl));
+										// 添加文章
+										SpiderScheduleController.getWeixinListRequest()
+												.add(getRequest(subUrl, subTitle, time, listurl));
 									}
 								}
 							}
@@ -165,37 +163,50 @@ public class GrabSpiderTask implements Runnable {
 				}
 			}
 
-			
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.info(this.toString() + "is error", e);
+			if ((boolean) ipJson.get("status")) {
+				ipError(maps, machine, "" + machine, true);
+			}
 		}
 	}
 
+	@Override
+	public String toString() {
+		return "GrabSpiderTask [sourceid=" + sourceid + ", ipJson=" + ipJson + ", priority=" + priority + ", appid="
+				+ appid + "]";
+	}
+
 	public void success(Map<String, String> maps) {
-		logger.info("列表成功：" + listSuccess++);
+		logger.info("list success ：" + listSuccess++);
+		ipJson.put("status", false);
 		VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/incproxyip.action", maps);// 自增
 		VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/updatefree.action", maps);// 置为空闲，其他项目可以使用
 	}
 
-	public void searchError(Map<String, String> maps, String machine, String message) {
+	public void ipError(Map<String, String> maps, String machine, String message, boolean regrab) {
 		logger.info(message);
-//		VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/updatestatus.action", maps);
+		// VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/updatestatus.action",
+		// maps);
+		ipJson.put("status", false);
 		VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/restartip.action", maps);
-		spiderSortService.addErrorTask(this.sourceid, spiderRateInfoService);
-		
-		
+		if (regrab) {
+			spiderSortService.addErrorTask(this.sourceid, spiderRateInfoService);
+		}
 	}
-	
+
 	public void listError(Map<String, String> maps, String machine, String message) {
 		logger.info(message);
+		ipJson.put("status", false);
 		VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/incproxyip.action", maps);// 自增
 		VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/updatefree.action", maps);// 置为空闲，其他项目可以使用
 		spiderSortService.addErrorTask(this.sourceid, spiderRateInfoService);
 	}
-	
+
 	public static final String WEIXIN_CONTENT = "weixin_content";
 	public static final String REQUEST_HEADER_REFERER = "requestHeaderReferer";
-	public Request getRequest(String url,String title, String time, String listUrl) {
+
+	public Request getRequest(String url, String title, String time, String listUrl) {
 		Request request = new Request();
 		if (url != null && !"".equals(url)) {
 			String contentUrl = url.replace("amp;", "").replace("\\", "");
@@ -215,8 +226,9 @@ public class GrabSpiderTask implements Runnable {
 			request.setSourceid(sourceid);
 			request.setAppid(appid);
 			request.setPriority(priority + 1);
-			
+
 		}
+		logger.info("get list request: " + request);
 		return request;
 	}
 

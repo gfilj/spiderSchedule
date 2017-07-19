@@ -16,6 +16,7 @@ import com.netease.spiderSchedule.ip.VPSHttp;
 import com.netease.spiderSchedule.model.SpiderScheduleDto;
 import com.netease.spiderSchedule.service.spiderRateInfo.SpiderRateInfoService;
 import com.netease.spiderSchedule.service.spiderSort.SpiderSortService;
+import com.netease.spiderSchedule.service.spiderSourceInfo.SpiderSourceInfoService;
 
 public class SpiderScheduleTask {
 
@@ -27,22 +28,8 @@ public class SpiderScheduleTask {
 	@Qualifier("smoothingAlgorithmSpiderSortService")
 	private SpiderSortService spiderSortService;
 	
-//	
-//	@Autowired
-//	private AppRecordInfoMapper appRecordInfoMapper;
-//	
-//	@Autowired
-//	private AppImageInfoMapper appImageInfoMapper;
-//
-//	@Autowired
-//	private NosServiceImpl nosServiceImpl;
-//	
-//	@Autowired
-//	private SignatureUtil signatureUtil;
-//	
-//	@Autowired
-//	@Qualifier("jedisPool")
-//	private JedisPool pool;	
+	@Autowired
+	private SpiderSourceInfoService spiderSourceInfoService;
 	
 	private static ExecutorService executor = Executors.newFixedThreadPool(5);
 
@@ -86,7 +73,7 @@ public class SpiderScheduleTask {
 				List<SpiderScheduleDto> task = spiderSortService.getTask(1, spiderRateInfoService);
 				if(task.size()>0){
 					SpiderScheduleDto spiderScheduleDto = task.get(0);
-					executor.submit(new GrabSpiderTask(spiderScheduleDto.getSourceId(),json.getJSONObject(i),spiderScheduleDto.getPriority(), spiderScheduleDto.getAppId(),spiderRateInfoService,spiderSortService));
+					executor.submit(new GrabSpiderTask(spiderScheduleDto.getSourceId(),json.getJSONObject(i),spiderScheduleDto.getPriority(), spiderScheduleDto.getAppId(),spiderRateInfoService,spiderSortService,spiderSourceInfoService));
 				}
 			}
 		}
