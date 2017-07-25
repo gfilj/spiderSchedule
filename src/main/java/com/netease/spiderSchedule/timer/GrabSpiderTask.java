@@ -1,9 +1,7 @@
 package com.netease.spiderSchedule.timer;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,7 +19,6 @@ import com.netease.spiderSchedule.service.spiderRateInfo.SpiderRateInfoService;
 import com.netease.spiderSchedule.service.spiderSort.SpiderSortService;
 import com.netease.spiderSchedule.service.spiderSourceInfo.SpiderSourceInfoService;
 import com.netease.spiderSchedule.timer.model.Request;
-import com.netease.spiderSchedule.timer.model.SpiderRequestInfo;
 import com.netease.spiderSchedule.util.DateUtil;
 
 public class GrabSpiderTask implements Runnable {
@@ -76,6 +73,7 @@ public class GrabSpiderTask implements Runnable {
 			try {
 				result = VPSHttp.getInstance().sendHttpGet(searchURl, ip, port, SEARCH_REFER);
 			} catch (Exception e) {
+				e.printStackTrace();
 				ipError(maps, machine, "ip is error：" + machine, false);
 				return;
 			}
@@ -103,15 +101,16 @@ public class GrabSpiderTask implements Runnable {
 				}
 			}
 			Random ran = new Random();
-			int sleepTime = ran.nextInt(500) + 500;
-			logger.info("sleep time" + sleepTime);
-			Thread.sleep(sleepTime);
+//			int sleepTime = ran.nextInt(500) + 500;
+//			logger.info("sleep time" + sleepTime);
+			Thread.sleep(500);
 
 			// list
 			String contentlist = null;
 			try {
 				contentlist = VPSHttp.getInstance().sendHttpGet(listurl, ip, port, searchURl);
 			} catch (Exception e) {
+				e.printStackTrace();
 				ipError(maps, machine, "ip is error：：" + machine, true);
 				// 可以考虑将此消息封装到
 				return;
@@ -123,8 +122,6 @@ public class GrabSpiderTask implements Runnable {
 				success(maps);
 			}
 
-			// list request info
-			List<SpiderRequestInfo> listSpiderRequestInfo = new ArrayList<SpiderRequestInfo>();
 
 			Matcher contentListMatcher = CONTENT_LIST_PATTERN.matcher(contentlist);
 			if (contentListMatcher.find()) {
@@ -162,7 +159,7 @@ public class GrabSpiderTask implements Runnable {
 					}
 				}
 			}
-
+			Thread.sleep(500);
 		} catch (Exception e) {
 			logger.info(this.toString() + "is error", e);
 			if ((boolean) ipJson.get("status")) {

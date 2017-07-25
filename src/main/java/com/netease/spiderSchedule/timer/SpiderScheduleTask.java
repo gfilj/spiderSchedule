@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.netease.spiderSchedule.controller.SpiderScheduleController;
 import com.netease.spiderSchedule.ip.VPSHttp;
 import com.netease.spiderSchedule.model.SpiderScheduleDto;
@@ -32,7 +34,7 @@ public class SpiderScheduleTask {
 	@Autowired
 	private SpiderSourceInfoService spiderSourceInfoService;
 	
-	private static ExecutorService executor = Executors.newFixedThreadPool(5);
+	private static ThreadPoolExecutor executor = (ThreadPoolExecutor)Executors.newFixedThreadPool(10);
 	
 	protected static Logger logger = Logger.getLogger(SpiderScheduleTask.class);
 	/**
@@ -76,10 +78,11 @@ public class SpiderScheduleTask {
 				if(task.size()>0){
 					SpiderScheduleDto spiderScheduleDto = task.get(0);
 					logger.info("per5sSchedule go to crab " + spiderScheduleDto);
-					executor.submit(new GrabSpiderTask(spiderScheduleDto.getSourceId(),json.getJSONObject(i),spiderScheduleDto.getPriority(), spiderScheduleDto.getAppId(),spiderRateInfoService,spiderSortService,spiderSourceInfoService));
+					executor.execute(new GrabSpiderTask(spiderScheduleDto.getSourceId(),json.getJSONObject(i),spiderScheduleDto.getPriority(), spiderScheduleDto.getAppId(),spiderRateInfoService,spiderSortService,spiderSourceInfoService));
 				}
 			}
 		}
+		logger.info("executor free size " + executor.getActiveCount());
 	}
 
 	/**
