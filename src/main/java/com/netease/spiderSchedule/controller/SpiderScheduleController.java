@@ -240,8 +240,8 @@ public class SpiderScheduleController extends AbstractVerticle {
 			});
 			int size = list.size();
 			calAbility.getSpiderScheduleAbility().addAndGet(0 - size);
-			logger.info("当前要的公众号数目：" + taskNum + ",5s内的剩余抓取量：" + calAbility.getSpiderScheduleAbility() + ",获取的队列大小:"
-					+ size + " 要抓的数据为：" + list);
+//			logger.info("当前要的公众号数目：" + taskNum + ",5s内的剩余抓取量：" + calAbility.getSpiderScheduleAbility() + ",获取的队列大小:"
+//					+ size + " 要抓的数据为：" + list);
 			response.putHeader("content-type", "application/json").end(arr.encodePrettily());
 		} else {
 			int getSize = 3;

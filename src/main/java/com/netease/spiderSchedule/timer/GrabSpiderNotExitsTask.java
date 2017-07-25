@@ -107,6 +107,8 @@ public class GrabSpiderNotExitsTask implements Runnable {
 //					System.out.println(result);
 					if(result.contains("相关的官方认证订阅号")){
 						logger.info("搜索失败：" + sourceid  + ", ip:" + ip);
+						//intodb
+						
 					}
 				}
 			}

@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -32,7 +33,8 @@ public class SpiderScheduleTask {
 	private SpiderSourceInfoService spiderSourceInfoService;
 	
 	private static ExecutorService executor = Executors.newFixedThreadPool(5);
-
+	
+	protected static Logger logger = Logger.getLogger(SpiderScheduleTask.class);
 	/**
 	 * 凌晨统计
 	 */
@@ -73,6 +75,7 @@ public class SpiderScheduleTask {
 				List<SpiderScheduleDto> task = spiderSortService.getTask(1, spiderRateInfoService);
 				if(task.size()>0){
 					SpiderScheduleDto spiderScheduleDto = task.get(0);
+					logger.info("per5sSchedule go to crab " + spiderScheduleDto);
 					executor.submit(new GrabSpiderTask(spiderScheduleDto.getSourceId(),json.getJSONObject(i),spiderScheduleDto.getPriority(), spiderScheduleDto.getAppId(),spiderRateInfoService,spiderSortService,spiderSourceInfoService));
 				}
 			}

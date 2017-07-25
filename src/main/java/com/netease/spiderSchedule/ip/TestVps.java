@@ -30,7 +30,8 @@ public class TestVps {
 		while (true) {
 			Map<String, String> maps = new HashMap<String, String>();
 			maps.put("size", "5");// 需要ip个数
-			String proxyjson = VPSHttp.getInstance().sendHttpPost("http://test.nbot.netease.com/getProxyUsable.action",
+			maps.put("type", "schedule");// 需要ip个数
+			String proxyjson = VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/getProxyUsable.action",
 					maps);// 获取接口
 			JSONArray json = JSON.parseArray(proxyjson);
 			if (json != null) {
@@ -53,19 +54,19 @@ public class TestVps {
 						} catch (Exception e) {
 							// e.printStackTrace();
 							System.out.println("代理软件出现问题：" + machine);
-							VPSHttp.getInstance().sendHttpPost("http://test.nbot.netease.com/updatestatus.action",
+							VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/updatestatus.action",
 									maps);
 							// 重新拨号
-							VPSHttp.getInstance().sendHttpPost("http://test.nbot.netease.com/restartip.action", maps);
+							VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/restartip.action", maps);
 							continue;
 						}
 						if (result.equals("error") || result.indexOf("您的访问出错了") != -1) {
 							System.out.println("失败的机器" + machine);
 							// 更新ip状态为不可用，避免拨号失败，死机等原因造成的不可用ip使抓取延迟
-							VPSHttp.getInstance().sendHttpPost("http://test.nbot.netease.com/updatestatus.action",
+							VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/updatestatus.action",
 									maps);
 							// 重新拨号
-							VPSHttp.getInstance().sendHttpPost("http://test.nbot.netease.com/restartip.action", maps);
+							VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/restartip.action", maps);
 
 						} else {
 							// System.out.println(result);
@@ -85,25 +86,25 @@ public class TestVps {
 						} catch (Exception e) {
 							// e.printStackTrace();
 							System.out.println("代理软件出现问题：" + machine);
-							VPSHttp.getInstance().sendHttpPost("http://test.nbot.netease.com/updatestatus.action",
+							VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/updatestatus.action",
 									maps);
 							// 重新拨号
-							VPSHttp.getInstance().sendHttpPost("http://test.nbot.netease.com/restartip.action", maps);
+							VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/restartip.action", maps);
 							continue;
 						}
 						if (contentlist.equals("error") || contentlist.indexOf("请输入验证码") != -1) {
 							System.out.println("失败的机器" + machine);
 							// 更新ip状态为不可用，避免拨号失败，死机等原因造成的不可用ip使抓取延迟
-							VPSHttp.getInstance().sendHttpPost("http://test.nbot.netease.com/updatestatus.action",
+							VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/updatestatus.action",
 									maps);
 							// 重新拨号
-							VPSHttp.getInstance().sendHttpPost("http://test.nbot.netease.com/restartip.action", maps);
+							VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/restartip.action", maps);
 							continue;
 						} else {
 							// System.out.println(result);
 							System.out.println("列表成功：" + sss++);
-							VPSHttp.getInstance().sendHttpPost("http://test.nbot.netease.com/incproxyip.action", maps);// 自增
-							VPSHttp.getInstance().sendHttpPost("http://test.nbot.netease.com/updatefree.action", maps);// 置为空闲，其他项目可以使用
+							VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/incproxyip.action", maps);// 自增
+							VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/updatefree.action", maps);// 置为空闲，其他项目可以使用
 						}
 
 						Matcher contentListMatcher = contentListPattern.matcher(contentlist);

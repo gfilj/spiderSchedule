@@ -35,7 +35,8 @@ public class GrabnoweixinBootStrap {
 		while (offset < selectAll.size()) {
 			Map<String, String> maps = new HashMap<String, String>();
 			maps.put("size", "5");// 需要ip个数
-			String proxyjson = VPSHttp.getInstance().sendHttpPost("http://test.nbot.netease.com/getProxyUsable.action",
+			maps.put("type", "schedule");// 类型
+			String proxyjson = VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/getProxyUsable.action",
 					maps);// 获取接口
 			JSONArray json = JSON.parseArray(proxyjson);
 			for (int i = 0; i < json.size(); i++) {
@@ -56,7 +57,8 @@ public class GrabnoweixinBootStrap {
 		while (GrabSpiderNotExitsTask.grabSpiderTaskList.size() > 0) {
 			Map<String, String> maps = new HashMap<String, String>();
 			maps.put("size", "5");// 需要ip个数
-			String proxyjson = VPSHttp.getInstance().sendHttpPost("http://test.nbot.netease.com/getProxyUsable.action",
+			maps.put("type", "schedule");//类型
+			String proxyjson = VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/getProxyUsable.action",
 					maps);// 获取接口
 			JSONArray json = JSON.parseArray(proxyjson);
 			for (int i = 0; i < json.size(); i++) {
