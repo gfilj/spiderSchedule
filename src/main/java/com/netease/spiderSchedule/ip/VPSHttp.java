@@ -23,9 +23,9 @@ import org.apache.http.util.EntityUtils;
 public class VPSHttp {
 
 	private RequestConfig requestConfig = RequestConfig.custom()
-            .setSocketTimeout(300000)
-            .setConnectTimeout(300000)
-            .setConnectionRequestTimeout(300000)
+            .setSocketTimeout(1000)
+            .setConnectTimeout(1000)
+            .setConnectionRequestTimeout(1000)
             .build();
 	
 	private static VPSHttp instance = new VPSHttp();
