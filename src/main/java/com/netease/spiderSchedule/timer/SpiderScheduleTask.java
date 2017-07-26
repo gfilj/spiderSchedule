@@ -34,7 +34,7 @@ public class SpiderScheduleTask {
 	@Autowired
 	private SpiderSourceInfoService spiderSourceInfoService;
 	
-	private static ThreadPoolExecutor executor = (ThreadPoolExecutor)Executors.newFixedThreadPool(10);
+	private static ThreadPoolExecutor executor = (ThreadPoolExecutor)Executors.newFixedThreadPool(20);
 	
 	protected static Logger logger = Logger.getLogger(SpiderScheduleTask.class);
 	/**

@@ -20,6 +20,7 @@ import com.netease.spiderSchedule.service.spiderRateInfo.SpiderRateInfoService;
 import com.netease.spiderSchedule.service.spiderRateInfo.impl.SpiderRateInfoServiceImpl;
 import com.netease.spiderSchedule.service.spiderRecordInfo.SpiderRecodeInfoService;
 import com.netease.spiderSchedule.service.spiderSort.impl.SpiderSortServiceImpl;
+import com.netease.spiderSchedule.timer.GrabSpiderTask;
 import com.netease.spiderSchedule.timer.model.Request;
 import com.netease.spiderSchedule.util.CalAbility;
 import com.netease.spiderSchedule.util.RateLevel;
@@ -46,14 +47,14 @@ public class SpiderScheduleController extends AbstractVerticle {
 	private static Map<PredictionRecordStaticInfoKey, PredictionRecordStaticInfoValue> predirctSpiderRecordInfoMap = new HashMap<PredictionRecordStaticInfoKey, PredictionRecordStaticInfoValue>();
 	public static Map<String, Integer> errorHandleMap = Collections.synchronizedMap(new HashMap<String, Integer>());//errorHandleMap
 //	private static Map<String,JSONObject> ipJsonMap = Collections.synchronizedMap(new HashMap<String,JSONObject>());
-	private static List<Request> weixinListRequest = Collections.synchronizedList(new ArrayList<Request>());//微信列表页list
+	private static List<Request> weixinRequest = Collections.synchronizedList(new ArrayList<Request>());//微信列表页list
 	
 	/**
 	 * 获取任务进行执行
 	 * @return
 	 */
-	public static List<Request> getWeixinListRequest() {
-		return weixinListRequest;
+	public static List<Request> getWeixinRequest() {
+		return weixinRequest;
 	}
 
 
@@ -236,7 +237,7 @@ public class SpiderScheduleController extends AbstractVerticle {
 			}
 			List<SpiderScheduleDto> list = spiderSortService.getTask(taskNum, spiderRateInfoService);
 			list.forEach((v) -> {
-				arr.add(JsonObject.mapFrom(v));
+				arr.add(JsonObject.mapFrom(GrabSpiderTask.getSearchRequest(v)));
 			});
 			int size = list.size();
 			calAbility.getSpiderScheduleAbility().addAndGet(0 - size);
@@ -245,11 +246,11 @@ public class SpiderScheduleController extends AbstractVerticle {
 			response.putHeader("content-type", "application/json").end(arr.encodePrettily());
 		} else {
 			int getSize = 3;
-			if(weixinListRequest.size()<3){
-				getSize=weixinListRequest.size();
+			if(weixinRequest.size()<3){
+				getSize=weixinRequest.size();
 			}
 			for(int i=0; i< getSize; i++){
-				arr.add(JsonObject.mapFrom(weixinListRequest.remove(0)));
+				arr.add(JsonObject.mapFrom(weixinRequest.remove(0)));
 			}
 			response.putHeader("content-type", "application/json").end(arr.encodePrettily());
 		}

@@ -15,6 +15,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.netease.spiderSchedule.controller.SpiderScheduleController;
 import com.netease.spiderSchedule.ip.VPSHttp;
+import com.netease.spiderSchedule.model.SpiderScheduleDto;
 import com.netease.spiderSchedule.service.spiderRateInfo.SpiderRateInfoService;
 import com.netease.spiderSchedule.service.spiderSort.SpiderSortService;
 import com.netease.spiderSchedule.service.spiderSourceInfo.SpiderSourceInfoService;
@@ -29,7 +30,7 @@ public class GrabSpiderTask implements Runnable {
 	private static final Pattern CONTENT_LIST_PATTERN = Pattern.compile(CONTENTLIST);
 
 	private static final String SEARCH_REFER = "http://weixin.sogou.com/";
-	private static final String ESSAY_HOST = "http://mp.weixin.qq.com";
+	private static final String ESSAY_HOST = "https://mp.weixin.qq.com";
 	private static int searchSuccess = 0;
 	private static int listSuccess = 0;
 	protected static Logger logger = Logger.getLogger(GrabSpiderTask.class);
@@ -74,7 +75,7 @@ public class GrabSpiderTask implements Runnable {
 				result = VPSHttp.getInstance().sendHttpGet(searchURl, ip, port, SEARCH_REFER);
 			} catch (Exception e) {
 				e.printStackTrace();
-				ipError(maps, machine, "ip is error：" + machine, false);
+				ipError(maps, machine, "search ip is error：" + machine, false);
 				return;
 			}
 
@@ -111,12 +112,15 @@ public class GrabSpiderTask implements Runnable {
 				contentlist = VPSHttp.getInstance().sendHttpGet(listurl, ip, port, searchURl);
 			} catch (Exception e) {
 				e.printStackTrace();
-				ipError(maps, machine, "ip is error：：" + machine, true);
-				// 可以考虑将此消息封装到
+				ipError(maps, machine, "list ip is error：" + machine, true);
+				// 可以考虑将此消息封装到 抓取结点进行抓取
+				SpiderScheduleController.getWeixinRequest().add(getListRequest(listurl,searchURl));
 				return;
 			}
 			if (contentlist.equals("error") || contentlist.indexOf("请输入验证码") != -1) {
-				listError(maps, machine, "list is error" + machine);
+				listError(maps, machine, "list page is error" + machine);
+				SpiderScheduleController.getWeixinRequest().add(getListRequest(listurl,searchURl));
+				// 可以考虑将此消息封装到
 				return;
 			} else {
 				success(maps);
@@ -141,8 +145,8 @@ public class GrabSpiderTask implements Runnable {
 								JSONObject amei = obj.getJSONObject("app_msg_ext_info");
 								String contentUrl = amei.get("content_url").toString().replaceAll("amp;", "");
 								String title = amei.get("title").toString();
-								SpiderScheduleController.getWeixinListRequest()
-										.add(getRequest(contentUrl, title, time, listurl));
+								SpiderScheduleController.getWeixinRequest()
+										.add(getPageRequest(contentUrl, title, time, listurl));
 								JSONArray jsonArray = amei.getJSONArray("multi_app_msg_item_list");
 								if (jsonArray != null && !jsonArray.isEmpty()) {
 									for (int z = 0; z < jsonArray.size(); z++) {
@@ -150,8 +154,8 @@ public class GrabSpiderTask implements Runnable {
 										String subUrl = subJson.getString("content_url").replaceAll("amp;", "");
 										String subTitle = subJson.get("title").toString();
 										// 添加文章
-										SpiderScheduleController.getWeixinListRequest()
-												.add(getRequest(subUrl, subTitle, time, listurl));
+										SpiderScheduleController.getWeixinRequest()
+												.add(getPageRequest(subUrl, subTitle, time, listurl));
 									}
 								}
 							}
@@ -188,6 +192,7 @@ public class GrabSpiderTask implements Runnable {
 		ipJson.put("status", false);
 		VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/restartip.action", maps);
 		if (regrab) {
+			logger.info("re crab " + this.sourceid);
 			spiderSortService.addErrorTask(this.sourceid, spiderRateInfoService);
 		}
 	}
@@ -202,8 +207,41 @@ public class GrabSpiderTask implements Runnable {
 
 	public static final String WEIXIN_CONTENT = "weixin_content";
 	public static final String REQUEST_HEADER_REFERER = "requestHeaderReferer";
-
-	public Request getRequest(String url, String title, String time, String listUrl) {
+	public static final String WEIXIN_LIST = "weixin_list";
+	public static final String WEIXIN_SEARCH = "weixin_search";
+	
+	public static Request getSearchRequest(SpiderScheduleDto spiderScheduleDto) {
+		String url = "http://weixin.sogou.com/weixin?type=1&query=" + spiderScheduleDto.getSourceId()
+				+ "&ie=utf8&_sug_=n&_sug_type_=";
+		Request request = new Request(url);
+		Map<String, Object> extras = new ConcurrentHashMap<String, Object>();
+		extras.put("pageName", WEIXIN_SEARCH);
+		extras.put("taskName", WEIXIN_SEARCH);
+		extras.put("needDeduplication", "false");
+		extras.put(REQUEST_HEADER_REFERER, "http://weixin.sogou.com/");
+		request.setExtras(extras);
+		request.setSourceid(spiderScheduleDto.getSourceId());
+		request.setAppid(spiderScheduleDto.getAppId());
+		request.setPriority(spiderScheduleDto.getPriority());
+		request.setWhether_proxy(true);
+		logger.info("get search request: " + request);
+		return request;
+	}
+	public Request getListRequest(String url,String searchUrl) {
+		Request request = new Request(url.replace("&amp;", "&"));
+		ConcurrentHashMap<String, Object> extras = new ConcurrentHashMap<String, Object>();
+		extras.put("pageName", WEIXIN_LIST);
+		extras.put("taskName", WEIXIN_LIST);
+		extras.put(REQUEST_HEADER_REFERER, searchUrl);
+		request.setExtras(extras);
+		request.setSourceid(sourceid);
+		request.setAppid(appid);
+		request.setPriority(priority + 1);
+		request.setWhether_proxy(true);
+		logger.info("get list request: " + request);
+		return request;
+	}
+	public Request getPageRequest(String url, String title, String time, String listUrl) {
 		Request request = new Request();
 		if (url != null && !"".equals(url)) {
 			String contentUrl = url.replace("amp;", "").replace("\\", "");
@@ -225,7 +263,7 @@ public class GrabSpiderTask implements Runnable {
 			request.setPriority(priority + 1);
 
 		}
-		logger.info("get list request: " + request);
+		logger.info("get page request: " + request);
 		return request;
 	}
 
