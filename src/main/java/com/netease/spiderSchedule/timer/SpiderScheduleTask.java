@@ -34,7 +34,7 @@ public class SpiderScheduleTask {
 	@Autowired
 	private SpiderSourceInfoService spiderSourceInfoService;
 	
-	private static ThreadPoolExecutor executor = (ThreadPoolExecutor)Executors.newFixedThreadPool(20);
+	private static ThreadPoolExecutor executor = (ThreadPoolExecutor)Executors.newFixedThreadPool(30);
 	
 	protected static Logger logger = Logger.getLogger(SpiderScheduleTask.class);
 	/**
@@ -67,7 +67,7 @@ public class SpiderScheduleTask {
 	public void per5sSchedule() {
 		// 获取ip
 		Map<String, String> maps = new HashMap<String, String>();
-		maps.put("size", "10");// 需要ip个数
+		maps.put("size", "13");// 需要ip个数
 		maps.put("type", "schedule");// 类型
 		String proxyjson = VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/getProxyUsable.action",
 				maps);// 获取接口

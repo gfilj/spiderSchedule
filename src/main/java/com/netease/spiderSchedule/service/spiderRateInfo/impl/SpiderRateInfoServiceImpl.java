@@ -280,37 +280,37 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 
 		}
 		// makeup all source
-//		List<SpiderSourceInfo> sourceList = spiderSourceInfoServie.selectAll();
-//
-//		System.out.println("before add sourceId rate map size ---------------->" + rateMap.size()
-//				+ " adding list size :" + sourceList.size());
-//		for (SpiderSourceInfo spiderSourceInfo : sourceList) {
-//			String sourceid = spiderSourceInfo.getSourceid();
-//			if (sourceid == null) {
-//				continue;
-//			}
-//			if (!rateMap.containsKey(sourceid)) {
-//				SpiderRateInfo spiderRateInfo = new SpiderRateInfo(spiderSourceInfo);
-//				rateMap.put(sourceid, spiderRateInfo);
-//				// 过滤刚创建的公众号
-//				Calendar cal = Calendar.getInstance();
-//				Date create_time = spiderSourceInfo.getCreate_time();
-//				if (create_time == null) {
-//					spiderRateInfo.setTooOld(true);
-//					countTooOld++;
-//				} else {
-//					cal.setTime(create_time);
-//					int dayUpdate = cal.get(Calendar.DAY_OF_YEAR);
-//					cal.setTimeInMillis(System.currentTimeMillis());
-//					int dayCur = cal.get(Calendar.DAY_OF_YEAR);
-//					if ((dayCur - dayUpdate) >= end) {
-//						spiderRateInfo.setTooOld(true);
-//						countTooOld++;
-//					}
-//				}
-//			}
-//		}
-//		System.out.println("end add sourceId ----------->" + rateMap.size() + "--------->countTooOld" + countTooOld);
+		List<SpiderSourceInfo> sourceList = spiderSourceInfoServie.selectAll();
+
+		System.out.println("before add sourceId rate map size ---------------->" + rateMap.size()
+				+ " adding list size :" + sourceList.size());
+		for (SpiderSourceInfo spiderSourceInfo : sourceList) {
+			String sourceid = spiderSourceInfo.getSourceid();
+			if (sourceid == null) {
+				continue;
+			}
+			if (!rateMap.containsKey(sourceid)) {
+				SpiderRateInfo spiderRateInfo = new SpiderRateInfo(spiderSourceInfo);
+				rateMap.put(sourceid, spiderRateInfo);
+				// 过滤刚创建的公众号
+				Calendar cal = Calendar.getInstance();
+				Date create_time = spiderSourceInfo.getCreate_time();
+				if (create_time == null) {
+					spiderRateInfo.setTooOld(true);
+					countTooOld++;
+				} else {
+					cal.setTime(create_time);
+					int dayUpdate = cal.get(Calendar.DAY_OF_YEAR);
+					cal.setTimeInMillis(System.currentTimeMillis());
+					int dayCur = cal.get(Calendar.DAY_OF_YEAR);
+					if ((dayCur - dayUpdate) >= end) {
+						spiderRateInfo.setTooOld(true);
+						countTooOld++;
+					}
+				}
+			}
+		}
+		System.out.println("end add sourceId ----------->" + rateMap.size() + "--------->countTooOld" + countTooOld);
 
 		// update time
 		Calendar cal = Calendar.getInstance();
