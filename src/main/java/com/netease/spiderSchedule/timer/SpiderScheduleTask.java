@@ -78,7 +78,7 @@ public class SpiderScheduleTask {
 				if(task.size()>0){
 					SpiderScheduleDto spiderScheduleDto = task.get(0);
 					logger.info("per5sSchedule go to crab " + spiderScheduleDto);
-					executor.execute(new GrabSpiderTask(spiderScheduleDto.getSourceId(),json.getJSONObject(i),spiderScheduleDto.getPriority(), spiderScheduleDto.getAppId(),spiderRateInfoService,spiderSortService,spiderSourceInfoService));
+					executor.execute(new GrabSpiderTask(spiderScheduleDto.getSourceId().trim(),json.getJSONObject(i),spiderScheduleDto.getPriority(), spiderScheduleDto.getAppId(),spiderRateInfoService,spiderSortService,spiderSourceInfoService));
 				}
 			}
 		}

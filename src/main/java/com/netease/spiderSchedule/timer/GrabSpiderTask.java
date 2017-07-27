@@ -211,7 +211,7 @@ public class GrabSpiderTask implements Runnable {
 	public static final String WEIXIN_SEARCH = "weixin_search";
 	
 	public static Request getSearchRequest(SpiderScheduleDto spiderScheduleDto) {
-		String url = "http://weixin.sogou.com/weixin?type=1&query=" + spiderScheduleDto.getSourceId()
+		String url = "http://weixin.sogou.com/weixin?type=1&query=" + spiderScheduleDto.getSourceId().trim()
 				+ "&ie=utf8&_sug_=n&_sug_type_=";
 		Request request = new Request(url);
 		Map<String, Object> extras = new ConcurrentHashMap<String, Object>();
