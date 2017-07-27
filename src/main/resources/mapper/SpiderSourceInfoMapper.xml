@@ -7,19 +7,19 @@
 	<select id="selectAll" resultType="com.netease.spiderSchedule.model.SpiderSourceInfo">
 		select 
 		<include refid="Base_Column_List" />
-		from spider_source_scheduler_info 
-		where status = 0 and openid is not null and openid != '' 
+		from spider_source_info 
+		where status = 0  and appid !=1
 	</select>
 	
 	<select id="selectBySourceid" resultType="com.netease.spiderSchedule.model.SpiderSourceInfo" parameterType="java.lang.String">
 		select 
 		<include refid="Base_Column_List" />
-		from spider_source_scheduler_info 
-		where sourceid = #{sourceid,jdbcType=VARCHAR} and status = 0 
+		from spider_source_info 
+		where sourceid = #{sourceid,jdbcType=VARCHAR} and status = 0  and appid !=1
 	</select>
 	
 	<update id="updateBySourceid" parameterType="java.lang.String">
-		update spider_source_scheduler_info set status = 1
-		where sourceid= #{sourceid,jdbcType=VARCHAR}
+		update spider_source_info set status = 1
+		where sourceid= #{sourceid,jdbcType=VARCHAR} and status = 0  and appid !=1
 	</update>	
 </mapper>

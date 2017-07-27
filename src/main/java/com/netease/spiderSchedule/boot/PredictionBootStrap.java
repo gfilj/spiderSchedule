@@ -53,7 +53,7 @@ public class PredictionBootStrap {
 		predictionSpiderRateInfoServiceImpl.setTimeSimulator(timeSimulator);
 		smoothingAlgorithmSpiderSortServiceImpl.setTimeSimulator(timeSimulator);
 		predictionSpiderRateInfoServiceImpl.setCombineInterval(combineInterval);
-		predictionSpiderRateInfoServiceImpl.generateRateMap(start + 1, start + 10);
+		predictionSpiderRateInfoServiceImpl.generateRateMap(start + 1, start + 15);
 
 		List<SpiderRecordInfo> todaySpiderRecordList = spiderRecordInfoServie.selectInterval(start, start + 1);
 //		System.out.println(todaySpiderRecordList.size());
@@ -80,7 +80,7 @@ public class PredictionBootStrap {
 			}
 			timeSimulator.getFiveMinuteAfter();
 		}
-		System.out.println("--------predictMap" + predictMap);
+		System.out.println("--------predictMap" + predictMap.size());
 		for (Entry<String, HashSet<Date>> entry : predictMap.entrySet()) {
 			System.out.println(entry.toString());
 		}

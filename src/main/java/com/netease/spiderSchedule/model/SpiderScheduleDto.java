@@ -158,13 +158,13 @@ public class SpiderScheduleDto implements Comparable<SpiderScheduleDto> {
 
 	public void countScore(SpiderRateInfo spiderRateInfo) {
 		if (spiderRateInfo.isTooOld()) {
-			if (delayVal >= DelayLevel.HALFDAY.getDelayVal()) {
+			if (delayVal >= DelayLevel.FOUR.getDelayVal()) {
 				this.score = delayVal * RateLevel.TEN.getRateVal();
 			} else {
 				this.score = -1;
 			}
 		} else {
-			if (delayVal >= DelayLevel.THREE.getDelayVal()) {
+			if (delayVal >= DelayLevel.ONE.getDelayVal()) {
 				setWheel(true);
 				if( rate <= 0d){
 					this.score = delayVal * RateLevel.TEN.getRateVal();

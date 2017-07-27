@@ -55,6 +55,7 @@ public class SmoothingAlgorithmSpiderScheduleDto extends SpiderScheduleDto{
 		Double max = 0d;
 		for(int i = lastTimeUpdateKey + 1; i<=timeSliceKey; i++){
 			Double predictValue = spiderRateInfo.getTimeSlicePredict().get((i)%288);
+			if(predictValue == null)continue;
 			if(max < predictValue){
 				max = predictValue;
 			}

@@ -41,7 +41,7 @@ public class SmoothingAlgorithmSpiderSortServiceImpl extends SpiderSortServiceIm
 						canPut = false;
 						countOld++;
 						//在9点以后才进行抓取
-						if (timeSliceKey >= 9 * 12 && countOld < (spiderRateInfoService.getCountTooOld() / 144)) {
+						if (timeSliceKey >= 9 * 12 && countOld < (spiderRateInfoService.getCountTooOld() / 60)) {
 							canPut = true;
 						}
 					}
@@ -66,7 +66,7 @@ public class SmoothingAlgorithmSpiderSortServiceImpl extends SpiderSortServiceIm
 			}
 
 			logger.info("SmoothingAlgorithmSpiderSortServiceImpl do call addTask add " + addCount + " currentSliceKey "
-					+ timeSliceKey);
+					+ timeSliceKey + " add countOld addCount is " + addCount);
 			return addCount;
 
 		} catch (Exception e) {
