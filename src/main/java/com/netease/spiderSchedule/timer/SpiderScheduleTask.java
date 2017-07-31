@@ -34,7 +34,7 @@ public class SpiderScheduleTask {
 	@Autowired
 	private SpiderSourceInfoService spiderSourceInfoService;
 	
-	private static ThreadPoolExecutor executor = (ThreadPoolExecutor)Executors.newFixedThreadPool(30);
+	private static ThreadPoolExecutor executor = (ThreadPoolExecutor)Executors.newFixedThreadPool(10);
 	
 	protected static Logger logger = Logger.getLogger(SpiderScheduleTask.class);
 	/**
@@ -82,7 +82,7 @@ public class SpiderScheduleTask {
 				}
 			}
 		}
-		logger.info("executor free size " + executor.getActiveCount());
+		logger.info("executor use size " + executor.getActiveCount());
 	}
 
 	/**

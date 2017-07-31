@@ -3,18 +3,26 @@ package com.netease.spiderSchedule.ip;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.netease.spiderSchedule.util.DateUtil;
+import com.netease.spiderSchedule.util.DecaptchaDemo;
 
 public class TestVps {
 	private static final String SEARCH_REGEX_PRE = "<a target=\"_blank\" uigs=\"account_name_0\" href=\"([\\s\\S]*?)\">[\\s\\S]*?";
 	private static final String SEARCH_REGEX_END = "</label>";
 	private static final Pattern pattern = Pattern.compile(SEARCH_REGEX_PRE + "people_rmw" + SEARCH_REGEX_END);
+	// private static final String searchR = "<input type=\"hidden\" name=\"r\"
+	// id=\"from\" value=\"[\\s\\S]*?\" >";
+	private static final Pattern searchRPattern = Pattern.compile("<img id=\"verify_img\" src=\"([\\s\\S]*?)\">");
+	private static final Pattern searchUrlPattern = Pattern.compile(
+			"<img id=\"seccodeImage\" onload=\"setImgCode\\(1\\)\" onerror=\"setImgCode\\(0\\)\" src=\"([\\s\\S]*?)\" width=\"100\" height=\"40\" alt=\"请输入图中的验证码\" title=\"请输入图中的验证码\">");
+
+	private static final String identify_code_prefix = "http://weixin.sogou.com/antispider/";
+	private static final String submit_code_url = "http://weixin.sogou.com/antispider/thank.php";
 
 	private static final String CONTENTLIST = "var\\s+msgList\\s+=\\s+\\{(.*?)\\};";
 	private static final Pattern contentListPattern = Pattern.compile(CONTENTLIST);
@@ -25,139 +33,104 @@ public class TestVps {
 
 	// 当前ip是否有效
 	public void run() {
+		Map<String, Object> identifyCodeMap = new HashMap<String, Object>();
 		int zzz = 0;
 		int sss = 0;
 		while (true) {
-			Map<String, String> maps = new HashMap<String, String>();
-			maps.put("size", "5");// 需要ip个数
-			maps.put("type", "schedule");// 需要ip个数
-			String proxyjson = VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/getProxyUsable.action",
-					maps);// 获取接口
-			JSONArray json = JSON.parseArray(proxyjson);
-			if (json != null) {
-				for (int i = 0; i < json.size(); i++) {
-					JSONObject jsonobject = json.getJSONObject(i);
-					String ip = jsonobject.getString("ip");
-					String port = jsonobject.getString("port");
-					String machine = jsonobject.getString("machine");
-					maps.put("machine", machine);
-					String listurl = "";
-					try {
-						// 访问微信搜索页
-						String result = null;
-						try {
-							result = VPSHttp.getInstance()
-									.sendHttpGet(
-											"http://weixin.sogou.com/weixin?type=1&query=" + "people_rmw"
-													+ "&ie=utf8&_sug_=n&_sug_type_=",
-											ip, port, "http://weixin.sogou.com/");
-						} catch (Exception e) {
-							// e.printStackTrace();
-							System.out.println("代理软件出现问题：" + machine);
-							VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/updatestatus.action",
-									maps);
-							// 重新拨号
-							VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/restartip.action", maps);
-							continue;
-						}
-						if (result.equals("error") || result.indexOf("您的访问出错了") != -1) {
-							System.out.println("失败的机器" + machine);
-							// 更新ip状态为不可用，避免拨号失败，死机等原因造成的不可用ip使抓取延迟
-							VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/updatestatus.action",
-									maps);
-							// 重新拨号
-							VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/restartip.action", maps);
-
-						} else {
-							// System.out.println(result);
-							Matcher m = pattern.matcher(result);
-							if (m.find()) {
-								listurl = m.group(1).replaceAll("amp;", "");
+			String listurl = "";
+			try {
+				// 访问微信搜索页
+				Map<String, Object> result = null;
+				// try {
+				// result =
+				// VPSHttp.getInstance().sendHttpGet("http://weixin.sogou.com/weixin?type=1&query="
+				// + "people_rmw" + "&ie=utf8&_sug_=n&_sug_type_=",
+				// "http://weixin.sogou.com/");
+				// } catch (Exception e) {
+				// e.printStackTrace();
+				// System.out.println(result);
+				// continue;
+				// }
+				// if (result.size() > 0) {
+				// int status = (int) result.get("status");
+				// if (status == 302) {
+				// System.err.println(result.get("location"));
+				// System.out.println("==========================");
+				// } else {
+				// String page = String.valueOf(result.get("result"));
+				//// System.err.println(page);
+				// if(page.contains("请输入图中的验证码")){
+				// System.out.println("==========================");
+				// String identifyUrl = identify_code_prefix +
+				// getPatternStr(searchUrlPattern,page);
+				// System.out.println(identifyUrl);
+				// String rStr = getPatternStr(searchRPattern,page);
+				// System.out.println(rStr);
+				//
+				// String identifyCodeStr =
+				// DecaptchaDemo.getIdentifyCode(identifyUrl);
+				// JSONObject identifyCodeJson =
+				// JSON.parseObject(identifyCodeStr);
+				// Map<String, String> submitMaps = new HashMap<String,
+				// String>();
+				// //{"msg":"OK","code":0,"data":"geyzzq"}
+				// if("OK".equals(identifyCodeJson.getString("msg"))){
+				// submitMaps.put("c", identifyCodeJson.getString("data"));
+				// }
+				// submitMaps.put("r", rStr);
+				// submitMaps.put("v", "5");
+				// System.out.println(submitMaps);
+				// String identifyCodeResult =
+				// VPSHttp.getInstance().sendHttpPost(submit_code_url,
+				// submitMaps);
+				// System.out.println(identifyCodeResult);
+				// }else{
+				// String listUrl =
+				// getPatternStr(pattern,page).replaceAll("amp;", "");
+				// System.out.println(listUrl);
+				Map<String, Object> contentlist = VPSHttp.getInstance().sendHttpGet(
+						"https://mp.weixin.qq.com/profile?src=3&timestamp=1501472818&ver=1&signature=pQHYYLowxMdZkMY1QWWeunarmp*ARU99KFqEgEktTtSSh8uhL-GtqKAXos4Guy9X9R8xkvqP*TwafR4ySyU9Og==",
+						"http://weixin.sogou.com/weixin?type=1&query=people_rmw&ie=utf8&_sug_=n&_sug_type_=");
+				if (contentlist.size() > 0) {
+					int status = (int) contentlist.get("status");
+					String page = String.valueOf(contentlist.get("result"));
+//					System.out.println(contentlist);
+					if (status == 200) {
+						if (page.contains("请输入验证码")) {
+							System.out.println("=====================");
+							Random ran = new Random();
+							String cert = +new Date().getTime() + "." + ran.nextInt(10000);
+							String identifyUrl = "https://mp.weixin.qq.com/mp/verifycode?cert=" + cert;
+							Map<String, Object> identifyCodeOrgin = DecaptchaDemo.getIdentifyCode(identifyUrl);
+							String identifyCodeStr = (String)identifyCodeOrgin.get("resp");
+							JSONObject identifyCodeJson = JSON.parseObject(identifyCodeStr);
+							Map<String, String> submitMaps = new HashMap<String, String>();
+							if ("OK".equals(identifyCodeJson.getString("msg"))) {
+								submitMaps.put("input", identifyCodeJson.getString("data"));
 							}
-							System.out.println("搜索成功：" + zzz++ + ", listurl" + listurl);
+							submitMaps.put("cert", cert);
+							System.out.println(submitMaps);
+							String identifyCodeResult = VPSHttp.getInstance().sendHttpPost("https://mp.weixin.qq.com/mp/verifycode", submitMaps, (String)identifyCodeOrgin.get("cookie"));
+							System.out.println(identifyCodeResult);
+						}else{
+							System.out.println("列表页成功");
 						}
-						Thread.sleep(500);
-
-						String contentlist = null;
-						try {
-							contentlist = VPSHttp.getInstance().sendHttpGet(listurl, ip, port,
-									"http://weixin.sogou.com/weixin?type=1&query=" + "people_rmw"
-											+ "&ie=utf8&_sug_=n&_sug_type_=");
-						} catch (Exception e) {
-							// e.printStackTrace();
-							System.out.println("代理软件出现问题：" + machine);
-							VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/updatestatus.action",
-									maps);
-							// 重新拨号
-							VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/restartip.action", maps);
-							continue;
-						}
-						if (contentlist.equals("error") || contentlist.indexOf("请输入验证码") != -1) {
-							System.out.println("失败的机器" + machine);
-							// 更新ip状态为不可用，避免拨号失败，死机等原因造成的不可用ip使抓取延迟
-							VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/updatestatus.action",
-									maps);
-							// 重新拨号
-							VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/restartip.action", maps);
-							continue;
-						} else {
-							// System.out.println(result);
-							System.out.println("列表成功：" + sss++);
-							VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/incproxyip.action", maps);// 自增
-							VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/updatefree.action", maps);// 置为空闲，其他项目可以使用
-						}
-
-						Matcher contentListMatcher = contentListPattern.matcher(contentlist);
-						if (contentListMatcher.find()) {
-							String contList = contentListMatcher.group(1);
-							if (contList != null && !"".equals(contList)) {
-								contList = "{" + contList + "}";
-								JSONObject jsonObject = JSON.parseObject(contList);
-								JSONArray list = jsonObject.getJSONArray("list");
-								if (list != null && !list.isEmpty()) {
-									for (int j = 0; j < list.size(); j++) {
-										JSONObject obj = list.getJSONObject(j);
-										JSONObject cmi = obj.getJSONObject("comm_msg_info");
-										String time = cmi.getString("datetime");
-										String today = DateUtil.formatTime(cmi.getString("datetime"), "yyyy-MM-dd");
-										String nowDay = DateUtil.formatDate(new Date(), "yyyy-MM-dd");
-										if (nowDay.equals(today)) {
-											JSONObject amei = obj.getJSONObject("app_msg_ext_info");
-											String contentUrl = amei.get("content_url").toString().replaceAll("amp;",
-													"");
-											String title = amei.get("title").toString();
-											System.out.println(title + ":" + contentUrl);
-											// page.addTargetRequest(getRequest(contentUrl,title,
-											// time,page));
-											JSONArray jsonArray = amei.getJSONArray("multi_app_msg_item_list");
-											if (jsonArray != null && !jsonArray.isEmpty()) {
-												for (int z = 0; z < jsonArray.size(); z++) {
-													JSONObject subJson = jsonArray.getJSONObject(z);
-													String subUrl = subJson.getString("content_url").replaceAll("amp;",
-															"");
-													String subTitle = subJson.get("title").toString();
-													System.out.println(subTitle + ":" + subUrl);
-													// page.addTargetRequest(getRequest(subUrl,
-													// subTitle, time, page));
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-
-						Thread.sleep(500);
-
-					} catch (Exception e) {
 					}
 				}
+				Thread.sleep(5000);
+
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-			// try {
-			// Thread.sleep(5000);//休眠5秒钟
-			// } catch (InterruptedException e) {
-			// e.printStackTrace();
-			// }
+		}
+	}
+
+	public static String getPatternStr(Pattern pattern, String page) {
+		Matcher matcher = pattern.matcher(page);
+		if (matcher.find()) {
+			return matcher.group(1);
+		} else {
+			return "";
 		}
 	}
 }

@@ -21,6 +21,7 @@ import com.netease.spiderSchedule.service.spiderSort.SpiderSortService;
 import com.netease.spiderSchedule.service.spiderSourceInfo.SpiderSourceInfoService;
 import com.netease.spiderSchedule.timer.model.Request;
 import com.netease.spiderSchedule.util.DateUtil;
+import com.netease.spiderSchedule.util.DecaptchaDemo;
 
 public class GrabSpiderTask implements Runnable {
 	private static final String SEARCH_REGEX_PRE = "<a target=\"_blank\" uigs=\"account_name_0\" href=\"([\\s\\S]*?)\">[\\s\\S]*?";
@@ -101,7 +102,6 @@ public class GrabSpiderTask implements Runnable {
 					ipError(maps, machine, "search false：" + result + ", ip:" + ip, true);
 				}
 			}
-			Random ran = new Random();
 //			int sleepTime = ran.nextInt(500) + 500;
 //			logger.info("sleep time" + sleepTime);
 			Thread.sleep(500);
@@ -116,6 +116,34 @@ public class GrabSpiderTask implements Runnable {
 				// 可以考虑将此消息封装到 抓取结点进行抓取
 				SpiderScheduleController.getWeixinRequest().add(getListRequest(listurl,searchURl));
 				return;
+			}
+			int retryTime = 0;
+			while(contentlist.equals("error") || contentlist.indexOf("请输入验证码") != -1) {
+				if(retryTime>=3){
+					break;
+				}
+				System.out.println("-----begin input identify code");
+				Random ran = new Random();
+				String cert = +new Date().getTime() + "." + ran.nextInt(10000);
+				String identifyUrl = "https://mp.weixin.qq.com/mp/verifycode?cert=" + cert;
+				Map<String, Object> identifyCodeOrgin = DecaptchaDemo.getIdentifyCode(identifyUrl,ip,port);
+				String identifyCodeStr = (String)identifyCodeOrgin.get("resp");
+				JSONObject identifyCodeJson = JSON.parseObject(identifyCodeStr);
+				Map<String, String> submitMaps = new HashMap<String, String>();
+				if ("OK".equals(identifyCodeJson.getString("msg"))) {
+					submitMaps.put("input", identifyCodeJson.getString("data"));
+				}
+				submitMaps.put("cert", cert);
+				System.out.println(submitMaps);
+				String identifyCodeResult = VPSHttp.getInstance().sendHttpPost("https://mp.weixin.qq.com/mp/verifycode", submitMaps, (String)identifyCodeOrgin.get("cookie"),ip,port);
+				Thread.sleep(2000 + new Random().nextInt(1000));
+				System.out.println(identifyCodeResult);
+				
+				contentlist = VPSHttp.getInstance().sendHttpGet(listurl, ip, port,
+						"http://weixin.sogou.com/weixin?type=1&query=" + "people_rmw"
+								+ "&ie=utf8&_sug_=n&_sug_type_=");
+				retryTime++;
+				
 			}
 			if (contentlist.equals("error") || contentlist.indexOf("请输入验证码") != -1) {
 				listError(maps, machine, "list page is error" + machine);
