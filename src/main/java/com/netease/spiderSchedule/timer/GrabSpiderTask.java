@@ -42,14 +42,16 @@ public class GrabSpiderTask implements Runnable {
 	private SpiderRateInfoService spiderRateInfoService;
 
 	private SpiderSortService spiderSortService;
-	
+
 	private SpiderSourceInfoService spiderSourceInfoService;
+
 	/**
 	 * @param sourceid
 	 * @param ipJson
 	 */
 	public GrabSpiderTask(String sourceid, JSONObject ipJson, int priority, int appid,
-			SpiderRateInfoService spiderRateInfoService, SpiderSortService spiderSortService, SpiderSourceInfoService spiderSourceInfoService) {
+			SpiderRateInfoService spiderRateInfoService, SpiderSortService spiderSortService,
+			SpiderSourceInfoService spiderSourceInfoService) {
 		this.sourceid = sourceid;
 		this.ipJson = ipJson;
 		this.priority = priority;
@@ -81,11 +83,12 @@ public class GrabSpiderTask implements Runnable {
 			}
 
 			if (result.equals("error") || result.indexOf("您的访问出错了") != -1) {
-				ipError(maps, machine, "search error:" + machine, false);
+				searchError(maps, machine, "search error:" + machine, true);
 				return;
 
 			} else {
-				Pattern pattern = Pattern.compile(SEARCH_REGEX_PRE + sourceid + SEARCH_REGEX_END, Pattern.CASE_INSENSITIVE);
+				Pattern pattern = Pattern.compile(SEARCH_REGEX_PRE + sourceid + SEARCH_REGEX_END,
+						Pattern.CASE_INSENSITIVE);
 				Matcher m = pattern.matcher(result);
 				if (m.find()) {
 					listurl = m.group(1).replace("amp;", "");
@@ -93,16 +96,23 @@ public class GrabSpiderTask implements Runnable {
 				} else {
 					if (result.contains("相关的官方认证订阅号")) {
 						logger.info("搜索失败：" + sourceid + ", ip:" + ip);
-						ipError(maps, machine, "not exist the source id  ："+ sourceid +" and the result is " + result + ", ip:" + ip, false);
+						searchError(maps, machine,
+								"not exist the source id  ：" + sourceid + " and the result is " + result + ", ip:" + ip,
+								false);
 						spiderRateInfoService.getRateMap().remove(sourceid);
 						// intodb
 						spiderSourceInfoService.updateBySourceid(sourceid);
+					} else {
+						searchError(maps, machine, "search false the source id  ：" + sourceid + " and the result is "
+								+ result + ", ip:" + ip, false);
+						// intodb
+						spiderSourceInfoService.updateBySourceid(sourceid);
 					}
-					ipError(maps, machine, "search false the source id  ："+ sourceid +" and the result is " + result + ", ip:" + ip, true);
+					return;
 				}
 			}
-//			int sleepTime = ran.nextInt(500) + 500;
-//			logger.info("sleep time" + sleepTime);
+			// int sleepTime = ran.nextInt(500) + 500;
+			// logger.info("sleep time" + sleepTime);
 			Thread.sleep(500);
 
 			// list
@@ -113,20 +123,20 @@ public class GrabSpiderTask implements Runnable {
 				e.printStackTrace();
 				ipError(maps, machine, "list ip is error：" + machine, true);
 				// 可以考虑将此消息封装到 抓取结点进行抓取
-				SpiderScheduleController.getWeixinRequest().add(getListRequest(listurl,searchURl));
+				SpiderScheduleController.getWeixinRequest().add(getListRequest(listurl, searchURl));
 				return;
 			}
 			int retryTime = 0;
-			while(contentlist.equals("error") || contentlist.indexOf("请输入验证码") != -1) {
-				if(retryTime>=3){
+			while (contentlist.equals("error") || contentlist.indexOf("请输入验证码") != -1) {
+				if (retryTime >= 3) {
 					break;
 				}
 				System.out.println("-----begin input identify code");
 				Random ran = new Random();
 				String cert = +new Date().getTime() + "." + ran.nextInt(10000);
 				String identifyUrl = "https://mp.weixin.qq.com/mp/verifycode?cert=" + cert;
-				Map<String, Object> identifyCodeOrgin = DecaptchaDemo.getIdentifyCode(identifyUrl,ip,port);
-				String identifyCodeStr = (String)identifyCodeOrgin.get("resp");
+				Map<String, Object> identifyCodeOrgin = DecaptchaDemo.getIdentifyCode(identifyUrl, ip, port);
+				String identifyCodeStr = (String) identifyCodeOrgin.get("resp");
 				JSONObject identifyCodeJson = JSON.parseObject(identifyCodeStr);
 				Map<String, String> submitMaps = new HashMap<String, String>();
 				if ("OK".equals(identifyCodeJson.getString("msg"))) {
@@ -134,25 +144,24 @@ public class GrabSpiderTask implements Runnable {
 				}
 				submitMaps.put("cert", cert);
 				System.out.println(submitMaps);
-				String identifyCodeResult = VPSHttp.getInstance().sendHttpPost("https://mp.weixin.qq.com/mp/verifycode", submitMaps, (String)identifyCodeOrgin.get("cookie"),ip,port);
+				String identifyCodeResult = VPSHttp.getInstance().sendHttpPost("https://mp.weixin.qq.com/mp/verifycode",
+						submitMaps, (String) identifyCodeOrgin.get("cookie"), ip, port);
 				Thread.sleep(2000 + new Random().nextInt(1000));
 				System.out.println(identifyCodeResult);
-				
+
 				contentlist = VPSHttp.getInstance().sendHttpGet(listurl, ip, port,
-						"http://weixin.sogou.com/weixin?type=1&query=" + "people_rmw"
-								+ "&ie=utf8&_sug_=n&_sug_type_=");
+						"http://weixin.sogou.com/weixin?type=1&query=" + "people_rmw" + "&ie=utf8&_sug_=n&_sug_type_=");
 				retryTime++;
-				
+
 			}
 			if (contentlist.equals("error") || contentlist.indexOf("请输入验证码") != -1) {
 				listError(maps, machine, "list page is error" + machine);
-				SpiderScheduleController.getWeixinRequest().add(getListRequest(listurl,searchURl));
+				SpiderScheduleController.getWeixinRequest().add(getListRequest(listurl, searchURl));
 				// 可以考虑将此消息封装到
 				return;
 			} else {
 				success(maps);
 			}
-
 
 			Matcher contentListMatcher = CONTENT_LIST_PATTERN.matcher(contentlist);
 			if (contentListMatcher.find()) {
@@ -232,11 +241,22 @@ public class GrabSpiderTask implements Runnable {
 		spiderSortService.addErrorTask(this.sourceid, spiderRateInfoService);
 	}
 
+	public void searchError(Map<String, String> maps, String machine, String message, boolean regrab) {
+		logger.info(message);
+		ipJson.put("status", false);
+		VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/incproxyip.action", maps);// 自增
+		VPSHttp.getInstance().sendHttpPost("http://vps.ws.netease.com/updatefree.action", maps);// 置为空闲，其他项目可以使用
+		if (regrab) {
+			logger.info("re crab " + this.sourceid);
+			spiderSortService.addErrorTask(this.sourceid, spiderRateInfoService);
+		}
+	}
+
 	public static final String WEIXIN_CONTENT = "weixin_content";
 	public static final String REQUEST_HEADER_REFERER = "requestHeaderReferer";
 	public static final String WEIXIN_LIST = "weixin_list";
 	public static final String WEIXIN_SEARCH = "weixin_search";
-	
+
 	public static Request getSearchRequest(SpiderScheduleDto spiderScheduleDto) {
 		String url = "http://weixin.sogou.com/weixin?type=1&query=" + spiderScheduleDto.getSourceId().trim()
 				+ "&ie=utf8&_sug_=n&_sug_type_=";
@@ -254,7 +274,8 @@ public class GrabSpiderTask implements Runnable {
 		logger.info("get search request: " + request);
 		return request;
 	}
-	public Request getListRequest(String url,String searchUrl) {
+
+	public Request getListRequest(String url, String searchUrl) {
 		Request request = new Request(url.replace("&amp;", "&"));
 		ConcurrentHashMap<String, Object> extras = new ConcurrentHashMap<String, Object>();
 		extras.put("pageName", WEIXIN_LIST);
@@ -268,6 +289,7 @@ public class GrabSpiderTask implements Runnable {
 		logger.info("get list request: " + request);
 		return request;
 	}
+
 	public Request getPageRequest(String url, String title, String time, String listUrl) {
 		Request request = new Request();
 		if (url != null && !"".equals(url)) {
