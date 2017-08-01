@@ -124,7 +124,8 @@ public class SpiderRateInfoServiceImpl implements SpiderRateInfoService, Initial
 		int delayNum = 0;
 		for(int i = 0; i < 500; i++){
 			SpiderRateInfo delayRateInfo = spiderRateInfoSortedList.removeTop();
-			if(delayRateInfo==null||delayRateInfo.getNearestInterval()<5||delayRateInfo.getNearestInterval()>96){
+			//现在基本一小时就能刷完,那么要提高的是半个小时之内抓取量,超过一个小时的会重抓
+			if(delayRateInfo==null||delayRateInfo.getNearestInterval()<1||delayRateInfo.getNearestInterval()>6){
 				continue;
 			}
 			spiderSortService.addTask(delayRateInfo.getSourceId(),this);
