@@ -41,7 +41,7 @@ public class SmoothingAlgorithmSpiderSortServiceImpl extends SpiderSortServiceIm
 						canPut = false;
 						countOld++;
 						//在9点以后才进行抓取
-						if (timeSliceKey >= 9 * 12 && countOld < (spiderRateInfoService.getCountTooOld() / 60)) {
+						if (timeSliceKey >= 9 * 12 && countOld < (spiderRateInfoService.getCountTooOld() / 72)) {
 							canPut = true;
 						}
 					}
