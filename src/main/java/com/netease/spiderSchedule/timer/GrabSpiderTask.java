@@ -85,7 +85,7 @@ public class GrabSpiderTask implements Runnable {
 				return;
 
 			} else {
-				Pattern pattern = Pattern.compile(SEARCH_REGEX_PRE + sourceid + SEARCH_REGEX_END);
+				Pattern pattern = Pattern.compile(SEARCH_REGEX_PRE + sourceid + SEARCH_REGEX_END, Pattern.CASE_INSENSITIVE);
 				Matcher m = pattern.matcher(result);
 				if (m.find()) {
 					listurl = m.group(1).replace("amp;", "");
@@ -93,13 +93,12 @@ public class GrabSpiderTask implements Runnable {
 				} else {
 					if (result.contains("相关的官方认证订阅号")) {
 						logger.info("搜索失败：" + sourceid + ", ip:" + ip);
-						ipError(maps, machine, "search false：" + result + ", ip:" + ip, false);
+						ipError(maps, machine, "not exist the source id  ："+ sourceid +" and the result is " + result + ", ip:" + ip, false);
 						spiderRateInfoService.getRateMap().remove(sourceid);
 						// intodb
 						spiderSourceInfoService.updateBySourceid(sourceid);
 					}
-					logger.info("search false：" + result + ", ip:" + ip);
-					ipError(maps, machine, "search false：" + result + ", ip:" + ip, true);
+					ipError(maps, machine, "search false the source id  ："+ sourceid +" and the result is " + result + ", ip:" + ip, true);
 				}
 			}
 //			int sleepTime = ran.nextInt(500) + 500;

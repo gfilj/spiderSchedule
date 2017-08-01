@@ -16,19 +16,27 @@ import com.netease.spiderSchedule.util.DecaptchaDemo;
 public class TestVpsYanZhengMa {
 	private static final String SEARCH_REGEX_PRE = "<a target=\"_blank\" uigs=\"account_name_0\" href=\"([\\s\\S]*?)\">[\\s\\S]*?";
 	private static final String SEARCH_REGEX_END = "</label>";
-	private static final Pattern pattern = Pattern.compile(SEARCH_REGEX_PRE + "people_rmw" + SEARCH_REGEX_END);
+	private static final Pattern pattern = Pattern.compile(SEARCH_REGEX_PRE + "tennisWorldMagazine" + SEARCH_REGEX_END, Pattern.CASE_INSENSITIVE);
 
 	private static final String CONTENTLIST = "var\\s+msgList\\s+=\\s+\\{(.*?)\\};";
 	private static final Pattern contentListPattern = Pattern.compile(CONTENTLIST);
 
 	public static void main(String[] args) {
-		new TestVpsYanZhengMa().run();
+//		new TestVpsYanZhengMa().run();
+		String str = "<a target=\"_blank\" uigs"
+				+ "=\"account_name_0\" href=\"http://mp.weixin.qq.com/profile?src=3&amp;timestamp=1501567697&amp;ver=1&amp;signature=NZi6bQWApxXdQgqvKXftNpcAS2T4ldtw0o9W1ZdHggJWipZ6tuC-o5S7jW0zBLemYDLlVJ*1yxb7Bxb5hgkoAQ==\">《网球天地》杂志</a>\r\n</p>\r\n<p class=\"info\">微信号：<label name=\"em_weixinhao\">TennisWorldMagazine</label>";
+		System.out.println(str);
+		Matcher m = pattern.matcher(str);
+		if (m.find()) {
+			System.out.println(m.group(1).replaceAll("amp;", ""));
+		}
 	}
 
 	// 当前ip是否有效
 	public void run() {
 		int zzz = 0;
 		int sss = 0;
+		
 		while (true) {
 			Map<String, String> maps = new HashMap<String, String>();
 			maps.put("size", "5");// 需要ip个数
@@ -50,7 +58,7 @@ public class TestVpsYanZhengMa {
 						try {
 							result = VPSHttp.getInstance()
 									.sendHttpGet(
-											"http://weixin.sogou.com/weixin?type=1&query=" + "people_rmw"
+											"http://weixin.sogou.com/weixin?type=1&query=" + "tennisWorldMagazine"
 													+ "&ie=utf8&_sug_=n&_sug_type_=",
 											ip, port, "http://weixin.sogou.com/");
 						} catch (Exception e) {
@@ -83,7 +91,7 @@ public class TestVpsYanZhengMa {
 						String contentlist = null;
 						try {
 							contentlist = VPSHttp.getInstance().sendHttpGet(listurl, ip, port,
-									"http://weixin.sogou.com/weixin?type=1&query=" + "people_rmw"
+									"http://weixin.sogou.com/weixin?type=1&query=" + "gh_7aa898d08b05"
 											+ "&ie=utf8&_sug_=n&_sug_type_=");
 						} catch (Exception e) {
 							// e.printStackTrace();
