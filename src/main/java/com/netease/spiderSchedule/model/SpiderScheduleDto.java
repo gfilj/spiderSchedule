@@ -13,7 +13,7 @@ public class SpiderScheduleDto implements Comparable<SpiderScheduleDto> {
 	private int priority;
 	private long lastUpdateTime;
 	private double rate;
-	private int delayVal;
+	private long delayVal;
 	private int appId;
 	private boolean wheel = false;// 甄别轮刷策略
 	private boolean highQuality = false;// 甄别高质量公众号
@@ -21,6 +21,8 @@ public class SpiderScheduleDto implements Comparable<SpiderScheduleDto> {
 	private String port;
 	private String machine;
 	
+	public static final int HOURVAL = 1000 * 60 * 60 ;
+
 	public String getProxyip() {
 		return proxyip;
 	}
@@ -46,7 +48,7 @@ public class SpiderScheduleDto implements Comparable<SpiderScheduleDto> {
 	}
 
 	public static boolean wheelSwitch = false;
-	public static int wheelScore = 10000;
+	public static long wheelScore = 10000;
 	
 
 	public boolean isHighQuality() {
@@ -73,11 +75,11 @@ public class SpiderScheduleDto implements Comparable<SpiderScheduleDto> {
 		this.appId = appId;
 	}
 
-	public int getDelayVal() {
+	public long getDelayVal() {
 		return delayVal;
 	}
 
-	public void setDelayVal(int delayVal) {
+	public void setDelayVal(long delayVal) {
 		this.delayVal = delayVal;
 	}
 
@@ -157,6 +159,7 @@ public class SpiderScheduleDto implements Comparable<SpiderScheduleDto> {
 	}
 
 	public void countScore(SpiderRateInfo spiderRateInfo) {
+		wheelScore = DelayLevel.ONE.getDelayVal()*RateLevel.TEN.getRateVal();
 		if (spiderRateInfo.isTooOld()) {
 			if (delayVal >= DelayLevel.FOUR.getDelayVal()) {
 				this.score = delayVal * RateLevel.TEN.getRateVal();
@@ -164,14 +167,13 @@ public class SpiderScheduleDto implements Comparable<SpiderScheduleDto> {
 				this.score = -1;
 			}
 		} else {
-			if (delayVal >= DelayLevel.ONE.getDelayVal()) {
+			if (delayVal >= DelayLevel.CURRLEVEL.getDelayVal()) {
 				setWheel(true);
 				if( rate <= 0d){
 					this.score = delayVal * RateLevel.TEN.getRateVal();
 				}else{
 					this.score = delayVal * (RateLevel.TEN.getRateVal()+rate);
 				}
-				
 			} else {
 				this.score = delayVal * rate;
 			}

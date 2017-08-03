@@ -11,6 +11,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import com.alibaba.fastjson.JSONObject;
 import com.netease.spiderSchedule.boot.PredictionBootStrap;
 import com.netease.spiderSchedule.model.PredictionRecordStaticInfoKey;
 import com.netease.spiderSchedule.model.PredictionRecordStaticInfoValue;
@@ -23,6 +24,7 @@ import com.netease.spiderSchedule.service.spiderSort.impl.SpiderSortServiceImpl;
 import com.netease.spiderSchedule.timer.GrabSpiderTask;
 import com.netease.spiderSchedule.timer.model.Request;
 import com.netease.spiderSchedule.util.CalAbility;
+import com.netease.spiderSchedule.util.DelayLevel;
 import com.netease.spiderSchedule.util.RateLevel;
 import com.netease.spiderSchedule.util.Runner;
 
@@ -84,15 +86,13 @@ public class SpiderScheduleController extends AbstractVerticle {
 		router.get("/getTask/:taskNum").handler(SpiderScheduleController::handleGetTask);
 		router.get("/addTask/:sourceId").handler(this::handleAddTask);
 		router.get("/getRateMap/:sourceId").handler(this::handleGetRateMap);
-		router.get("/getRateMap/:sourceId").handler(this::handleGetRateMap);
 		router.get("/handleTaskError/:sourceId").handler(this::handleTaskError);
-		router.get("/daychart").handler(routingContext -> {
-			routingContext.response().putHeader("content-type", "text/html")
-					.end("<form action=\"/form\" method=\"post\">\n" + "<div>\n"
-							+ "<label for=\"name\">Enter your name:</label>\n"
-							+ "<input type=\"text\" id=\"name\" name=\"name\" />\n" + "</div>\n"
-							+ "<div class=\"button\">\n" + "<button type=\"submit\">Send</button>\n" + "</div>"
-							+ "</form>");
+		router.get("/status").handler(routingContext -> {
+			JsonObject jo = new JsonObject();
+			jo.put("wheelInterval", DelayLevel.WHEELLEVEL.getDelayVal());
+			jo.put("taskSize", spiderSortService.getSize());
+			jo.put("effitiveSouceIdNum", spiderRateInfoService.getEfficeTiveSourceIdNum());
+			routingContext.response().end(jo.encodePrettily());
 		});
 		router.route("/*").handler(StaticHandler.create());
 

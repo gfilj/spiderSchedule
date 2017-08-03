@@ -1,53 +1,43 @@
 package com.netease.spiderSchedule.util;
 
+import com.netease.spiderSchedule.model.SpiderScheduleDto;
+
 public enum DelayLevel {
 
-	HALFDAY(10000 ),SIX(6000), FIVE(3000), FOUR(2000), THREE(1000), TWO(20), ONE(10), ZERO(1);
+	HALFDAY(12 * SpiderScheduleDto.HOURVAL), 
+	SIX(6 * SpiderScheduleDto.HOURVAL),
+	FIVE(5 * SpiderScheduleDto.HOURVAL), 
+	FOUR(4 * SpiderScheduleDto.HOURVAL), 
+	THREE(3 * SpiderScheduleDto.HOURVAL), 
+	TWO(2 * SpiderScheduleDto.HOURVAL), 
+	ONE(SpiderScheduleDto.HOURVAL), 
+	ZERO(1), 
+	WHEELLEVEL(1),
+	CURRLEVEL(1);
+	
+	private long levelVal;
 
-	private int levelVal;
-
-	private DelayLevel(int levelVal) {
+	private DelayLevel(long levelVal) {
 		this.levelVal = levelVal;
 	}
-	
-	public int getDelayVal(){
+
+	public long getDelayVal() {
 		return levelVal;
+	}
+	
+	public void setDelayVal(long interVal){
+		this.levelVal = interVal;
 	}
 
 	public static DelayLevel getDelayLevel(long lastUpdateTime) {
 		long interVal = System.currentTimeMillis() - lastUpdateTime;
-		final int HOURVAL = 1000 * 60 * 60 ;
-		if (0 <= interVal && interVal < HOURVAL) {
-			return DelayLevel.ZERO;
-		} else if (HOURVAL <= interVal && interVal < 2 * HOURVAL) {
-			return DelayLevel.ONE;
-		} else if (2 * HOURVAL <= interVal && interVal < 4 * HOURVAL) {
-			return DelayLevel.TWO;
-		} else if (4 * HOURVAL <= interVal) {
-			return DelayLevel.FOUR;
-		}
-		return DelayLevel.ZERO;
+		DelayLevel.CURRLEVEL.setDelayVal(interVal);
+		return CURRLEVEL;
 	}
+
 	public static DelayLevel getDelayLevel(long lastUpdateTime, TimeSimulator timeSimulator) {
 		long interVal = timeSimulator.getTime() - lastUpdateTime;
-		final int HOURVAL = 1000 * 60 * 60 ;
-		if (0 <= interVal && interVal < HOURVAL) {
-			return DelayLevel.ZERO;
-		} else if (HOURVAL <= interVal && interVal < 2 * HOURVAL) {
-			return DelayLevel.ONE;
-		} else if (2 * HOURVAL <= interVal && interVal < 3 * HOURVAL) {
-			return DelayLevel.TWO;
-		} else if (3 * HOURVAL <= interVal && interVal < 4 * HOURVAL) {
-			return DelayLevel.THREE;
-		} else if (4 * HOURVAL <= interVal && interVal < 5 * HOURVAL) {
-			return DelayLevel.FOUR;
-		} else if (5 * HOURVAL <= interVal && interVal < 6 * HOURVAL) {
-			return DelayLevel.FIVE;
-		} else if (6 * HOURVAL <= interVal && interVal <7 * HOURVAL) {
-			return DelayLevel.SIX;
-		} else if (12 * HOURVAL <=interVal ){
-			return DelayLevel.HALFDAY;
-		}
-		return DelayLevel.ZERO;
+		DelayLevel.CURRLEVEL.setDelayVal(interVal);
+		return CURRLEVEL;
 	}
 }

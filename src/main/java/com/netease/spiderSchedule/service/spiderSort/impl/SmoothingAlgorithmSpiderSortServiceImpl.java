@@ -8,7 +8,6 @@ import com.netease.spiderSchedule.model.SpiderScheduleDto;
 import com.netease.spiderSchedule.model.prediction.SmoothingAlgorithmSpiderScheduleDto;
 import com.netease.spiderSchedule.service.spiderRateInfo.SpiderRateInfoService;
 import com.netease.spiderSchedule.service.spiderSort.SpiderSortService;
-import com.netease.spiderSchedule.util.RateLevel;
 import com.netease.spiderSchedule.util.TimeSimulator;
 
 @Service("smoothingAlgorithmSpiderSortService")
@@ -19,7 +18,7 @@ public class SmoothingAlgorithmSpiderSortServiceImpl extends SpiderSortServiceIm
 	public void setTimeSimulator(TimeSimulator timeSimulator) {
 		this.timeSimulator = timeSimulator;
 	}
-
+	
 	@Override
 	public int addTask(SpiderRateInfoService spiderRateInfoService) {
 		try {
@@ -30,18 +29,17 @@ public class SmoothingAlgorithmSpiderSortServiceImpl extends SpiderSortServiceIm
 			int addCount = 0;//static的数目
 			int timeSliceKey = timeSimulator.getTimeSliceKey();
 			int countOld = 0;//static tooold的数目
-			int countWheel = 0;
 			for (SpiderRateInfo spiderRateInfo : spiderRateInfoService.getRateMap().values()) {
 				SmoothingAlgorithmSpiderScheduleDto smoothingAlgorithmSpiderScheduleDto;
 				smoothingAlgorithmSpiderScheduleDto = new SmoothingAlgorithmSpiderScheduleDto(spiderRateInfo,
 						timeSimulator);
-				if (smoothingAlgorithmSpiderScheduleDto.getScore() > 0) {
+				if (smoothingAlgorithmSpiderScheduleDto.getScore() >= SpiderScheduleDto.wheelScore) {
 					boolean canPut = true;
 					if (spiderRateInfo.isTooOld()) {
 						canPut = false;
-						countOld++;
 						//在9点以后才进行抓取
 						if (timeSliceKey >= 9 * 12 && countOld < (spiderRateInfoService.getCountTooOld() / 72)) {
+							countOld++;
 							canPut = true;
 						}
 					}
@@ -66,7 +64,7 @@ public class SmoothingAlgorithmSpiderSortServiceImpl extends SpiderSortServiceIm
 			}
 
 			logger.info("SmoothingAlgorithmSpiderSortServiceImpl do call addTask add " + addCount + " currentSliceKey "
-					+ timeSliceKey + " add countOld addCount is " + addCount);
+					+ timeSliceKey + " add countOld is " + countOld);
 			return addCount;
 
 		} catch (Exception e) {
